@@ -35,10 +35,13 @@ class FFmpegCompositor:
             "-i", frames_pattern,
             "-i", audio_file_path,
             "-c:v", "libx264",
+            "-preset", "medium",
+            "-crf", "18",
             "-pix_fmt", "yuv420p",
             "-c:a", "aac",
             "-b:a", "192k",
-            "-shortest",  # Sync to shorter stream
+            "-af", "apad",
+            "-shortest",  # Sync precisely to the 300-frame video timeline
             "-movflags", "+faststart",  # Web/YouTube optimized
             output_video_path
         ]

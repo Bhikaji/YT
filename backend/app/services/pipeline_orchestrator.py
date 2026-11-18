@@ -118,9 +118,14 @@ class PipelineOrchestrator:
                 # Offset timing
                 current_time_offset += audio_meta["duration_seconds"] + 0.3
 
-        total_audio_duration = max(current_time_offset, 5.0)
-        fps = 30
-        total_frames = int(total_audio_duration * fps)
+        if format_type == "SHORT":
+            total_audio_duration = 10.0
+            fps = 30
+            total_frames = 300
+        else:
+            total_audio_duration = max(current_time_offset, 5.0)
+            fps = 30
+            total_frames = int(total_audio_duration * fps)
         print(f"[PIPELINE] Dialogue synthesis completed. Total duration: {total_audio_duration:.2f}s ({total_frames} frames)")
 
         # Generate combined dialogue track
@@ -158,7 +163,11 @@ class PipelineOrchestrator:
 
         # STEP 4: Quality Control Pre-flight Check on Renders and Audio
         await ProductionJobStateMachine.transition(job_id, JobState.QUALITY_CHECK)
-        hero_frame = os.path.join(render_output_dir, f"frame_{min(total_frames // 2, 45):04d}.png")
+        hero_frame = os.path.join(render_output_dir, f"frame_{min(total_frames // 2, 120):04d}.jpg")
+        if not os.path.exists(hero_frame):
+            hero_frame = os.path.join(render_output_dir, f"frame_{min(total_frames // 2, 45):04d}.png")
+        if not os.path.exists(hero_frame):
+            hero_frame = os.path.join(render_output_dir, "frame_0001.jpg")
         if not os.path.exists(hero_frame):
             hero_frame = os.path.join(render_output_dir, "frame_0001.png")
 
@@ -171,7 +180,9 @@ class PipelineOrchestrator:
         final_video_dir = settings.OUTPUT_DIR / ("shorts" if format_type == "SHORT" else "episodes")
         final_video_path = str(final_video_dir / final_video_name)
         
-        frames_pattern = os.path.join(render_output_dir, "frame_%04d.png")
+        frames_pattern = os.path.join(render_output_dir, "frame_%04d.jpg")
+        if not any(f.endswith(".jpg") for f in os.listdir(render_output_dir) if os.path.exists(render_output_dir)):
+            frames_pattern = os.path.join(render_output_dir, "frame_%04d.png")
         print("[PIPELINE] Assembling video, audio stems, and metadata via FFmpeg...")
         FFmpegCompositor.assemble_video_with_audio(
             frames_pattern=frames_pattern,

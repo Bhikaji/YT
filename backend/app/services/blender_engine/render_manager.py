@@ -37,7 +37,7 @@ class RenderManager:
     def execute_blender_render(
         cls,
         bpy_script_path: str,
-        timeout_seconds: int = 600
+        timeout_seconds: int = 1800
     ) -> bool:
         """Executes a Blender headless automation script."""
         blender_bin = cls.find_blender_binary()

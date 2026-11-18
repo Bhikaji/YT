@@ -11,7 +11,8 @@ FFMPEG_BIN = r"C:\Users\Mr.Scientist\AppData\Roaming\Python\Python312\site-packa
 FRAMES_PATTERN = r"E:\YT\output\renders\blender_3d_frames\frame_%04d.jpg"
 AUDIO_FILE = r"E:\YT\assets\audio\demo_short\master_cinematic_audio_10s.wav"
 OUTPUT_VIDEO = r"E:\YT\output\shorts\master_blender_3d_short_10s.mp4"
-THUMBNAIL_SRC = r"E:\YT\output\renders\blender_3d_frames\frame_0120.jpg"
+DEMO_PIXAR_VIDEO = r"E:\YT\output\shorts\demo_pixar_short_10s.mp4"
+THUMBNAIL_SRC = r"E:\YT\output\renders\blender_3d_frames\frame_0135.jpg"
 THUMBNAIL_DST = r"E:\YT\assets\thumbnails\demo_pixar_short_10s_thumb.jpg"
 BRAIN_DIR = r"C:\Users\Mr.Scientist\.gemini\antigravity\brain\1ff6e728-5386-415c-b67c-5b2db0481163"
 
@@ -42,6 +43,9 @@ def assemble():
         
     print(f"[Assembly] SUCCESS! Master 3D video created: {OUTPUT_VIDEO}")
     
+    # Also write demo_pixar_short_10s.mp4
+    shutil.copy2(OUTPUT_VIDEO, DEMO_PIXAR_VIDEO)
+    
     # Copy thumbnail
     if os.path.exists(THUMBNAIL_SRC):
         shutil.copy2(THUMBNAIL_SRC, THUMBNAIL_DST)
@@ -49,13 +53,13 @@ def assemble():
         
     # Copy artifacts
     shutil.copy2(OUTPUT_VIDEO, os.path.join(BRAIN_DIR, "master_blender_3d_short_10s.mp4"))
-    if os.path.exists(THUMBNAIL_SRC):
-        shutil.copy2(THUMBNAIL_SRC, os.path.join(BRAIN_DIR, "master_blender_3d_frame_0120.jpg"))
-    if os.path.exists(r"E:\YT\output\renders\blender_3d_frames\frame_0045.jpg"):
-        shutil.copy2(r"E:\YT\output\renders\blender_3d_frames\frame_0045.jpg", os.path.join(BRAIN_DIR, "master_blender_3d_frame_0045.jpg"))
-    if os.path.exists(r"E:\YT\output\renders\blender_3d_frames\frame_0210.jpg"):
-        shutil.copy2(r"E:\YT\output\renders\blender_3d_frames\frame_0210.jpg", os.path.join(BRAIN_DIR, "master_blender_3d_frame_0210.jpg"))
-        
+    shutil.copy2(OUTPUT_VIDEO, os.path.join(BRAIN_DIR, "demo_pixar_short_10s.mp4"))
+    
+    for f_idx in [45, 135, 240]:
+        src_f = rf"E:\YT\output\renders\blender_3d_frames\frame_{f_idx:04d}.jpg"
+        if os.path.exists(src_f):
+            shutil.copy2(src_f, os.path.join(BRAIN_DIR, f"master_blender_3d_frame_{f_idx:04d}.jpg"))
+            
     print("[Assembly] Artifact copies generated.")
     return True
 
