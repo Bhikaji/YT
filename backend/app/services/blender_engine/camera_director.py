@@ -85,6 +85,34 @@ class LightingManager:
                 "rim_light": {"color": (1.0, 0.4, 0.1), "energy": 1800, "pos": (0.0, 3.0, 4.0)},
                 "ambient_world": (0.03, 0.01, 0.01)
             }
+        elif preset_name == "bioluminescent_mushroom_forest":
+            return {
+                "key_light": {"color": (0.85, 0.45, 0.95), "energy": 1100, "pos": (-3.0, -3.0, 3.5)},
+                "fill_light": {"color": (0.1, 0.9, 0.8), "energy": 550, "pos": (3.5, -2.0, 2.0)},
+                "rim_light": {"color": (0.4, 0.9, 1.0), "energy": 1800, "pos": (0.0, 4.0, 4.0)},
+                "ambient_world": (0.04, 0.08, 0.12)
+            }
+        elif preset_name == "lantern_night_sky":
+            return {
+                "key_light": {"color": (1.0, 0.65, 0.25), "energy": 1400, "pos": (2.0, -2.5, 3.0)},
+                "fill_light": {"color": (0.15, 0.25, 0.55), "energy": 350, "pos": (-3.0, -2.0, 2.0)},
+                "rim_light": {"color": (1.0, 0.85, 0.45), "energy": 1600, "pos": (0.5, 3.5, 3.5)},
+                "ambient_world": (0.02, 0.03, 0.07)
+            }
+        elif preset_name == "crystal_cave_bridge":
+            return {
+                "key_light": {"color": (0.2, 0.85, 1.0), "energy": 1300, "pos": (-2.5, -3.0, 3.0)},
+                "fill_light": {"color": (0.9, 0.2, 0.8), "energy": 600, "pos": (3.0, -2.0, 2.5)},
+                "rim_light": {"color": (1.0, 0.4, 0.9), "energy": 1700, "pos": (0.0, 3.5, 3.5)},
+                "ambient_world": (0.02, 0.05, 0.08)
+            }
+        elif preset_name == "waterfall_log_canopy":
+            return {
+                "key_light": {"color": (1.0, 0.95, 0.8), "energy": 1600, "pos": (2.0, -4.0, 6.0)},
+                "fill_light": {"color": (0.2, 0.6, 0.4), "energy": 500, "pos": (-3.5, -2.5, 2.5)},
+                "rim_light": {"color": (0.8, 1.0, 0.85), "energy": 1400, "pos": (0.0, 3.5, 4.0)},
+                "ambient_world": (0.10, 0.18, 0.15)
+            }
         else:  # daylight default
             return {
                 "key_light": {"color": (1.0, 0.95, 0.85), "energy": 1000, "pos": (3.0, -4.0, 5.0)},
