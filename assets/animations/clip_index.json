@@ -1,0 +1,62 @@
+{
+  "anim_walk_cycle_01": {
+    "name": "Brisk Confident Walk Cycle",
+    "category": "locomotion",
+    "duration_seconds": 1.2,
+    "loopable": true,
+    "fps": 30,
+    "skeleton_type": "UHD54",
+    "tags": [
+      "walk",
+      "locomotion",
+      "confident",
+      "adventure"
+    ],
+    "file_path": "E:\\YT\\assets\\animations\\walk_cycle_01.bvh"
+  },
+  "anim_run_cycle_01": {
+    "name": "Heroic Sprint Run Cycle",
+    "category": "locomotion",
+    "duration_seconds": 0.8,
+    "loopable": true,
+    "fps": 30,
+    "skeleton_type": "UHD54",
+    "tags": [
+      "run",
+      "sprint",
+      "fast",
+      "urgent"
+    ],
+    "file_path": "E:\\YT\\assets\\animations\\run_cycle_01.bvh"
+  },
+  "anim_point_wonder_01": {
+    "name": "Hand Raise & Forward Pointing in Awe",
+    "category": "acting",
+    "duration_seconds": 2.5,
+    "loopable": false,
+    "fps": 30,
+    "skeleton_type": "UHD54",
+    "tags": [
+      "point",
+      "gesture",
+      "wonder",
+      "discovery"
+    ],
+    "file_path": "E:\\YT\\assets\\animations\\point_wonder_01.bvh"
+  },
+  "anim_idle_inquisitive_01": {
+    "name": "Inquisitive Breathing Idle with Head Tilt",
+    "category": "idle",
+    "duration_seconds": 3.0,
+    "loopable": true,
+    "fps": 30,
+    "skeleton_type": "UHD54",
+    "tags": [
+      "idle",
+      "breathing",
+      "inquisitive",
+      "curious"
+    ],
+    "file_path": "E:\\YT\\assets\\animations\\idle_inquisitive_01.bvh"
+  }
+}

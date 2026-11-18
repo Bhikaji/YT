@@ -40,7 +40,7 @@ scene.frame_start = 1
 scene.frame_end = {total_frames}
 
 if hasattr(scene, "eevee"):
-    scene.eevee.taa_render_samples = 4
+    scene.eevee.taa_render_samples = 2
 
 if 'AgX' in [c.name for c in bpy.types.ColorManagedViewSettings.bl_rna.properties['view_transform'].enum_items]:
     scene.view_settings.view_transform = 'AgX'
