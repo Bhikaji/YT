@@ -9,6 +9,7 @@ This document evaluates the 22 candidate repositories identified for integration
 
 ### 1. MPFB2 (MakeHuman Plugin for Blender 2)
 - **Repository URL:** `https://github.com/makehumancommunity/mpfb2.git`
+- **Pinned Commit Hash:** `9de0707fdc88438d7c53a1a2ac7937d9221e2431`
 - **Description:** Complete procedural character generator inside Blender. Generates human/stylized meshes, parametric body controls, Rigify rigs, clothes, and facial shapekeys directly in `bpy`.
 - **License:** **GPLv3** (Software) / **CC0 / Public Domain** (Base meshes and target assets).
 - **Blender Compatibility:** Blender 3.6 to 4.2+ LTS.
@@ -40,6 +41,7 @@ This document evaluates the 22 candidate repositories identified for integration
 
 ### 4. Blender Animation Retargeting
 - **Repository URL:** `https://github.com/Mwni/blender-animation-retargeting`
+- **Pinned Commit Hash:** `424f08bd7e675619adf539209a1e8816c242c386`
 - **Description:** Automated bone mapping and animation retargeting addon for Blender. Retargets BVH, FBX, and Mixamo mocap animations to any arbitrary character rig (including Rigify).
 - **License:** **GPLv3**.
 - **Blender Compatibility:** Blender 2.80 - 4.2+.
@@ -104,6 +106,7 @@ This document evaluates the 22 candidate repositories identified for integration
 
 ### 11. Rhubarb Lip Sync
 - **Repository URL:** `https://github.com/DanielSWolf/rhubarb-lip-sync`
+- **Pinned Commit Hash:** `9b9573cd21b253c9ba58739bbd1aa0b50b991bff`
 - **Description:** Professional command-line tool that analyzes speech audio files and generates timestamped visemes (A, B, C, D, E, F, G, H, X) for mouth blendshapes.
 - **License:** **MIT License**.
 - **Blender Compatibility:** Native shapekey integration via Python scripts.
@@ -113,6 +116,7 @@ This document evaluates the 22 candidate repositories identified for integration
 
 ### 12. WhisperX
 - **Repository URL:** `https://github.com/m-bain/whisperX`
+- **Pinned Commit Hash:** `b904f02b7e1f26fd10fb04840d655ff27e88e464`
 - **Description:** Forced word-level alignment and speech recognition using Whisper + wav2vec2.
 - **License:** **BSD 2-Clause**.
 - **Hardware Requirements:** Can run on CPU using `faster-whisper` (int8 quantization).
@@ -125,6 +129,7 @@ This document evaluates the 22 candidate repositories identified for integration
 
 ### 13. Piper TTS
 - **Repository URL:** `https://github.com/OHF-Voice/piper1-gpl`
+- **Pinned Commit Hash:** `46c3c71f9155c4f5bfb887845f524433fd02febc`
 - **Description:** Extremely fast, local neural text-to-speech engine running on ONNX Runtime. Designed for Raspberry Pi and low-power CPUs.
 - **License:** **GPLv3** (Engine) / **Open Voice Licenses** (Voices: CC-BY, Public Domain).
 - **Hardware Requirements:** **100% CPU-compatible.** Runs faster than real-time (~0.15x) on Intel i5-8265U.
@@ -133,6 +138,7 @@ This document evaluates the 22 candidate repositories identified for integration
 
 ### 14. Kokoro TTS
 - **Repository URL:** `https://github.com/hexgrad/kokoro`
+- **Pinned Commit Hash:** `dfb907a02bba8152ca444717ca5d78747ccb4bec`
 - **Description:** 82-million parameter open-weight TTS model with expressive, natural delivery.
 - **License:** **Apache 2.0**.
 - **Hardware Requirements:** Runs on CPU via ONNX Runtime / `kokoro-onnx` in near real-time.
@@ -145,6 +151,7 @@ This document evaluates the 22 candidate repositories identified for integration
 
 ### 15. Blender MCP Server (djeada)
 - **Repository URL:** `https://github.com/djeada/blender-mcp-server`
+- **Pinned Commit Hash:** `f921efedeba738c3e143f1d835ca5ab825f16c86`
 - **Description:** Model Context Protocol (MCP) server connecting LLM agents directly to Blender's Python runtime.
 - **License:** **MIT License**.
 - **Blender Compatibility:** Blender 3.6 to 4.2+.
