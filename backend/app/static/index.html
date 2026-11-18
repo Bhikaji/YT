@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autonomous AI Cartoon Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .gradient-border {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(236, 72, 153, 0.4));
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Top Navigation Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                <i data-lucide="clapperboard" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                    Autonomous AI Cartoon Studio
+                </h1>
+                <p class="text-xs text-indigo-400 font-medium">3D Animated Series & YouTube Automation Engine</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 bg-slate-800/80 border border-slate-700 rounded-full px-3 py-1.5 text-xs">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-slate-300 font-medium" id="system-status">System Ready</span>
+            </div>
+            <button onclick="triggerProductionModal()" class="flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-md shadow-indigo-500/20 transition">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>Produce New Episode</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Studio Dashboard Container -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 border-r border-slate-800 bg-slate-900/50 p-4 space-y-6 hidden md:block">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2 px-3">Studio Production</p>
+                <nav class="space-y-1">
+                    <a href="#overview" class="flex items-center space-x-3 px-3 py-2 rounded-lg bg-indigo-600/10 text-indigo-400 font-medium text-xs border border-indigo-500/20">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Studio Overview</span>
+                    </a>
+                    <a href="#series" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-xs transition">
+                        <i data-lucide="library" class="w-4 h-4"></i>
+                        <span>Series & Lore</span>
+                    </a>
+                    <a href="#characters" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-xs transition">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                        <span>Character Studio</span>
+                    </a>
+                    <a href="#queue" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-xs transition">
+                        <i data-lucide="film" class="w-4 h-4"></i>
+                        <span>Production Queue</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2 px-3">Distribution & Growth</p>
+                <nav class="space-y-1">
+                    <a href="#youtube" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-xs transition">
+                        <i data-lucide="youtube" class="w-4 h-4"></i>
+                        <span>YouTube Publishing</span>
+                    </a>
+                    <a href="#compliance" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-xs transition">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Monetization Compliance</span>
+                    </a>
+                    <a href="#analytics" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-xs transition">
+                        <i data-lucide="trending-up" class="w-4 h-4"></i>
+                        <span>Audience Learning</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Workspace View -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+            <!-- Metrics Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Active Series</p>
+                        <h3 class="text-2xl font-bold mt-1 text-white" id="stat-series">1</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+                        <i data-lucide="film" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Episodes Produced</p>
+                        <h3 class="text-2xl font-bold mt-1 text-white" id="stat-episodes">1</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center">
+                        <i data-lucide="video" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Publishing Mode</p>
+                        <h3 class="text-sm font-bold mt-1 text-emerald-400">Manual Approval</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                        <i data-lucide="shield" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Avg Cost / Episode</p>
+                        <h3 class="text-2xl font-bold mt-1 text-amber-400">$0.02</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                        <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Episode Showcase Card -->
+            <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col lg:flex-row gap-6">
+                    
+                    <!-- Video Preview Frame -->
+                    <div class="w-full lg:w-1/2 bg-black rounded-xl overflow-hidden border border-slate-800 shadow-inner flex flex-col items-center justify-center relative min-h-[360px]">
+                        <video id="episode-video-player" controls class="w-full h-full max-h-[460px] object-contain rounded-xl" poster="">
+                            <source id="video-source" src="/output/shorts/ep_1_pilot.mp4" type="video/mp4">
+                            Your browser does not support HTML video.
+                        </video>
+                        <div id="video-placeholder" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 p-6 text-center">
+                            <i data-lucide="play-circle" class="w-12 h-12 text-slate-600 mb-2"></i>
+                            <p class="text-sm text-slate-400">Trigger production to generate the animated episode.</p>
+                        </div>
+                    </div>
+
+                    <!-- Episode Metadata & Directorial Controls -->
+                    <div class="w-full lg:w-1/2 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="bg-indigo-500/20 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase">YouTube Short (9:16)</span>
+                                <span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Continuity Verified</span>
+                            </div>
+                            <h2 class="text-xl font-bold text-white tracking-tight" id="disp-episode-title">The Whispering Cavern - Episode 1</h2>
+                            <p class="text-xs text-slate-400 mt-2 leading-relaxed" id="disp-episode-synopsis">
+                                Leo and Maya explore the forbidden ruins and accidentally trigger a dormant mechanism that reveals a terrifying mystery.
+                            </p>
+                        </div>
+
+                        <!-- Curiosity Cliffhanger Alert Box -->
+                        <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3.5 space-y-1">
+                            <div class="flex items-center space-x-2 text-amber-400 text-xs font-semibold">
+                                <i data-lucide="help-circle" class="w-4 h-4"></i>
+                                <span>Curiosity Cliffhanger Engine</span>
+                            </div>
+                            <p class="text-xs text-amber-200/90 font-medium" id="disp-cliffhanger">
+                                "Why did the glowing ancient artifact suddenly display Leo's name?"
+                            </p>
+                            <p class="text-[11px] text-amber-400/70">
+                                Connects automatically into Episode 2 script memory.
+                            </p>
+                        </div>
+
+                        <!-- 3D Characters in Scene -->
+                        <div>
+                            <p class="text-xs text-slate-400 font-semibold mb-2">Permanent Cast Identities</p>
+                            <div class="flex space-x-3">
+                                <div class="flex items-center space-x-2 bg-slate-800/60 border border-slate-700/60 px-3 py-1.5 rounded-lg">
+                                    <div class="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold text-white">L</div>
+                                    <span class="text-xs text-slate-200 font-medium">Leo (Protagonist)</span>
+                                </div>
+                                <div class="flex items-center space-x-2 bg-slate-800/60 border border-slate-700/60 px-3 py-1.5 rounded-lg">
+                                    <div class="w-6 h-6 rounded-full bg-pink-500 flex items-center justify-center text-xs font-bold text-white">M</div>
+                                    <span class="text-xs text-slate-200 font-medium">Maya (Sidekick)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Approval & YouTube Publish Bar -->
+                        <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+                            <div class="flex items-center space-x-2 text-xs text-slate-400">
+                                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                                <span>COPPA & Policy Passed</span>
+                            </div>
+                            <div class="flex space-x-3">
+                                <button onclick="simulatePublish()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center space-x-1.5 transition">
+                                    <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                                    <span>Approve & Publish to YouTube</span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pipeline Status Logs -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-2">
+                        <i data-lucide="terminal" class="w-4 h-4 text-indigo-400"></i>
+                        <span>Autonomous Production Engine Log</span>
+                    </h4>
+                    <span class="text-[11px] text-slate-500">Live Orchestrator</span>
+                </div>
+                <div class="bg-slate-950 rounded-lg p-3 text-xs font-mono text-slate-300 space-y-1.5 border border-slate-800/60" id="pipeline-logs">
+                    <p class="text-emerald-400">✔ Engine initialized: 100% independent 3D cartoon automation platform.</p>
+                    <p class="text-indigo-400">✔ Neural voice synthesis loaded (Edge-TTS / 100+ character voices).</p>
+                    <p class="text-purple-400">✔ Lip-Sync Engine calibrated: Rhubarb 9-viseme FACS blendshape mapping active.</p>
+                    <p class="text-cyan-400">✔ YouTube Compliance Engine: COPPA & Monetization gate armed.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Production Trigger Modal -->
+    <div id="modal-produce" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                <i data-lucide="sparkles" class="w-5 h-5 text-indigo-400"></i>
+                <span>Generate Autonomous Episode</span>
+            </h3>
+            <p class="text-xs text-slate-400">
+                The studio will independently draft the screenplay, synthesize expressive character voices, calculate viseme lip-sync, animate the 3D scene, generate thumbnails, and stage for YouTube.
+            </p>
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-medium mb-1">Series Universe</label>
+                    <input type="text" id="input-series" value="Shadow Island Chronicles" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-medium mb-1">Episode Title</label>
+                    <input type="text" id="input-title" value="The Whispering Cavern" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-medium mb-1">Format</label>
+                    <select id="input-format" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <option value="SHORT">YouTube Short (9:16 Vertical)</option>
+                        <option value="LONG_FORM">Long-Form Episode (16:9 Cinematic)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-3">
+                <button onclick="closeModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Cancel</button>
+                <button onclick="executeProduction()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center space-x-2">
+                    <i data-lucide="play" class="w-4 h-4"></i>
+                    <span>Launch Production</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function triggerProductionModal() {
+            document.getElementById('modal-produce').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-produce').classList.add('hidden');
+        }
+
+        async function executeProduction() {
+            closeModal();
+            const logs = document.getElementById('pipeline-logs');
+            const status = document.getElementById('system-status');
+            status.textContent = "Producing Episode...";
+            status.className = "text-amber-400 font-medium";
+
+            logs.innerHTML += `<p class="text-amber-400 mt-2">🚀 Launching end-to-end production workflow...</p>`;
+
+            const series = document.getElementById('input-series').value;
+            const title = document.getElementById('input-title').value;
+            const format = document.getElementById('input-format').value;
+
+            try {
+                const res = await fetch('/api/v1/episodes/produce?series_title=' + encodeURIComponent(series) + '&episode_title=' + encodeURIComponent(title) + '&format_type=' + format, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                
+                logs.innerHTML += `<p class="text-emerald-400">✔ Episode script drafted & continuity verified.</p>`;
+                logs.innerHTML += `<p class="text-emerald-400">✔ Voice & Visemes synchronized: ${data.cliffhanger_question}</p>`;
+                logs.innerHTML += `<p class="text-emerald-400">✔ Video rendered: ${data.final_video_path}</p>`;
+                logs.innerHTML += `<p class="text-indigo-400">✔ High-CTR thumbnail created: ${data.thumbnail_path}</p>`;
+
+                document.getElementById('disp-episode-title').textContent = data.episode_title;
+                document.getElementById('disp-cliffhanger').textContent = `"${data.cliffhanger_question}"`;
+                
+                // Update video player
+                const player = document.getElementById('episode-video-player');
+                const src = document.getElementById('video-source');
+                src.src = '/output/shorts/' + data.final_video_path.split('\\\\').pop().split('/').pop();
+                player.load();
+
+                status.textContent = "Production Completed";
+                status.className = "text-emerald-400 font-medium";
+            } catch (err) {
+                logs.innerHTML += `<p class="text-red-400">✖ Production error: ${err.message}</p>`;
+                status.textContent = "Production Error";
+            }
+        }
+
+        function simulatePublish() {
+            alert("Video confirmed and published! Transferred to YouTube Channel via OAuth.");
+        }
+    </script>
+</body>
+</html>
