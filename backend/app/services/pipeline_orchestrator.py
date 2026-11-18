@@ -142,30 +142,19 @@ class PipelineOrchestrator:
         )
 
         await ProductionJobStateMachine.transition(job_id, JobState.ANIMATING)
-        blender_bin = RenderManager.find_blender_binary()
-        
         await ProductionJobStateMachine.transition(job_id, JobState.RENDERING)
-        if blender_bin:
-            print(f"[PIPELINE] Blender binary detected at: {blender_bin}. Executing headless render...")
-            bpy_script_file = str(settings.SCRIPTS_DIR / f"render_{episode_slug}.py")
-            BpyScriptGenerator.generate_blender_render_script(
-                script=script,
-                output_script_path=bpy_script_file,
-                output_frames_dir=render_output_dir,
-                viseme_data_map={},
-                resolution=settings.BLENDER_RESOLUTION_SHORT if format_type == "SHORT" else settings.BLENDER_RESOLUTION_LONG
-            )
-            import subprocess
-            subprocess.run([blender_bin, "-b", "-P", bpy_script_file], capture_output=True)
-        else:
-            print("[PIPELINE] Executing calibrated 3D procedural simulation engine with real-time viseme mouth aperture...")
-            RenderManager.render_procedural_3d_simulation(
-                output_frames_dir=render_output_dir,
-                total_frames=total_frames,
-                viseme_keyframes=viseme_keyframes,
-                resolution=(1080, 1920) if format_type == "SHORT" else (1920, 1080),
-                fps=fps
-            )
+        print(f"[PIPELINE] Launching genuine 3D character animation render via Blender EEVEE-Next...")
+        bpy_script_file = str(settings.SCRIPTS_DIR / f"render_{episode_slug}.py")
+        BpyScriptGenerator.generate_blender_render_script(
+            script=script,
+            output_script_path=bpy_script_file,
+            output_frames_dir=render_output_dir,
+            viseme_data_map={},
+            resolution=settings.BLENDER_RESOLUTION_SHORT if format_type == "SHORT" else settings.BLENDER_RESOLUTION_LONG,
+            fps=fps,
+            total_frames=total_frames
+        )
+        RenderManager.execute_blender_render(bpy_script_file)
 
         # STEP 4: Quality Control Pre-flight Check on Renders and Audio
         await ProductionJobStateMachine.transition(job_id, JobState.QUALITY_CHECK)
