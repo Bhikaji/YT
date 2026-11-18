@@ -42,6 +42,10 @@ credentials/youtube_token.json
 credentials/*.json
 !credentials/.gitkeep
 
+# Third-party cloned repositories (kept local and intact without submodule taint)
+third_party/*
+!third_party/.gitkeep
+
 # IDE & OS
 .vscode/
 .idea/
