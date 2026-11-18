@@ -20,6 +20,10 @@ from backend.app.services.youtube_engine.compliance_checker import ComplianceChe
 from backend.app.services.youtube_engine.metadata_generator import MetadataGenerator
 from backend.app.services.youtube_engine.uploader import YouTubeUploader
 
+from backend.orchestrator.state_machine import ProductionJobStateMachine, JobState
+from modules.quality_control.inspector import QualityControlInspector
+from modules.character_engine.generator import CharacterSpecification
+
 class PipelineOrchestrator:
     """End-to-End Autonomous 3D Cartoon Production & YouTube Publishing Pipeline."""
 
@@ -51,7 +55,14 @@ class PipelineOrchestrator:
 
         print(f"\n[PIPELINE] Starting Production: '{series_title}' - Episode {episode_number}: '{episode_title}' ({format_type})")
 
+        episode_slug = f"ep_{episode_number}_{abs(hash(episode_title))}"
+        # Initialize durable state machine job
+        job = await ProductionJobStateMachine.create_job(episode_id=episode_slug)
+        job_id = job["job_id"]
+        await ProductionJobStateMachine.transition(job_id, JobState.PLANNING, {"series": series_title, "format": format_type})
+
         # STEP 1: Generate Episode Script & Dialogue
+        await ProductionJobStateMachine.transition(job_id, JobState.SCRIPTING)
         script = ShowrunnerAgent.develop_episode_script(
             series_title=series_title,
             series_genre=series_genre,
@@ -66,9 +77,9 @@ class PipelineOrchestrator:
         print(f"[PIPELINE] Script generated: {len(script.scenes)} scenes, cliffhanger: '{script.cliffhanger_question}'")
 
         # STEP 2: Synthesize Character Voices & Extract Visemes
+        await ProductionJobStateMachine.transition(job_id, JobState.VOICING)
         dialogue_records = []
         combined_visemes = []
-        episode_slug = f"ep_{episode_number}_{abs(hash(episode_title))}"
         audio_dir = settings.ASSETS_DIR / "audio" / "voices" / episode_slug
         audio_dir.mkdir(parents=True, exist_ok=True)
 
@@ -122,14 +133,18 @@ class PipelineOrchestrator:
         else:
             await VoiceEngine.generate_speech("Mystery awaits on Shadow Island.", output_path=master_audio_path)
 
-        # STEP 3: Generate 3D Visual Frames
+        # STEP 3: Generate 3D Visual Frames & Lip-Sync
+        await ProductionJobStateMachine.transition(job_id, JobState.LIPSYNCING)
         render_output_dir = str(settings.OUTPUT_DIR / "renders" / episode_slug)
         viseme_keyframes = LipSyncEngine.generate_visemes_from_text_and_duration(
             text=" ".join(d["text"] for d in dialogue_records),
             total_duration_seconds=total_audio_duration
         )
 
+        await ProductionJobStateMachine.transition(job_id, JobState.ANIMATING)
         blender_bin = RenderManager.find_blender_binary()
+        
+        await ProductionJobStateMachine.transition(job_id, JobState.RENDERING)
         if blender_bin:
             print(f"[PIPELINE] Blender binary detected at: {blender_bin}. Executing headless render...")
             bpy_script_file = str(settings.SCRIPTS_DIR / f"render_{episode_slug}.py")
@@ -140,7 +155,6 @@ class PipelineOrchestrator:
                 viseme_data_map={},
                 resolution=settings.BLENDER_RESOLUTION_SHORT if format_type == "SHORT" else settings.BLENDER_RESOLUTION_LONG
             )
-            # Run blender
             import subprocess
             subprocess.run([blender_bin, "-b", "-P", bpy_script_file], capture_output=True)
         else:
@@ -153,11 +167,17 @@ class PipelineOrchestrator:
                 fps=fps
             )
 
-        # STEP 4: Subtitles
+        # STEP 4: Quality Control Pre-flight Check on Renders and Audio
+        await ProductionJobStateMachine.transition(job_id, JobState.QUALITY_CHECK)
+        hero_frame = os.path.join(render_output_dir, f"frame_{min(total_frames // 2, 45):04d}.png")
+        if not os.path.exists(hero_frame):
+            hero_frame = os.path.join(render_output_dir, "frame_0001.png")
+
+        # STEP 5: Subtitles & Video Assembly via FFmpeg
+        await ProductionJobStateMachine.transition(job_id, JobState.ASSEMBLING)
         srt_file = str(settings.OUTPUT_DIR / "renders" / episode_slug / "subtitles.srt")
         SubtitleEngine.generate_srt(dialogue_records, srt_file)
 
-        # STEP 5: Final Video Assembly via FFmpeg
         final_video_name = f"{episode_slug}.mp4"
         final_video_dir = settings.OUTPUT_DIR / ("shorts" if format_type == "SHORT" else "episodes")
         final_video_path = str(final_video_dir / final_video_name)
@@ -173,10 +193,6 @@ class PipelineOrchestrator:
         print(f"[PIPELINE] Final video successfully encoded: {final_video_path}")
 
         # STEP 6: AI Thumbnail Generation
-        hero_frame = os.path.join(render_output_dir, f"frame_{min(total_frames // 2, 45):04d}.png")
-        if not os.path.exists(hero_frame):
-            hero_frame = os.path.join(render_output_dir, "frame_0001.png")
-
         thumbnail_path = str(settings.ASSETS_DIR / "thumbnails" / f"{episode_slug}_thumb.jpg")
         ThumbnailGenerator.create_thumbnail(
             base_frame_path=hero_frame,
@@ -204,7 +220,17 @@ class PipelineOrchestrator:
             is_original_animation=True
         )
 
-        # STEP 8: YouTube Staging / Publishing Gate
+        qc_result = QualityControlInspector.audit_episode(
+            script_data={"scenes": script.scenes, "cliffhanger_question": script.cliffhanger_question},
+            video_path=final_video_path,
+            audio_path=master_audio_path,
+            thumbnail_path=thumbnail_path,
+            metadata=meta,
+            format_type=format_type
+        )
+
+        # STEP 9: YouTube Staging / Publishing Gate
+        await ProductionJobStateMachine.transition(job_id, JobState.READY_TO_PUBLISH)
         pub_result = YouTubeUploader.publish_video(
             video_file_path=final_video_path,
             thumbnail_path=thumbnail_path,
@@ -216,11 +242,15 @@ class PipelineOrchestrator:
             approval_mode=settings.DEFAULT_PUBLISH_MODE
         )
 
+        if pub_result.get("status") == "PUBLISHED":
+            await ProductionJobStateMachine.transition(job_id, JobState.PUBLISHED)
+
         production_end = datetime.utcnow()
         elapsed = (production_end - production_start).total_seconds()
 
         return {
             "status": "COMPLETED",
+            "job_id": job_id,
             "series": series_title,
             "episode_number": episode_number,
             "episode_title": episode_title,
@@ -232,6 +262,7 @@ class PipelineOrchestrator:
             "next_episode_teaser": script.next_episode_teaser,
             "metadata": meta,
             "compliance": compliance,
+            "quality_control": qc_result,
             "publishing_status": pub_result,
             "elapsed_seconds": elapsed,
             "story_memory_updates": script.story_memory_updates

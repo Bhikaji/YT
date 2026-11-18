@@ -7,6 +7,8 @@ from backend.app.schemas.character import CharacterCreate
 from backend.app.services.pipeline_orchestrator import PipelineOrchestrator
 from backend.app.services.blender_engine.render_manager import RenderManager
 from backend.app.services.voice_engine.audio_processor import AudioProcessor
+from backend.orchestrator.state_machine import ProductionJobStateMachine
+from modules.character_engine.generator import CharacterSpecification
 from backend.app.config import settings
 
 api_router = APIRouter()
@@ -29,6 +31,16 @@ async def health_check():
             "publish_mode": settings.DEFAULT_PUBLISH_MODE
         }
     }
+
+@api_router.get("/characters/presets")
+async def get_character_presets():
+    """Returns canonical Pixar/DreamWorks character specifications."""
+    return CharacterSpecification.get_pixar_style_presets()
+
+@api_router.get("/jobs")
+async def list_production_jobs():
+    """Lists recent production jobs and state machine lifecycle statuses."""
+    return await ProductionJobStateMachine.get_active_jobs()
 
 @api_router.get("/series")
 async def list_series():
