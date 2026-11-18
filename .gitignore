@@ -34,10 +34,6 @@ data/*.db-journal
 # Temporary Render Frame Dumps (keep folder, ignore thousands of individual frames)
 output/renders/*
 !output/renders/.gitkeep
-output/shorts/ep_*
-output/episodes/ep_*
-assets/audio/voices/ep_*
-assets/thumbnails/ep_*
 
 # Sensitive Credentials
 .env
@@ -46,9 +42,13 @@ credentials/youtube_token.json
 credentials/*.json
 !credentials/.gitkeep
 
-# Third-party cloned repositories (kept local and intact without submodule taint)
+# Third-party cloned repositories & binaries (kept local and intact without submodule taint)
 third_party/*
 !third_party/.gitkeep
+tools/*
+!tools/.gitkeep
+*.zip
+*.tar.xz
 
 # IDE & OS
 .vscode/

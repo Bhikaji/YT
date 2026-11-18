@@ -17,11 +17,19 @@ class RenderManager:
         if which_blender:
             return which_blender
         candidates = [
+            r"E:\YT\tools\blender\blender-4.2.16-windows-x64\blender.exe",
             r"C:\Program Files\Blender Foundation\Blender 4.5\blender.exe",
             r"C:\Program Files\Blender Foundation\Blender 4.2\blender.exe",
             r"C:\Program Files\Blender Foundation\Blender 4.1\blender.exe",
             r"C:\Program Files\Blender Foundation\Blender 4.0\blender.exe",
         ]
+        # Also check anywhere inside E:\YT\tools\blender
+        tools_blender_dir = Path("E:/YT/tools/blender")
+        if tools_blender_dir.exists():
+            for p in tools_blender_dir.rglob("blender.exe"):
+                if p.is_file():
+                    return str(p)
+
         for c in candidates:
             if os.path.exists(c):
                 return c

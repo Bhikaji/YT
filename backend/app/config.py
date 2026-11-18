@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = f"sqlite+aiosqlite:///{BASE_DIR / 'data' / 'cartoon_studio.db'}"
     
     # Blender Configuration
-    BLENDER_EXECUTABLE_PATH: Optional[str] = None  # Will auto-detect or use configured path
+    BLENDER_EXECUTABLE_PATH: Optional[str] = r"E:\YT\tools\blender\blender-4.2.16-windows-x64\blender.exe"
     BLENDER_DEFAULT_RENDER_ENGINE: str = "BLENDER_EEVEE_NEXT"  # or CYCLES
     BLENDER_RENDER_SAMPLES: int = 32
     BLENDER_FPS: int = 30
