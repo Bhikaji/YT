@@ -139,8 +139,9 @@
                     
                     <!-- Video Preview Frame -->
                     <div class="w-full lg:w-1/2 bg-black rounded-xl overflow-hidden border border-slate-800 shadow-inner flex flex-col items-center justify-center relative min-h-[360px]">
-                        <video id="episode-video-player" controls class="w-full h-full max-h-[460px] object-contain rounded-xl" poster="">
-                            <source id="video-source" src="/output/shorts/ep_1_pilot.mp4" type="video/mp4">
+                        <video id="episode-video-player" controls class="w-full h-full max-h-[460px] object-contain rounded-xl" poster="/assets/thumbnails/demo_pixar_characters_thumb.jpg">
+                            <source id="video-source" src="/output/shorts/demo_pixar_characters.mp4" type="video/mp4">
+                            <source src="/output/shorts/ep_1_8644659358034629307.mp4" type="video/mp4">
                             Your browser does not support HTML video.
                         </video>
                         <div id="video-placeholder" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 p-6 text-center">
@@ -178,15 +179,23 @@
 
                         <!-- 3D Characters in Scene -->
                         <div>
-                            <p class="text-xs text-slate-400 font-semibold mb-2">Permanent Cast Identities</p>
-                            <div class="flex space-x-3">
-                                <div class="flex items-center space-x-2 bg-slate-800/60 border border-slate-700/60 px-3 py-1.5 rounded-lg">
-                                    <div class="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold text-white">L</div>
-                                    <span class="text-xs text-slate-200 font-medium">Leo (Protagonist)</span>
+                            <p class="text-xs text-slate-400 font-semibold mb-2">Permanent Feature-Animation Cast</p>
+                            <div class="flex flex-wrap gap-2">
+                                <div class="flex items-center space-x-2 bg-slate-800/80 border border-slate-700/60 px-3 py-1.5 rounded-lg shadow-sm">
+                                    <div class="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-xs font-bold text-white">L</div>
+                                    <span class="text-xs text-slate-200 font-medium">Leo (Lead Explorer)</span>
                                 </div>
-                                <div class="flex items-center space-x-2 bg-slate-800/60 border border-slate-700/60 px-3 py-1.5 rounded-lg">
-                                    <div class="w-6 h-6 rounded-full bg-pink-500 flex items-center justify-center text-xs font-bold text-white">M</div>
-                                    <span class="text-xs text-slate-200 font-medium">Maya (Sidekick)</span>
+                                <div class="flex items-center space-x-2 bg-slate-800/80 border border-slate-700/60 px-3 py-1.5 rounded-lg shadow-sm">
+                                    <div class="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center text-xs font-bold text-white">A</div>
+                                    <span class="text-xs text-slate-200 font-medium">Aria (Co-Lead Tracker)</span>
+                                </div>
+                                <div class="flex items-center space-x-2 bg-slate-800/80 border border-pink-500/30 px-3 py-1.5 rounded-lg bg-pink-950/20 shadow-sm">
+                                    <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-pink-500 to-cyan-400 flex items-center justify-center text-xs font-bold text-white">🦊</div>
+                                    <span class="text-xs text-pink-300 font-medium">Lumi (Magical Fox)</span>
+                                </div>
+                                <div class="flex items-center space-x-2 bg-slate-800/80 border border-slate-700/60 px-3 py-1.5 rounded-lg shadow-sm">
+                                    <div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold text-white">M</div>
+                                    <span class="text-xs text-slate-200 font-medium">Milo (Inventor)</span>
                                 </div>
                             </div>
                         </div>
