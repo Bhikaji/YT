@@ -127,6 +127,20 @@ def init_database():
         FOREIGN KEY(series_id) REFERENCES series(series_id)
     );
     """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS story_memory (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        series_id TEXT NOT NULL,
+        episode_number INTEGER NOT NULL,
+        event_name TEXT NOT NULL,
+        character_involved TEXT,
+        lore_fact TEXT NOT NULL,
+        cliffhanger TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(series_id) REFERENCES series(series_id)
+    );
+    """)
     
     # 6. Render Jobs & QA Inspections
     cursor.execute("""

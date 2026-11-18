@@ -87,7 +87,7 @@ class ProductionStateMachine:
                 query += ", error_message = ?"
                 params.append(error_msg)
                 
-            if target_state in [JobState.PUBLISHED, JobState.COMPLETED, JobState.READY_TO_PUBLISH]:
+            if target_state in [JobState.PUBLISHED, JobState.READY_TO_PUBLISH]:
                 query += ", completed_at = CURRENT_TIMESTAMP"
                 
             query += " WHERE job_id = ?"

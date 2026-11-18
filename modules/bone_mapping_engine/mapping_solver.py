@@ -5,7 +5,7 @@ to the canonical UHD-54 standard bone hierarchy.
 """
 
 from typing import Dict, Any, Optional, List
-from modules.skeleton_profiles.uhd_standard import UHD54_BONES, MIXAMO_TO_UHD54
+from modules.skeleton_profiles.uhd_standard import UHD_54_CANONICAL_BONES, MIXAMO_TO_UHD54
 
 RIGIFY_TO_UHD54 = {
     "spine": "spine_01",
@@ -126,7 +126,7 @@ class BoneMappingSolver:
             # Fuzzy heuristic matching
             for b in bone_names:
                 cleaned = b.lower().replace("_", "").replace(".", "").replace("-", "")
-                for uhd in UHD54_BONES:
+                for uhd in UHD_54_CANONICAL_BONES:
                     uhd_clean = uhd.lower().replace("_", "")
                     if cleaned == uhd_clean:
                         mapping[b] = uhd
