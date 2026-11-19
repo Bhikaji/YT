@@ -12,6 +12,10 @@ class AudioProcessor:
     @staticmethod
     def get_ffmpeg_path() -> str:
         """Returns the absolute path to the functional FFmpeg executable."""
+        import shutil
+        sys_ffmpeg = shutil.which("ffmpeg")
+        if sys_ffmpeg:
+            return sys_ffmpeg
         return imageio_ffmpeg.get_ffmpeg_exe()
 
     @classmethod

@@ -37,30 +37,30 @@
       "brow_thickness": 1.2
     },
     "wardrobe": {
-      "primary_outfit": "adventure_hoodie",
+      "primary_outfit": "orange_tee_and_denim_shorts",
       "top_color": [
-        0.85,
-        0.22,
-        0.15,
+        0.96,
+        0.45,
+        0.10,
         1.0
       ],
       "bottom_color": [
-        0.15,
-        0.25,
-        0.4,
+        0.16,
+        0.32,
+        0.62,
         1.0
       ],
       "backpack": {
         "enabled": true,
         "color": [
-          0.15,
-          0.45,
-          0.55,
+          0.12,
+          0.40,
+          0.70,
           1.0
         ],
-        "straps": "leather_brown"
+        "straps": "adventurer_yellow"
       },
-      "footwear": "high_top_hikers"
+      "footwear": "red_canvas_sneakers"
     },
     "shader_properties": {
       "skin_subsurface_weight": 0.28,
@@ -254,6 +254,70 @@
       "skin_subsurface_weight": 0.25,
       "glasses_glass_transmission": 0.98,
       "glasses_glass_ior": 1.52
+    }
+  },
+  "char_lumi_puppy": {
+    "character_id": "char_lumi_puppy",
+    "name": "Lumi",
+    "archetype": "golden_retriever_puppy",
+    "age_category": "companion_creature",
+    "voice_id": "en-US-AnaNeural",
+    "proportions": {
+      "head_scale": 1.15,
+      "eye_scale": 1.5,
+      "body_height": 0.42,
+      "ear_style": "floppy_bouncing",
+      "tail_style": "wagging"
+    },
+    "facial_features": {
+      "fur_color": [0.88, 0.65, 0.35, 1.0],
+      "nose_color": [0.08, 0.06, 0.06, 1.0],
+      "eye_color": [0.05, 0.05, 0.05, 1.0]
+    },
+    "wardrobe": {
+      "collar_color": [0.88, 0.12, 0.14, 1.0],
+      "tag_color": [0.95, 0.75, 0.15, 1.0]
+    }
+  },
+  "creature_stegosaurus": {
+    "character_id": "creature_stegosaurus",
+    "name": "Stegosaurus",
+    "archetype": "prehistoric_herbivore",
+    "age_category": "giant_creature",
+    "proportions": {
+      "body_length": 6.8,
+      "plate_count": 14,
+      "thagomizer_spikes": 4
+    },
+    "color_palette": {
+      "skin": [0.48, 0.42, 0.34, 1.0],
+      "plates": [0.78, 0.28, 0.16, 1.0]
+    }
+  },
+  "creature_sauropod": {
+    "character_id": "creature_sauropod",
+    "name": "Lagoon Sauropod",
+    "archetype": "lagoon_gentle_giant",
+    "age_category": "colossal_creature",
+    "proportions": {
+      "neck_length": 4.5,
+      "habitat": "tropical_lagoon"
+    },
+    "color_palette": {
+      "skin": [0.28, 0.58, 0.62, 1.0]
+    }
+  },
+  "creature_baby_trex": {
+    "character_id": "creature_baby_trex",
+    "name": "Baby T-Rex",
+    "archetype": "inquisitive_dino",
+    "age_category": "juvenile_creature",
+    "proportions": {
+      "head_scale": 1.4,
+      "eye_scale": 1.6
+    },
+    "color_palette": {
+      "skin": [0.38, 0.62, 0.32, 1.0]
     }
   }
 }

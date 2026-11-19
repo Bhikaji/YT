@@ -16,13 +16,13 @@ class RenderManager:
         if which_blender:
             return which_blender
         candidates = [
-            r"E:\YT\tools\blender\blender-4.2.16-windows-x64\blender.exe",
+            str(settings.BASE_DIR / "tools" / "blender" / "Blender Foundation" / "Blender 4.5" / "blender.exe"),
             r"C:\Program Files\Blender Foundation\Blender 4.5\blender.exe",
             r"C:\Program Files\Blender Foundation\Blender 4.2\blender.exe",
             r"C:\Program Files\Blender Foundation\Blender 4.1\blender.exe",
             r"C:\Program Files\Blender Foundation\Blender 4.0\blender.exe",
         ]
-        tools_blender_dir = Path("E:/YT/tools/blender")
+        tools_blender_dir = settings.BASE_DIR / "tools" / "blender"
         if tools_blender_dir.exists():
             for p in tools_blender_dir.rglob("blender.exe"):
                 if p.is_file():
@@ -42,11 +42,11 @@ class RenderManager:
         """Executes a Blender headless automation script."""
         blender_bin = cls.find_blender_binary()
         if not blender_bin:
-            raise RuntimeError("Blender 4.2 LTS binary not found! Please ensure Blender is installed at E:\\YT\\tools\\blender.")
+            raise RuntimeError(f"Blender binary not found! Please ensure Blender is installed at {settings.BASE_DIR / 'tools' / 'blender'}.")
 
-        print(f"[RenderManager] Launching Blender headless: {blender_bin} -b -P {bpy_script_path}")
+        print(f"[RenderManager] Launching Blender headless: {blender_bin} --factory-startup -b -P {bpy_script_path}")
         result = subprocess.run(
-            [blender_bin, "-b", "-P", bpy_script_path],
+            [blender_bin, "--factory-startup", "-b", "-P", bpy_script_path],
             capture_output=True,
             text=True,
             timeout=timeout_seconds

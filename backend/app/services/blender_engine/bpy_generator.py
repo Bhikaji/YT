@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 from typing import Dict, Any, List
 from backend.app.schemas.script import GeneratedEpisodeScript, ScriptScene
+from modules.character_engine.pixar_master_builder import PixarMasterBuilder
+from modules.environment_engine.prehistoric_world_builder import PrehistoricWorldBuilder
 
 class BpyScriptGenerator:
     """Generates standalone Python scripts executed headlessly by Blender (bpy)."""
@@ -20,17 +22,19 @@ class BpyScriptGenerator:
     ) -> str:
         """
         Creates a self-contained Python script to drive Blender headless rendering
-        with master stylized 3D characters (Leo & Lumi), 41-bone skeletal animation,
-        NLA action strips, and cinematic lighting.
+        with master Pixar stylized 3D characters (Leo & Lumi Puppy), prehistoric dinosaurs,
+        lush lost world environment, speech viseme shapekeys, and multi-act cinematography.
         """
         script_content = f'''# Auto-generated Master 3D Production Render Script by Autonomous AI Cartoon Studio
 import bpy
 import math
 import os
 
+# 1. Clear Scene
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
 
+# 2. Render Settings (EEVEE-Next, High Definition {resolution[0]}x{resolution[1]} @ {fps}fps)
 scene.render.engine = 'BLENDER_EEVEE_NEXT' if hasattr(bpy.types, "RenderEngine") else 'BLENDER_EEVEE'
 scene.render.resolution_x = {resolution[0]}
 scene.render.resolution_y = {resolution[1]}
@@ -40,8 +44,9 @@ scene.frame_start = 1
 scene.frame_end = {total_frames}
 
 if hasattr(scene, "eevee"):
-    scene.eevee.taa_render_samples = 2
+    scene.eevee.taa_render_samples = 4
 
+# AgX Color Management
 if 'AgX' in [c.name for c in bpy.types.ColorManagedViewSettings.bl_rna.properties['view_transform'].enum_items]:
     scene.view_settings.view_transform = 'AgX'
     scene.view_settings.look = 'Medium High Contrast'
@@ -53,237 +58,120 @@ scene.render.filepath = os.path.join(r"{output_frames_dir}", "frame_")
 scene.render.image_settings.file_format = 'JPEG'
 scene.render.image_settings.quality = 95
 
-# World
-world = bpy.data.worlds.new("EnchantedWorld")
-scene.world = world
-world.use_nodes = True
-bg = world.node_tree.nodes.get("Background")
-if bg:
-    bg.inputs['Color'].default_value = (0.015, 0.025, 0.05, 1.0)
-    bg.inputs['Strength'].default_value = 0.55
+# 3. Materials Palette
+{PixarMasterBuilder.get_shader_definitions_code()}
 
-# 1. Import Hero (Leo)
-gltf_hero = r"E:\\YT\\assets\\characters\\kaykit_adventurers\\addons\\kaykit_character_pack_adventures\\Characters\\gltf\\Rogue_Hooded.glb"
-bpy.ops.import_scene.gltf(filepath=gltf_hero)
+# 4. Environment & Prehistoric World
+{PrehistoricWorldBuilder.get_environment_code()}
+build_prehistoric_world()
 
-hero_rig = [o for o in bpy.data.objects if o.type == 'ARMATURE' and o.name == 'Rig'][0]
-hero_rig.name = "Leo_Hero_Rig"
-hero_rig.location = (0, 0, 0)
+# 5. Characters & Creatures
+{PixarMasterBuilder.get_leo_builder_code(location=(-0.35, 0.0, 0.0))}
+head_leo, mouth_leo, leo_objs = build_pixar_leo()
 
-for w_name in ['1H_Crossbow', '2H_Crossbow', 'Knife', 'Knife_Offhand', 'Throwable']:
-    obj = bpy.data.objects.get(w_name)
-    if obj:
-        bpy.data.objects.remove(obj, do_unlink=True)
+{PixarMasterBuilder.get_lumi_puppy_code(location=(0.42, -0.25, 0.0))}
+phead, ptail, puppy_objs = build_puppy_lumi()
 
-leo_tex_path = r"E:\\YT\\assets\\characters\\kaykit_adventurers\\addons\\kaykit_character_pack_adventures\\Characters\\fbx\\leo_texture.png"
-tex_image = bpy.data.images.load(leo_tex_path)
+{PixarMasterBuilder.get_prehistoric_creatures_code()}
+stego_objs = build_stegosaurus(location=(-2.4, 3.8, 0.0))
+sauro_objs = build_lagoon_sauropod(location=(2.8, 10.5, -0.4))
+trex_objs = build_baby_trex(location=(-1.5, 5.2, 0.1))
 
-mat = bpy.data.materials.get("rogue_texture")
-if mat and mat.use_nodes:
-    bsdf = mat.node_tree.nodes.get("Principled BSDF")
-    tex_node = [n for n in mat.node_tree.nodes if n.type == 'TEX_IMAGE']
-    if tex_node:
-        tex_node[0].image = tex_image
-    else:
-        new_tex = mat.node_tree.nodes.new('ShaderNodeTexImage')
-        new_tex.image = tex_image
-        mat.node_tree.links.new(new_tex.outputs['Color'], bsdf.inputs['Base Color'])
+# Apply Shade Smooth & Subdivision Surface to all character meshes
+for obj in scene.objects:
+    if obj.type == 'MESH':
+        for poly in obj.data.polygons:
+            poly.use_smooth = True
+        if any(tag in obj.name for tag in ["Leo_Head", "Leo_Nose", "Leo_Mouth", "Leo_Torso", "Puppy_Head", "Puppy_Body", "Puppy_Ear", "HairCluster"]):
+            sub = obj.modifiers.new(name="Subsurf", type='SUBSURF')
+            sub.levels = 1
+            sub.render_levels = 2
 
-# Import Animations
-fbx_anim = r"E:\\YT\\assets\\characters\\kaykit_animations\\Animations\\KayKit Animated Character_v1.1.fbx"
-bpy.ops.import_scene.fbx(filepath=fbx_anim)
-temp_arm = [o for o in bpy.data.objects if o.type == 'ARMATURE' and o != hero_rig][0]
-
-walk_action = bpy.data.actions.get("KayKit Animated Character|KayKit Animated Character|Walk")
-wave_action = bpy.data.actions.get("KayKit Animated Character|KayKit Animated Character|Wave")
-cheer_action = bpy.data.actions.get("KayKit Animated Character|KayKit Animated Character|Cheer")
-bpy.data.objects.remove(temp_arm, do_unlink=True)
-
-# 2. Import Companion Fox (Lumi)
-gltf_fox = r"E:\\YT\\assets\\animals\\Fox.glb"
-bpy.ops.import_scene.gltf(filepath=gltf_fox)
-
-fox_rig = [o for o in bpy.data.objects if o.type == 'ARMATURE' and o != hero_rig][0]
-fox_rig.name = "Lumi_Fox_Rig"
-fox_rig.scale = (0.012, 0.012, 0.012)
-fox_rig.location = (0.60, 0.25, 0.0)
-fox_rig.rotation_euler = (0, 0, math.radians(20))
-
-fox_walk = bpy.data.actions.get("Walk_root")
-fox_survey = bpy.data.actions.get("Survey_root")
-
-# 3. NLA Action Strips
-hero_rig.animation_data_create()
-hero_track = hero_rig.animation_data.nla_tracks.new()
-
-s1 = hero_track.strips.new("WalkStrip", 1, walk_action)
-walk_len = walk_action.frame_range[1] - walk_action.frame_range[0]
-s1.repeat = 90.0 / walk_len
-s1.frame_end = 90
-
-s2 = hero_track.strips.new("WaveStrip", 91, wave_action)
-wave_len = wave_action.frame_range[1] - wave_action.frame_range[0]
-s2.repeat = 90.0 / wave_len
-s2.frame_end = 180
-
-s3 = hero_track.strips.new("CheerStrip", 181, cheer_action)
-cheer_len = cheer_action.frame_range[1] - cheer_action.frame_range[0]
-s3.repeat = 120.0 / cheer_len
-s3.frame_end = 300
-hero_rig.animation_data.action = None
-
-fox_rig.animation_data_create()
-fox_track = fox_rig.animation_data.nla_tracks.new()
-
-fs1 = fox_track.strips.new("FoxWalk", 1, fox_walk)
-f_walk_len = fox_walk.frame_range[1] - fox_walk.frame_range[0]
-fs1.repeat = 90.0 / f_walk_len
-fs1.frame_end = 90
-
-fs2 = fox_track.strips.new("FoxSurvey", 91, fox_survey)
-f_surv_len = fox_survey.frame_range[1] - fox_survey.frame_range[0]
-fs2.repeat = 210.0 / f_surv_len
-fs2.frame_end = 300
-fox_rig.animation_data.action = None
-
-# 4. Environment
-def create_pbr_mat(name, base_color, roughness=0.4, metallic=0.0, emission=None, emission_strength=1.0):
-    m = bpy.data.materials.new(name=name)
-    m.use_nodes = True
-    nodes = m.node_tree.nodes
-    bsdf = nodes.get("Principled BSDF")
-    if bsdf:
-        bsdf.inputs['Base Color'].default_value = base_color
-        bsdf.inputs['Roughness'].default_value = roughness
-        bsdf.inputs['Metallic'].default_value = metallic
-        if emission:
-            if 'Emission Color' in bsdf.inputs:
-                bsdf.inputs['Emission Color'].default_value = emission
-                bsdf.inputs['Emission Strength'].default_value = emission_strength
-    return m
-
-mat_stone = create_pbr_mat("BridgeStone", (0.28, 0.30, 0.35, 1.0), roughness=0.7)
-mat_gold = create_pbr_mat("GoldRune", (0.85, 0.70, 0.20, 1.0), roughness=0.25, metallic=0.8, emission=(0.95, 0.8, 0.2, 1.0), emission_strength=1.5)
-mat_crystal = create_pbr_mat("CrystalCyan", (0.15, 0.85, 1.0, 1.0), roughness=0.15, emission=(0.10, 0.85, 1.0, 1.0), emission_strength=3.5)
-mat_shroom_teal = create_pbr_mat("ShroomTeal", (0.08, 0.75, 0.70, 1.0), roughness=0.35, emission=(0.08, 0.75, 0.70, 1.0), emission_strength=2.2)
-mat_shroom_purple = create_pbr_mat("ShroomPurple", (0.75, 0.20, 0.88, 1.0), roughness=0.35, emission=(0.75, 0.20, 0.88, 1.0), emission_strength=2.5)
-
-bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, -0.15))
-deck = bpy.context.active_object
-deck.scale = (2.2, 22.0, 0.30)
-bpy.ops.object.transform_apply(scale=True)
-deck.data.materials.append(mat_stone)
-
-for sx in [-1.05, 1.05]:
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(sx, 0, 0.08))
-    curb = bpy.context.active_object
-    curb.scale = (0.18, 22.0, 0.16)
-    bpy.ops.object.transform_apply(scale=True)
-    curb.data.materials.append(mat_gold)
-
-for py in [-6.0, -3.5, -1.0, 1.5, 4.0, 6.5]:
-    for px in [-1.15, 1.15]:
-        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.08, depth=0.8, location=(px, py, 0.4))
-        p = bpy.context.active_object
-        p.data.materials.append(mat_stone)
-        bpy.ops.mesh.primitive_uv_sphere_add(radius=0.08, location=(px, py, 0.85))
-        c = bpy.context.active_object
-        c.data.materials.append(mat_crystal)
-
-shrooms = [(-3.0, -2.0, 0.0, 1.8, mat_shroom_teal), (3.2, -0.5, 0.2, 2.2, mat_shroom_purple), (-3.4, 2.5, 0.3, 2.5, mat_shroom_purple), (3.0, 4.8, 0.1, 1.9, mat_shroom_teal)]
-for mx, my, mz, scale_s, cap_mat in shrooms:
-    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.15 * scale_s, depth=2.0 * scale_s, location=(mx, my, mz + 1.0 * scale_s))
-    st = bpy.context.active_object
-    st.data.materials.append(mat_stone)
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=24, ring_count=16, radius=0.9 * scale_s, location=(mx, my, mz + 2.0 * scale_s))
-    cp = bpy.context.active_object
-    cp.scale = (1.0, 1.0, 0.4)
-    bpy.ops.object.transform_apply(scale=True)
-    cp.data.materials.append(cap_mat)
-
-# 5. Lighting
-l_key_data = bpy.data.lights.new("KeyLight", type='POINT')
-l_key_data.energy = 200
-l_key_data.color = (1.0, 0.88, 0.72)
-l_key = bpy.data.objects.new("KeyLight", l_key_data)
-bpy.context.collection.objects.link(l_key)
-l_key.location = (-1.8, -2.5, 2.6)
-
-l_face_data = bpy.data.lights.new("FaceFillLight", type='POINT')
-l_face_data.energy = 95
-l_face_data.color = (1.0, 0.94, 0.85)
-l_face = bpy.data.objects.new("FaceFillLight", l_face_data)
-bpy.context.collection.objects.link(l_face)
-l_face.location = (-0.2, -2.2, 1.1)
-
-l_fill_data = bpy.data.lights.new("FillLight", type='POINT')
-l_fill_data.energy = 70
-l_fill_data.color = (0.4, 0.55, 0.95)
-l_fill = bpy.data.objects.new("FillLight", l_fill_data)
-bpy.context.collection.objects.link(l_fill)
-l_fill.location = (2.2, -1.0, 2.2)
-
-l_rim_data = bpy.data.lights.new("RimLight", type='SPOT')
-l_rim_data.energy = 420
-l_rim_data.color = (0.2, 0.9, 1.0)
-l_rim_data.spot_size = math.radians(70)
-l_rim = bpy.data.objects.new("RimLight", l_rim_data)
-bpy.context.collection.objects.link(l_rim)
-l_rim.location = (0.5, 2.5, 2.2)
-l_rim.rotation_euler = (math.radians(-45), 0, math.radians(-160))
-
-# 6. Camera Director
+# 6. Camera Director & Multi-Act Cinematography
 cam_data = bpy.data.cameras.new("DirectorCamera")
-cam_data.lens = 42
+cam_data.lens = 38
 cam_data.dof.use_dof = True
-cam_data.dof.focus_distance = 3.0
-cam_data.dof.aperture_fstop = 2.8
+cam_data.dof.aperture_fstop = 3.2
 
 cam_obj = bpy.data.objects.new("DirectorCamera", cam_data)
 bpy.context.collection.objects.link(cam_obj)
 scene.camera = cam_obj
 
-for f in range(1, 301):
-    if f <= 90:
-        y_travel = -2.5 + (f / 90.0) * 1.5
-        hero_rig.location = (0.0, y_travel, 0.0)
-        hero_rig.keyframe_insert(data_path="location", frame=f)
-        fox_rig.location = (0.60, y_travel + 0.25, 0.0)
-        fox_rig.keyframe_insert(data_path="location", frame=f)
-        cam_obj.location = (0.05, y_travel - 3.4, 1.25)
-        cam_obj.rotation_euler = (math.radians(82), 0, math.radians(2))
-        cam_obj.keyframe_insert(data_path="location", frame=f)
-        cam_obj.keyframe_insert(data_path="rotation_euler", frame=f)
-        cam_data.dof.focus_distance = 3.4
-        cam_data.keyframe_insert(data_path="dof.focus_distance", frame=f)
-    elif f <= 180:
-        hero_rig.location = (0.0, -1.0, 0.0)
-        hero_rig.keyframe_insert(data_path="location", frame=f)
-        fox_rig.location = (0.60, -0.75, 0.0)
-        fox_rig.keyframe_insert(data_path="location", frame=f)
-        prog = (f - 90) / 90.0
-        cam_obj.location = (-0.30 + prog * 0.15, -3.5 - prog * 0.1, 1.35 + prog * 0.10)
-        cam_obj.rotation_euler = (math.radians(82), 0, math.radians(-5 + prog * 3))
-        cam_obj.keyframe_insert(data_path="location", frame=f)
-        cam_obj.keyframe_insert(data_path="rotation_euler", frame=f)
-        cam_data.dof.focus_distance = 2.9
-        cam_data.keyframe_insert(data_path="dof.focus_distance", frame=f)
-    else:
-        hero_rig.location = (0.0, -1.0, 0.0)
-        hero_rig.keyframe_insert(data_path="location", frame=f)
-        fox_rig.location = (0.60, -0.75, 0.0)
-        fox_rig.keyframe_insert(data_path="location", frame=f)
-        prog3 = (f - 180) / 120.0
-        cam_obj.location = (-0.05, -2.55 - prog3 * 0.10, 1.55)
-        cam_obj.rotation_euler = (math.radians(84), 0, math.radians(-2))
-        cam_obj.keyframe_insert(data_path="location", frame=f)
-        cam_obj.keyframe_insert(data_path="rotation_euler", frame=f)
-        cam_data.lens = 48
-        cam_data.keyframe_insert(data_path="lens", frame=f)
-        cam_data.dof.focus_distance = 1.65
-        cam_data.keyframe_insert(data_path="dof.focus_distance", frame=f)
+# 7. Animation Keyframing (4 Acts matching Demo Video)
+for f in range(1, {total_frames} + 1):
+    # Leo Lip-Sync & Emotion Blendshapes
+    if head_leo and head_leo.data.shape_keys:
+        kb = head_leo.data.shape_keys.key_blocks
+        if "jawOpen" in kb:
+            if (65 <= f <= 135) or (165 <= f <= 275):
+                jaw_val = abs(math.sin(f * 0.48)) * 0.70 + 0.12
+                smile_val = 0.60 + 0.20 * math.sin(f * 0.22)
+            else:
+                jaw_val = 0.04
+                smile_val = 0.45
+                
+            kb["jawOpen"].value = jaw_val
+            kb["jawOpen"].keyframe_insert(data_path="value", frame=f)
+            kb["mouthSmile"].value = smile_val
+            kb["mouthSmile"].keyframe_insert(data_path="value", frame=f)
+            if "wonderEmotion" in kb:
+                kb["wonderEmotion"].value = 0.75
+                kb["wonderEmotion"].keyframe_insert(data_path="value", frame=f)
 
+    # Puppy Tail Wagging Animation
+    if ptail:
+        wag = math.sin(f * 0.75) * math.radians(30)
+        ptail.rotation_euler = (math.radians(-45), 0, wag)
+        ptail.keyframe_insert(data_path="rotation_euler", frame=f)
+
+    # Puppy Sniffing & Looking Up
+    if phead:
+        if f <= 140:
+            sniff = math.radians(16 + math.sin(f * 0.35) * 6)
+            phead.rotation_euler = (sniff, 0, math.radians(-12))
+        else:
+            look_up = math.radians(-16 + math.sin(f * 0.18) * 5)
+            phead.rotation_euler = (look_up, 0, math.radians(14))
+        phead.keyframe_insert(data_path="rotation_euler", frame=f)
+
+    # Camera Multi-Act Sequence
+    if f <= 75:
+        # ACT 1 (Frames 1-75): Level Establishing View
+        t1 = f / 75.0
+        cam_obj.location = (0.05 + t1 * 0.1, -3.2 + t1 * 0.3, 1.25 + t1 * 0.05)
+        cam_obj.rotation_euler = (math.radians(88), 0, math.radians(2))
+        cam_data.lens = 35
+        cam_data.dof.focus_distance = 3.0
+    elif f <= 150:
+        # ACT 2 (Frames 76-150): Medium Tracking Shot - Footprint Discovery
+        t2 = (f - 75) / 75.0
+        cam_obj.location = (0.15 + t2 * 0.1, -2.4 - t2 * 0.15, 0.95 - t2 * 0.1)
+        cam_obj.rotation_euler = (math.radians(82 + t2 * 2), 0, math.radians(4))
+        cam_data.lens = 42
+        cam_data.dof.focus_distance = 2.0
+    elif f <= 225:
+        # ACT 3 (Frames 151-225): Macro Low-Angle Shot on Footprint
+        t3 = (f - 150) / 75.0
+        cam_obj.location = (0.28 - t3 * 0.12, -1.8 - t3 * 0.15, 0.65 + t3 * 0.15)
+        cam_obj.rotation_euler = (math.radians(82), 0, math.radians(-3 + t3 * 4))
+        cam_data.lens = 48
+        cam_data.dof.focus_distance = 1.6
+    else:
+        # ACT 4 (Frames 226-300): Hero Close-Up & Grand Dinosaur Reveal
+        t4 = (f - 225) / 75.0
+        cam_obj.location = (-0.25 + t4 * 0.20, -1.85 - t4 * 0.35, 1.48 + t4 * 0.10)
+        cam_obj.rotation_euler = (math.radians(88 - t4 * 3), 0, math.radians(-4 + t4 * 8))
+        cam_data.lens = 50
+        cam_data.dof.focus_distance = 1.85
+
+    cam_obj.keyframe_insert(data_path="location", frame=f)
+    cam_obj.keyframe_insert(data_path="rotation_euler", frame=f)
+    cam_data.keyframe_insert(data_path="lens", frame=f)
+    cam_data.dof.keyframe_insert(data_path="focus_distance", frame=f)
+
+print("[MasterRenderer] Scene setup complete. Beginning high-definition animation render...")
 bpy.ops.render.render(animation=True)
+print("[MasterRenderer] 3D Animation render finished successfully.")
 '''
         os.makedirs(os.path.dirname(output_script_path), exist_ok=True)
         with open(output_script_path, "w", encoding="utf-8") as f:
