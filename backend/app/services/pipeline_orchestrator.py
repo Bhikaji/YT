@@ -25,6 +25,7 @@ from modules.quality_control.inspector import QualityControlInspector
 from modules.character_engine.generator import CharacterSpecification
 from backend.app.services.ai_video_engine.pixar_animator import PixarAiVideoEngine
 from backend.app.services.ai_video_engine.veo_video_generator import GoogleVeoVideoGenerator
+from backend.app.services.ai_video_engine.local_diffusion_engine import LocalDiffusionVideoEngine
 
 class PipelineOrchestrator:
     """End-to-End Autonomous 3D Cartoon Production & YouTube Publishing Pipeline."""
@@ -156,7 +157,31 @@ class PipelineOrchestrator:
         has_gemini_key = bool(getattr(settings, "GEMINI_API_KEY", None) or os.getenv("GEMINI_API_KEY"))
         has_wan_url = bool(getattr(settings, "WAN21_API_URL", None) or os.getenv("WAN21_API_URL"))
 
-        if has_wan_url:
+        if mode == "LOCAL_DIFFUSION":
+            print(f"[PIPELINE] Launching 100% Free Local GPU Video Diffusion ({getattr(settings, 'LOCAL_DIFFUSION_MODEL', 'LTX-Video')})...")
+            scene_prompt = (
+                f"Disney Pixar 3D animated movie, cute adventurer boy in orange tshirt and blue shorts smiling and pointing excitedly "
+                f"at a friendly Stegosaurus dinosaur walking between palm trees in {script.scenes[0].environment}, "
+                f"{script.scenes[0].lighting_preset} lighting, golden puppy Lumi beside him, cinematic camera motion, 8k render, masterpiece"
+            )
+            local_raw_mp4 = Path(render_output_dir) / "local_diffusion_master.mp4"
+            try:
+                LocalDiffusionVideoEngine.generate_video(
+                    prompt=scene_prompt,
+                    output_file=local_raw_mp4,
+                    num_frames=int(total_audio_duration * 24),
+                    fps=24
+                )
+                import imageio_ffmpeg
+                ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+                subprocess.run([
+                    ffmpeg_exe, "-y", "-i", str(local_raw_mp4),
+                    "-vf", f"fps={fps}",
+                    os.path.join(render_output_dir, "frame_%04d.jpg")
+                ], capture_output=True)
+            except Exception as e:
+                print(f"[PIPELINE] Local diffusion error: {e}. Falling back to default pipeline...")
+        elif has_wan_url:
             print(f"[PIPELINE] Launching 100% Free Open-Source Colab AI Video Generator (Wan 2.1)...")
             scene_prompt = f"Disney Pixar 3D animation, cute adventurer boy in orange tshirt and puppy pointing excitedly at a huge friendly Stegosaurus dinosaur walking between palm trees, cinematic lighting, 8k render, masterpiece"
             free_ai_mp4 = Path(render_output_dir) / "free_wan_master.mp4"

@@ -17,8 +17,16 @@ class Settings(BaseSettings):
     OUTPUT_DIR: Path = BASE_DIR / "output"
     SCRIPTS_DIR: Path = BASE_DIR / "scripts"
     
-    # Animation Engine Mode: 'VEO_AI' (Google Veo 3 / Veo 2 / Gemini AI video generation), 'AI_PIXAR' (Pixar Neural Diffusion), or 'BLENDER_3D' (Blender EEVEE-Next)
-    ANIMATION_ENGINE_MODE: str = "VEO_AI"
+    # Animation Engine Mode:
+    # 'LOCAL_DIFFUSION' (100% Free Local Open-Source AI Video on your GPU - LTX-Video / Wan 2.1)
+    # 'VEO_AI' (Google Veo 3 / Veo 2 / Gemini AI video generation)
+    # 'BLENDER_3D' (Blender 4.2 LTS EEVEE-Next procedural character engine)
+    # 'AI_PIXAR' (Pixar Neural Diffusion keyframes)
+    ANIMATION_ENGINE_MODE: str = "LOCAL_DIFFUSION"
+    LOCAL_DIFFUSION_MODEL: str = "Lightricks/LTX-Video"
+    LOCAL_DIFFUSION_DEVICE: str = "cuda"
+    
+    # Cloud & Remote Options
     VEO_MODEL: str = "veo-3.1-fast-generate-preview"
     VEO_FALLBACK_MODEL: str = "veo-2.0-generate-001"
     VEO_RESOLUTION: str = "720p"
