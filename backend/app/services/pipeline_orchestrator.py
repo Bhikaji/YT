@@ -23,6 +23,7 @@ from backend.app.services.youtube_engine.uploader import YouTubeUploader
 from backend.orchestrator.state_machine import ProductionJobStateMachine, JobState
 from modules.quality_control.inspector import QualityControlInspector
 from modules.character_engine.generator import CharacterSpecification
+from backend.app.services.ai_video_engine.pixar_animator import PixarAiVideoEngine
 
 class PipelineOrchestrator:
     """End-to-End Autonomous 3D Cartoon Production & YouTube Publishing Pipeline."""
@@ -148,18 +149,33 @@ class PipelineOrchestrator:
 
         await ProductionJobStateMachine.transition(job_id, JobState.ANIMATING)
         await ProductionJobStateMachine.transition(job_id, JobState.RENDERING)
-        print(f"[PIPELINE] Launching genuine 3D character animation render via Blender EEVEE-Next...")
-        bpy_script_file = str(settings.SCRIPTS_DIR / f"render_{episode_slug}.py")
-        BpyScriptGenerator.generate_blender_render_script(
-            script=script,
-            output_script_path=bpy_script_file,
-            output_frames_dir=render_output_dir,
-            viseme_data_map={},
-            resolution=settings.BLENDER_RESOLUTION_SHORT if format_type == "SHORT" else settings.BLENDER_RESOLUTION_LONG,
-            fps=fps,
-            total_frames=total_frames
-        )
-        RenderManager.execute_blender_render(bpy_script_file)
+
+        resolution = settings.BLENDER_RESOLUTION_SHORT if format_type == "SHORT" else settings.BLENDER_RESOLUTION_LONG
+        if getattr(settings, "ANIMATION_ENGINE_MODE", "AI_PIXAR") == "AI_PIXAR":
+            print(f"[PIPELINE] Launching 100% Free High-Definition Pixar AI Video Engine ({resolution[0]}x{resolution[1]} @ {fps}fps)...")
+            scene_prompts = [
+                f"Disney Pixar 3D animated film still, cute boy Leo in orange tshirt and blue shorts with puppy Lumi in {s.environment}, {s.lighting_preset} lighting, cinematic lighting, 8k render, masterpiece"
+                for s in script.scenes
+            ]
+            PixarAiVideoEngine.render_episode_frames(
+                output_dir=Path(render_output_dir),
+                total_frames=total_frames,
+                resolution=resolution,
+                custom_scene_prompts=scene_prompts
+            )
+        else:
+            print(f"[PIPELINE] Launching genuine 3D character animation render via Blender EEVEE-Next...")
+            bpy_script_file = str(settings.SCRIPTS_DIR / f"render_{episode_slug}.py")
+            BpyScriptGenerator.generate_blender_render_script(
+                script=script,
+                output_script_path=bpy_script_file,
+                output_frames_dir=render_output_dir,
+                viseme_data_map={},
+                resolution=resolution,
+                fps=fps,
+                total_frames=total_frames
+            )
+            RenderManager.execute_blender_render(bpy_script_file)
 
         # STEP 4: Quality Control Pre-flight Check on Renders and Audio
         await ProductionJobStateMachine.transition(job_id, JobState.QUALITY_CHECK)

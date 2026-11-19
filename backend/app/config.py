@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     OUTPUT_DIR: Path = BASE_DIR / "output"
     SCRIPTS_DIR: Path = BASE_DIR / "scripts"
     
+    # Animation Engine Mode: 'AI_PIXAR' (100% free photorealistic Pixar AI) or 'BLENDER_3D' (Blender EEVEE-Next)
+    ANIMATION_ENGINE_MODE: str = "AI_PIXAR"
+    
     # Database
     DATABASE_URL: str = f"sqlite+aiosqlite:///{BASE_DIR / 'data' / 'cartoon_studio.db'}"
     

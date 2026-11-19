@@ -1,0 +1,564 @@
+[
+  {
+    "start": 0.0,
+    "end": 0.136,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 0.136,
+    "end": 0.272,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 0.272,
+    "end": 0.409,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 0.409,
+    "end": 0.545,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 0.545,
+    "end": 0.641,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 0.641,
+    "end": 0.75,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 0.75,
+    "end": 0.859,
+    "viseme": "H",
+    "blendshapes": {
+      "jawOpen": 0.35,
+      "mouthFunnel": 0.15
+    }
+  },
+  {
+    "start": 0.859,
+    "end": 0.968,
+    "viseme": "E",
+    "blendshapes": {
+      "jawOpen": 0.45,
+      "mouthFunnel": 0.65,
+      "mouthPucker": 0.3
+    }
+  },
+  {
+    "start": 0.968,
+    "end": 1.077,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 1.077,
+    "end": 1.186,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 1.186,
+    "end": 1.282,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 1.282,
+    "end": 1.418,
+    "viseme": "A",
+    "blendshapes": {
+      "jawOpen": 0.05,
+      "mouthClose": 0.8,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 1.418,
+    "end": 1.554,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 1.554,
+    "end": 1.691,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 1.691,
+    "end": 1.827,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 1.827,
+    "end": 1.923,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 1.923,
+    "end": 2.032,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.032,
+    "end": 2.141,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.141,
+    "end": 2.25,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.25,
+    "end": 2.359,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.359,
+    "end": 2.468,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.468,
+    "end": 2.564,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 2.564,
+    "end": 2.673,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.673,
+    "end": 2.782,
+    "viseme": "F",
+    "blendshapes": {
+      "jawOpen": 0.2,
+      "mouthPucker": 0.85,
+      "mouthFunnel": 0.4
+    }
+  },
+  {
+    "start": 2.782,
+    "end": 2.891,
+    "viseme": "D",
+    "blendshapes": {
+      "jawOpen": 0.85,
+      "mouthFunnel": 0.1,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.891,
+    "end": 3.0,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.0,
+    "end": 3.109,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.109,
+    "end": 3.205,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 3.205,
+    "end": 3.296,
+    "viseme": "F",
+    "blendshapes": {
+      "jawOpen": 0.2,
+      "mouthPucker": 0.85,
+      "mouthFunnel": 0.4
+    }
+  },
+  {
+    "start": 3.296,
+    "end": 3.387,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.387,
+    "end": 3.477,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.477,
+    "end": 3.568,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.568,
+    "end": 3.659,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.659,
+    "end": 3.75,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.75,
+    "end": 3.846,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 3.846,
+    "end": 3.955,
+    "viseme": "A",
+    "blendshapes": {
+      "jawOpen": 0.05,
+      "mouthClose": 0.8,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 3.955,
+    "end": 4.064,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 4.064,
+    "end": 4.173,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 4.173,
+    "end": 4.282,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 4.282,
+    "end": 4.391,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 4.391,
+    "end": 4.487,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 4.487,
+    "end": 4.759,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 4.759,
+    "end": 5.032,
+    "viseme": "E",
+    "blendshapes": {
+      "jawOpen": 0.45,
+      "mouthFunnel": 0.65,
+      "mouthPucker": 0.3
+    }
+  },
+  {
+    "start": 5.032,
+    "end": 5.128,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 5.128,
+    "end": 5.4,
+    "viseme": "A",
+    "blendshapes": {
+      "jawOpen": 0.05,
+      "mouthClose": 0.8,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 5.4,
+    "end": 5.673,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 5.673,
+    "end": 5.769,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 5.769,
+    "end": 5.878,
+    "viseme": "G",
+    "blendshapes": {
+      "jawOpen": 0.15,
+      "mouthLowerDownLeft": 0.4,
+      "mouthLowerDownRight": 0.4
+    }
+  },
+  {
+    "start": 5.878,
+    "end": 5.987,
+    "viseme": "E",
+    "blendshapes": {
+      "jawOpen": 0.45,
+      "mouthFunnel": 0.65,
+      "mouthPucker": 0.3
+    }
+  },
+  {
+    "start": 5.987,
+    "end": 6.096,
+    "viseme": "F",
+    "blendshapes": {
+      "jawOpen": 0.2,
+      "mouthPucker": 0.85,
+      "mouthFunnel": 0.4
+    }
+  },
+  {
+    "start": 6.096,
+    "end": 6.205,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 6.205,
+    "end": 6.314,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 6.314,
+    "end": 6.41,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  }
+]

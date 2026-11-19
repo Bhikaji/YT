@@ -37,6 +37,7 @@ output/renders/*
 demo_video/analysis_frames/
 demo_video/current_output_frames/
 demo_video/new_pipeline_frames/
+demo_video/*.wav
 scripts/render_ep_*.py
 
 # Sensitive Credentials

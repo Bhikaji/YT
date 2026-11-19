@@ -1,0 +1,3 @@
+file 'D:/YT/assets/audio/ai_short/scene1.mp3'
+file 'D:/YT/assets/audio/ai_short/scene2.mp3'
+file 'D:/YT/assets/audio/ai_short/scene3.mp3'

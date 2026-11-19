@@ -1,0 +1,528 @@
+[
+  {
+    "start": 0.0,
+    "end": 0.129,
+    "viseme": "H",
+    "blendshapes": {
+      "jawOpen": 0.35,
+      "mouthFunnel": 0.15
+    }
+  },
+  {
+    "start": 0.129,
+    "end": 0.257,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 0.257,
+    "end": 0.386,
+    "viseme": "E",
+    "blendshapes": {
+      "jawOpen": 0.45,
+      "mouthFunnel": 0.65,
+      "mouthPucker": 0.3
+    }
+  },
+  {
+    "start": 0.386,
+    "end": 0.454,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 0.454,
+    "end": 0.55,
+    "viseme": "H",
+    "blendshapes": {
+      "jawOpen": 0.35,
+      "mouthFunnel": 0.15
+    }
+  },
+  {
+    "start": 0.55,
+    "end": 0.647,
+    "viseme": "E",
+    "blendshapes": {
+      "jawOpen": 0.45,
+      "mouthFunnel": 0.65,
+      "mouthPucker": 0.3
+    }
+  },
+  {
+    "start": 0.647,
+    "end": 0.743,
+    "viseme": "E",
+    "blendshapes": {
+      "jawOpen": 0.45,
+      "mouthFunnel": 0.65,
+      "mouthPucker": 0.3
+    }
+  },
+  {
+    "start": 0.743,
+    "end": 0.84,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 0.84,
+    "end": 0.908,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 0.908,
+    "end": 1.101,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 1.101,
+    "end": 1.294,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 1.294,
+    "end": 1.362,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 1.362,
+    "end": 1.491,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 1.491,
+    "end": 1.619,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 1.619,
+    "end": 1.748,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 1.748,
+    "end": 1.816,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 1.816,
+    "end": 1.912,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 1.912,
+    "end": 2.009,
+    "viseme": "E",
+    "blendshapes": {
+      "jawOpen": 0.45,
+      "mouthFunnel": 0.65,
+      "mouthPucker": 0.3
+    }
+  },
+  {
+    "start": 2.009,
+    "end": 2.105,
+    "viseme": "E",
+    "blendshapes": {
+      "jawOpen": 0.45,
+      "mouthFunnel": 0.65,
+      "mouthPucker": 0.3
+    }
+  },
+  {
+    "start": 2.105,
+    "end": 2.202,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.202,
+    "end": 2.27,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 2.27,
+    "end": 2.399,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.399,
+    "end": 2.527,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.527,
+    "end": 2.656,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.656,
+    "end": 2.724,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 2.724,
+    "end": 2.779,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.779,
+    "end": 2.834,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 2.834,
+    "end": 2.889,
+    "viseme": "A",
+    "blendshapes": {
+      "jawOpen": 0.05,
+      "mouthClose": 0.8,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 2.889,
+    "end": 2.945,
+    "viseme": "A",
+    "blendshapes": {
+      "jawOpen": 0.05,
+      "mouthClose": 0.8,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 2.945,
+    "end": 3.0,
+    "viseme": "E",
+    "blendshapes": {
+      "jawOpen": 0.45,
+      "mouthFunnel": 0.65,
+      "mouthPucker": 0.3
+    }
+  },
+  {
+    "start": 3.0,
+    "end": 3.055,
+    "viseme": "H",
+    "blendshapes": {
+      "jawOpen": 0.35,
+      "mouthFunnel": 0.15
+    }
+  },
+  {
+    "start": 3.055,
+    "end": 3.11,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.11,
+    "end": 3.178,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 3.178,
+    "end": 3.274,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.274,
+    "end": 3.371,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.371,
+    "end": 3.467,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.467,
+    "end": 3.564,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.564,
+    "end": 3.632,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 3.632,
+    "end": 3.761,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.761,
+    "end": 3.889,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 3.889,
+    "end": 4.018,
+    "viseme": "C",
+    "blendshapes": {
+      "jawOpen": 0.5,
+      "mouthFunnel": 0.2,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 4.018,
+    "end": 4.086,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  },
+  {
+    "start": 4.086,
+    "end": 4.141,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 4.141,
+    "end": 4.196,
+    "viseme": "H",
+    "blendshapes": {
+      "jawOpen": 0.35,
+      "mouthFunnel": 0.15
+    }
+  },
+  {
+    "start": 4.196,
+    "end": 4.251,
+    "viseme": "E",
+    "blendshapes": {
+      "jawOpen": 0.45,
+      "mouthFunnel": 0.65,
+      "mouthPucker": 0.3
+    }
+  },
+  {
+    "start": 4.251,
+    "end": 4.307,
+    "viseme": "F",
+    "blendshapes": {
+      "jawOpen": 0.2,
+      "mouthPucker": 0.85,
+      "mouthFunnel": 0.4
+    }
+  },
+  {
+    "start": 4.307,
+    "end": 4.362,
+    "viseme": "D",
+    "blendshapes": {
+      "jawOpen": 0.85,
+      "mouthFunnel": 0.1,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 4.362,
+    "end": 4.417,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 4.417,
+    "end": 4.472,
+    "viseme": "B",
+    "blendshapes": {
+      "jawOpen": 0.25,
+      "mouthSmileLeft": 0.35,
+      "mouthSmileRight": 0.35,
+      "mouthClose": 0.0
+    }
+  },
+  {
+    "start": 4.472,
+    "end": 4.54,
+    "viseme": "X",
+    "blendshapes": {
+      "jawOpen": 0.0,
+      "mouthClose": 0.0,
+      "mouthPucker": 0.0,
+      "mouthFunnel": 0.0
+    }
+  }
+]
