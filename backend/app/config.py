@@ -18,11 +18,11 @@ class Settings(BaseSettings):
     SCRIPTS_DIR: Path = BASE_DIR / "scripts"
     
     # Animation Engine Mode:
-    # 'LOCAL_DIFFUSION' (100% Free Local Open-Source AI Video on your GPU - LTX-Video / Wan 2.1)
+    # 'COLAB_WAN' (Path 1: 100% Free Cloud GPU Worker on Google Colab T4 - Wan 2.1 / LTX-Video)
+    # 'LOCAL_DIFFUSION' (Path 2: 100% Free On-Device NVIDIA CUDA GPU - LTX-Video / Wan 2.1)
     # 'VEO_AI' (Google Veo 3 / Veo 2 / Gemini AI video generation)
-    # 'BLENDER_3D' (Blender 4.2 LTS EEVEE-Next procedural character engine)
-    # 'AI_PIXAR' (Pixar Neural Diffusion keyframes)
-    ANIMATION_ENGINE_MODE: str = "LOCAL_DIFFUSION"
+    # 'BLENDER_3D' (Blender 4.2 LTS EEVEE-Next procedural engine)
+    ANIMATION_ENGINE_MODE: str = "COLAB_WAN"
     LOCAL_DIFFUSION_MODEL: str = "Lightricks/LTX-Video"
     LOCAL_DIFFUSION_DEVICE: str = "cuda"
     

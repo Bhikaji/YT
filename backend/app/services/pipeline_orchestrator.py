@@ -168,11 +168,47 @@ class PipelineOrchestrator:
         await ProductionJobStateMachine.transition(job_id, JobState.RENDERING)
 
         resolution = settings.BLENDER_RESOLUTION_SHORT if format_type == "SHORT" else settings.BLENDER_RESOLUTION_LONG
-        mode = getattr(settings, "ANIMATION_ENGINE_MODE", "LOCAL_DIFFUSION")
+        mode = getattr(settings, "ANIMATION_ENGINE_MODE", "COLAB_WAN")
         has_gemini_key = bool(getattr(settings, "GEMINI_API_KEY", None) or os.getenv("GEMINI_API_KEY"))
         has_wan_url = bool(getattr(settings, "WAN21_API_URL", None) or os.getenv("WAN21_API_URL"))
 
-        if mode == "LOCAL_DIFFUSION":
+        if mode in ["COLAB_WAN", "WAN_AI"] or (has_wan_url and mode != "LOCAL_DIFFUSION"):
+            print(f"[PIPELINE] Launching 100% Free Open-Source Colab AI Video Generator (Wan 2.1 / LTX)...")
+            scene_prompt = (
+                f"Disney Pixar 3D animated movie, cute adventurer boy in orange tshirt and blue shorts smiling and pointing excitedly "
+                f"at a friendly Stegosaurus dinosaur walking between palm trees in {script.scenes[0].environment}, "
+                f"{script.scenes[0].lighting_preset} lighting, golden puppy Lumi beside him, cinematic camera motion, 8k render, masterpiece"
+            )
+            free_ai_mp4 = Path(render_output_dir) / "free_wan_master.mp4"
+            try:
+                GoogleVeoVideoGenerator.generate_from_free_colab_wan(
+                    prompt=scene_prompt,
+                    output_file=free_ai_mp4
+                )
+                import imageio_ffmpeg
+                ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+                subprocess.run([
+                    ffmpeg_exe, "-y", "-i", str(free_ai_mp4),
+                    "-vf", f"fps={fps}",
+                    os.path.join(render_output_dir, "frame_%04d.jpg")
+                ], capture_output=True)
+            except Exception as e:
+                print(f"[PIPELINE] Colab Wan AI notice: {e}. Executing fallback video engine...")
+                local_raw_mp4 = Path(render_output_dir) / "local_diffusion_master.mp4"
+                LocalDiffusionVideoEngine.generate_video(
+                    prompt=scene_prompt,
+                    output_file=local_raw_mp4,
+                    num_frames=int(total_audio_duration * 24),
+                    fps=24,
+                    aspect_ratio="9:16" if format_type == "SHORT" else "16:9"
+                )
+                import imageio_ffmpeg
+                subprocess.run([
+                    imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-i", str(local_raw_mp4),
+                    "-vf", f"fps={fps}",
+                    os.path.join(render_output_dir, "frame_%04d.jpg")
+                ], capture_output=True)
+        elif mode == "LOCAL_DIFFUSION":
             print(f"[PIPELINE] Launching 100% Free Local GPU Video Diffusion ({getattr(settings, 'LOCAL_DIFFUSION_MODEL', 'LTX-Video')})...")
             scene_prompt = (
                 f"Disney Pixar 3D animated movie, cute adventurer boy in orange tshirt and blue shorts smiling and pointing excitedly "
@@ -197,24 +233,6 @@ class PipelineOrchestrator:
                 ], capture_output=True)
             except Exception as e:
                 print(f"[PIPELINE] Local diffusion error: {e}. Falling back to default pipeline...")
-        elif has_wan_url:
-            print(f"[PIPELINE] Launching 100% Free Open-Source Colab AI Video Generator (Wan 2.1)...")
-            scene_prompt = f"Disney Pixar 3D animation, cute adventurer boy in orange tshirt and puppy pointing excitedly at a huge friendly Stegosaurus dinosaur walking between palm trees, cinematic lighting, 8k render, masterpiece"
-            free_ai_mp4 = Path(render_output_dir) / "free_wan_master.mp4"
-            try:
-                GoogleVeoVideoGenerator.generate_from_free_colab_wan(
-                    prompt=scene_prompt,
-                    output_file=free_ai_mp4
-                )
-                import imageio_ffmpeg
-                ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
-                subprocess.run([
-                    ffmpeg_exe, "-y", "-i", str(free_ai_mp4),
-                    "-vf", f"fps={fps}",
-                    os.path.join(render_output_dir, "frame_%04d.jpg")
-                ], capture_output=True)
-            except Exception as e:
-                print(f"[PIPELINE] Free Wan AI error: {e}. Falling back to default pipeline...")
         elif mode == "VEO_AI" and has_gemini_key:
             print(f"[PIPELINE] Launching Google Veo / Gemini AI Video Engine ({settings.VEO_MODEL})...")
             scene_prompts = [

@@ -92,3 +92,46 @@ async def trigger_episode_production(
     })
 
     return result
+
+@api_router.get("/settings/colab")
+async def get_colab_settings():
+    """Returns current Google Colab Wan 2.1 GPU Worker configuration."""
+    url = getattr(settings, "WAN21_API_URL", None) or os.getenv("WAN21_API_URL")
+    return {
+        "wan21_api_url": url,
+        "animation_engine_mode": getattr(settings, "ANIMATION_ENGINE_MODE", "COLAB_WAN"),
+        "is_connected": bool(url),
+        "colab_notebook_url": "https://colab.research.google.com/github/Bhikaji/YT/blob/main/scripts/Wan21_Free_AI_Video_Colab.ipynb"
+    }
+
+@api_router.post("/settings/colab")
+async def set_colab_settings(gradio_url: str):
+    """Connects and persists the free Google Colab Wan 2.1 Gradio tunnel URL."""
+    url = gradio_url.strip()
+    if not url.startswith("http"):
+        url = "https://" + url
+
+    settings.WAN21_API_URL = url
+    settings.ANIMATION_ENGINE_MODE = "COLAB_WAN"
+    os.environ["WAN21_API_URL"] = url
+    os.environ["ANIMATION_ENGINE_MODE"] = "COLAB_WAN"
+
+    env_file = settings.BASE_DIR / ".env"
+    existing_lines = []
+    if env_file.exists():
+        with open(env_file, "r", encoding="utf-8") as f:
+            existing_lines = [
+                line for line in f.readlines()
+                if not line.startswith("WAN21_API_URL=") and not line.startswith("ANIMATION_ENGINE_MODE=")
+            ]
+    existing_lines.append(f"ANIMATION_ENGINE_MODE=COLAB_WAN\n")
+    existing_lines.append(f"WAN21_API_URL={url}\n")
+    with open(env_file, "w", encoding="utf-8") as f:
+        f.writelines(existing_lines)
+
+    return {
+        "status": "SUCCESS",
+        "message": "Connected to Google Colab GPU Worker (Path 1: Wan 2.1)",
+        "wan21_api_url": url,
+        "animation_engine_mode": "COLAB_WAN"
+    }

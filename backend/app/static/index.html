@@ -33,6 +33,12 @@
         </div>
         
         <div class="flex items-center space-x-4">
+            <!-- Path 1 Colab Worker Status -->
+            <button onclick="triggerColabModal()" id="colab-status-badge" class="flex items-center space-x-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-full px-3 py-1.5 text-xs transition">
+                <span class="w-2 h-2 rounded-full bg-amber-400" id="colab-dot"></span>
+                <span class="text-slate-300 font-medium" id="colab-status-text">Colab GPU: Connecting...</span>
+            </button>
+
             <div class="flex items-center space-x-2 bg-slate-800/80 border border-slate-700 rounded-full px-3 py-1.5 text-xs">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span class="text-slate-300 font-medium" id="system-status">System Ready</span>
@@ -327,8 +333,88 @@
         </div>
     </div>
 
+    <!-- Colab Cloud GPU Modal -->
+    <div id="modal-colab" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                <i data-lucide="cloud-lightning" class="w-5 h-5 text-amber-400"></i>
+                <span>Path 1: Free Cloud GPU Worker (Wan 2.1)</span>
+            </h3>
+            <p class="text-xs text-slate-400">
+                Run our 1-click open-source video diffusion backend on a <strong>Free Google Colab T4 GPU</strong> for 100% free unlimited video generations.
+            </p>
+            <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-2 text-xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-400">1. Open Notebook:</span>
+                    <a href="https://colab.research.google.com/github/Bhikaji/YT/blob/main/scripts/Wan21_Free_AI_Video_Colab.ipynb" target="_blank" class="text-indigo-400 hover:text-indigo-300 font-semibold underline flex items-center space-x-1">
+                        <span>Open Free Colab Notebook</span>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+                <p class="text-slate-500">2. Select <strong>Runtime &gt; Run all</strong>.</p>
+                <p class="text-slate-500">3. Copy the generated <code>https://xxxx.gradio.live</code> URL and paste below:</p>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Gradio Live URL</label>
+                <input type="text" id="input-colab-url" placeholder="https://xxxxxxxx.gradio.live" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
+            </div>
+            <div class="flex justify-end space-x-3 pt-3">
+                <button onclick="closeColabModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Cancel</button>
+                <button onclick="saveColabUrl()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white transition flex items-center space-x-2">
+                    <i data-lucide="link" class="w-4 h-4"></i>
+                    <span>Connect Worker</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
+
+        function triggerColabModal() {
+            document.getElementById('modal-colab').classList.remove('hidden');
+        }
+
+        function closeColabModal() {
+            document.getElementById('modal-colab').classList.add('hidden');
+        }
+
+        async function checkColabStatus() {
+            try {
+                const res = await fetch('/api/v1/settings/colab');
+                const data = await res.json();
+                const badgeText = document.getElementById('colab-status-text');
+                const dot = document.getElementById('colab-dot');
+                const input = document.getElementById('input-colab-url');
+                if (data.is_connected) {
+                    badgeText.textContent = "Colab GPU (Connected)";
+                    badgeText.className = "text-emerald-300 font-medium";
+                    dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+                    input.value = data.wan21_api_url;
+                } else {
+                    badgeText.textContent = "Connect Colab GPU";
+                    badgeText.className = "text-amber-300 font-medium";
+                    dot.className = "w-2 h-2 rounded-full bg-amber-400";
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        checkColabStatus();
+
+        async function saveColabUrl() {
+            const url = document.getElementById('input-colab-url').value.trim();
+            if (!url) return alert("Please enter a valid gradio.live URL");
+            try {
+                const res = await fetch('/api/v1/settings/colab?gradio_url=' + encodeURIComponent(url), { method: 'POST' });
+                const data = await res.json();
+                alert(data.message);
+                closeColabModal();
+                checkColabStatus();
+            } catch (e) {
+                alert("Failed to save: " + e.message);
+            }
+        }
 
         function triggerProductionModal() {
             document.getElementById('modal-produce').classList.remove('hidden');
