@@ -24,6 +24,7 @@ from backend.orchestrator.state_machine import ProductionJobStateMachine, JobSta
 from modules.quality_control.inspector import QualityControlInspector
 from modules.character_engine.generator import CharacterSpecification
 from backend.app.services.ai_video_engine.pixar_animator import PixarAiVideoEngine
+from backend.app.services.ai_video_engine.veo_video_generator import GoogleVeoVideoGenerator
 
 class PipelineOrchestrator:
     """End-to-End Autonomous 3D Cartoon Production & YouTube Publishing Pipeline."""
@@ -151,8 +152,41 @@ class PipelineOrchestrator:
         await ProductionJobStateMachine.transition(job_id, JobState.RENDERING)
 
         resolution = settings.BLENDER_RESOLUTION_SHORT if format_type == "SHORT" else settings.BLENDER_RESOLUTION_LONG
-        if getattr(settings, "ANIMATION_ENGINE_MODE", "AI_PIXAR") == "AI_PIXAR":
-            print(f"[PIPELINE] Launching 100% Free High-Definition Pixar AI Video Engine ({resolution[0]}x{resolution[1]} @ {fps}fps)...")
+        mode = getattr(settings, "ANIMATION_ENGINE_MODE", "VEO_AI")
+        has_gemini_key = bool(getattr(settings, "GEMINI_API_KEY", None) or os.getenv("GEMINI_API_KEY"))
+
+        if mode == "VEO_AI" and has_gemini_key:
+            print(f"[PIPELINE] Launching Google Veo / Gemini AI Video Engine ({settings.VEO_MODEL})...")
+            scene_prompts = [
+                f"Disney Pixar 3D animated scene, cute young adventurer boy Leo in orange tshirt and blue shorts with playful golden retriever puppy Lumi in {s.environment}, {s.lighting_preset} lighting, dynamic cinematic camera movement, lifelike character animation and expressions, 8k render, masterpiece"
+                for s in script.scenes
+            ]
+            veo_raw_mp4 = Path(render_output_dir) / "veo_master.mp4"
+            try:
+                GoogleVeoVideoGenerator.generate_full_short_pipeline(
+                    output_path=veo_raw_mp4,
+                    scene_prompts=scene_prompts,
+                    aspect_ratio="9:16" if format_type == "SHORT" else "16:9",
+                    total_duration=int(total_audio_duration)
+                )
+                import imageio_ffmpeg
+                ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+                subprocess.run([
+                    ffmpeg_exe, "-y", "-i", str(veo_raw_mp4),
+                    "-vf", f"fps={fps}",
+                    os.path.join(render_output_dir, "frame_%04d.jpg")
+                ], capture_output=True)
+            except Exception as e:
+                print(f"[PIPELINE] Veo generation error: {e}. Falling back to Pixar neural pipeline...")
+                PixarAiVideoEngine.render_episode_frames(
+                    output_dir=Path(render_output_dir),
+                    total_frames=total_frames,
+                    resolution=resolution
+                )
+        elif mode in ["AI_PIXAR", "VEO_AI"]:
+            if mode == "VEO_AI" and not has_gemini_key:
+                print("[PIPELINE] Notice: GEMINI_API_KEY not configured. To use Google Veo 3 / Veo 2 video generation, set GEMINI_API_KEY in E:\\YT\\.env.")
+            print(f"[PIPELINE] Launching High-Definition Pixar AI Video Engine ({resolution[0]}x{resolution[1]} @ {fps}fps)...")
             scene_prompts = [
                 f"Disney Pixar 3D animated film still, cute boy Leo in orange tshirt and blue shorts with puppy Lumi in {s.environment}, {s.lighting_preset} lighting, cinematic lighting, 8k render, masterpiece"
                 for s in script.scenes

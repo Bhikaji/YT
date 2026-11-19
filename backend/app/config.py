@@ -17,8 +17,11 @@ class Settings(BaseSettings):
     OUTPUT_DIR: Path = BASE_DIR / "output"
     SCRIPTS_DIR: Path = BASE_DIR / "scripts"
     
-    # Animation Engine Mode: 'AI_PIXAR' (100% free photorealistic Pixar AI) or 'BLENDER_3D' (Blender EEVEE-Next)
-    ANIMATION_ENGINE_MODE: str = "AI_PIXAR"
+    # Animation Engine Mode: 'VEO_AI' (Google Veo 3 / Veo 2 / Gemini AI video generation), 'AI_PIXAR' (Pixar Neural Diffusion), or 'BLENDER_3D' (Blender EEVEE-Next)
+    ANIMATION_ENGINE_MODE: str = "VEO_AI"
+    VEO_MODEL: str = "veo-3.1-fast-generate-preview"
+    VEO_FALLBACK_MODEL: str = "veo-2.0-generate-001"
+    VEO_RESOLUTION: str = "720p"
     
     # Database
     DATABASE_URL: str = f"sqlite+aiosqlite:///{BASE_DIR / 'data' / 'cartoon_studio.db'}"

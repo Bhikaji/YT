@@ -1,18 +1,18 @@
 import os
-import cv2
 import time
-import numpy as np
 import urllib.request
 import urllib.parse
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+from PIL import Image
 from backend.app.config import settings
 
 class PixarAiVideoEngine:
     """
-    100% Free Generative AI Pixar/Disney Video Engine.
+    Generative AI Pixar/Disney Video Engine.
     Generates photorealistic keyframes with consistent characters, dinosaurs,
     and lush prehistoric environments, then compiles smooth cinematic camera motion.
+    Uses PIL for robust cross-platform frame synthesis.
     """
 
     DEFAULT_PROMPTS = [
@@ -45,28 +45,25 @@ class PixarAiVideoEngine:
         return False
 
     @classmethod
-    def load_and_fit(cls, img_path: Path, target_w: int, target_h: int) -> np.ndarray:
+    def load_and_fit(cls, img_path: Path, target_w: int, target_h: int) -> Image.Image:
         """Loads image and fits to target aspect ratio (cropping/padding smoothly)."""
-        img = cv2.imread(str(img_path))
-        if img is None:
-            raise FileNotFoundError(f"Could not load image: {img_path}")
-        h, w, _ = img.shape
+        img = Image.open(str(img_path)).convert("RGB")
+        w, h = img.size
         scale = max(target_w / w, target_h / h)
         new_w = int(w * scale)
         new_h = int(h * scale)
-        resized = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_LANCZOS4)
+        resized = img.resize((new_w, new_h), Image.Resampling.LANCZOS)
         start_x = (new_w - target_w) // 2
         start_y = (new_h - target_h) // 2
-        return resized[start_y:start_y + target_h, start_x:start_x + target_w]
+        return resized.crop((start_x, start_y, start_x + target_w, start_y + target_h))
 
     @classmethod
-    def create_cinematic_shot(cls, img: np.ndarray, frame_count: int, shot_type: str = "push_in") -> List[np.ndarray]:
+    def create_cinematic_shot(cls, img: Image.Image, frame_count: int, shot_type: str = "push_in") -> List[Image.Image]:
         """Generates smoothly interpolating cinematic camera frames."""
         frames = []
-        h, w, _ = img.shape
+        w, h = img.size
         for i in range(frame_count):
             t = i / float(frame_count - 1) if frame_count > 1 else 0
-            # Smooth ease-in-out curve
             smooth_t = 3 * (t ** 2) - 2 * (t ** 3)
             if shot_type == "push_in":
                 zoom = 1.0 + 0.12 * smooth_t
@@ -86,8 +83,8 @@ class PixarAiVideoEngine:
             y1 = max(0, int(center_y - crop_h / 2.0))
             x2 = min(w, int(x1 + crop_w))
             y2 = min(h, int(y1 + crop_h))
-            crop = img[y1:y2, x1:x2]
-            frame = cv2.resize(crop, (w, h), interpolation=cv2.INTER_LINEAR)
+            crop = img.crop((x1, y1, x2, y2))
+            frame = crop.resize((w, h), Image.Resampling.BILINEAR)
             frames.append(frame)
         return frames
 
@@ -121,12 +118,17 @@ class PixarAiVideoEngine:
                 loaded_scenes.append((cls.load_and_fit(frame_path, target_w, target_h), shot_types[idx % len(shot_types)]))
 
         if not loaded_scenes:
-            # Fallback to local cached scenes
             fallback_names = ["act1_lost_world.jpg", "act2_footprint_track.jpg", "act3_stego_encounter.jpg", "act4_lagoon_sauropod.jpg"]
             for idx, fname in enumerate(fallback_names):
                 f_path = cache_dir / fname
                 if f_path.exists():
                     loaded_scenes.append((cls.load_and_fit(f_path, target_w, target_h), shot_types[idx % len(shot_types)]))
+
+        if not loaded_scenes:
+            # Fallback to demo video extracted frame if present
+            demo_frame = Path("E:/YT/demo_video/frames/frame_15s.jpg")
+            if demo_frame.exists():
+                loaded_scenes.append((cls.load_and_fit(demo_frame, target_w, target_h), "push_in"))
 
         # 2. Interpolate Shots
         frames_per_shot = max(total_frames // max(len(loaded_scenes), 1), 1)
@@ -134,7 +136,7 @@ class PixarAiVideoEngine:
 
         # 3. Apply Cross-dissolve transitions
         crossfade = 12
-        rendered_frames = []
+        rendered_frames: List[Image.Image] = []
         for s_idx, shot in enumerate(all_shots):
             if s_idx == 0:
                 rendered_frames.extend(shot[:-crossfade])
@@ -142,7 +144,7 @@ class PixarAiVideoEngine:
                 prev_shot = all_shots[s_idx - 1]
                 for k in range(crossfade):
                     alpha = k / float(crossfade)
-                    blend = cv2.addWeighted(prev_shot[-crossfade + k], 1.0 - alpha, shot[k], alpha, 0)
+                    blend = Image.blend(prev_shot[-crossfade + k], shot[k], alpha)
                     rendered_frames.append(blend)
                 if s_idx < len(all_shots) - 1:
                     rendered_frames.extend(shot[crossfade:-crossfade])
@@ -158,7 +160,7 @@ class PixarAiVideoEngine:
         frame_paths = []
         for idx, f in enumerate(rendered_frames):
             frame_file = output_dir / f"frame_{idx + 1:04d}.jpg"
-            cv2.imwrite(str(frame_file), f, [cv2.IMWRITE_JPEG_QUALITY, 95])
+            f.save(str(frame_file), "JPEG", quality=95)
             frame_paths.append(frame_file)
 
         print(f"[PixarAiVideoEngine] Rendered {len(frame_paths)} high-definition Pixar frames into {output_dir}")
