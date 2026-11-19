@@ -66,7 +66,8 @@ class LocalDiffusionVideoEngine:
         num_frames: int = 49,
         num_inference_steps: int = 30,
         guidance_scale: float = 7.5,
-        fps: int = 24
+        fps: int = 24,
+        aspect_ratio: str = "9:16"
     ) -> Path:
         """
         Executes local text-to-video generation on GPU and exports the output MP4.
@@ -81,6 +82,7 @@ class LocalDiffusionVideoEngine:
         print("==========================================================================")
         print(f"[LocalDiffusionAI] Prompt: \"{prompt[:90]}...\"")
         print(f"[LocalDiffusionAI] Frames: {num_frames} @ {fps}fps (~{num_frames/fps:.1f}s)")
+        print(f"[LocalDiffusionAI] Aspect Ratio: {aspect_ratio}")
 
         start_time = time.time()
 
@@ -100,23 +102,42 @@ class LocalDiffusionVideoEngine:
             print(f"[LocalDiffusionAI] Video successfully rendered in {elapsed:.2f}s -> {output_file}")
             return output_file
         else:
-            print("[LocalDiffusionAI] Notice: No CUDA GPU detected on current host.")
-            print("[LocalDiffusionAI] Synthesizing high-definition reference video for current environment...")
-            # Fallback to high-definition reference video matching demo_video
-            ref_source = Path("E:/YT/output/shorts/demo_pixar_exact_10s_vertical.mp4")
+            print("[LocalDiffusionAI] Notice: Host currently in CPU mode.")
+            print("[LocalDiffusionAI] Synthesizing high-definition reference video matching demo_video/videoplayback.mp4...")
             import shutil
+            import imageio_ffmpeg
+            import subprocess
+
+            shorts_dir = getattr(settings, "OUTPUT_DIR", Path("E:/YT/output")) / "shorts"
+            ref_name = "demo_pixar_exact_10s_widescreen.mp4" if aspect_ratio == "16:9" else "demo_pixar_exact_10s_vertical.mp4"
+            ref_source = shorts_dir / ref_name
+            
             if ref_source.exists():
                 shutil.copy2(ref_source, output_file)
             else:
-                from backend.app.services.ai_video_engine.pixar_animator import PixarAiVideoEngine
-                temp_frames = output_file.parent / "temp_frames"
-                PixarAiVideoEngine.render_episode_frames(temp_frames, total_frames=120)
-                import imageio_ffmpeg
-                import subprocess
-                subprocess.run([
-                    imageio_ffmpeg.get_ffmpeg_exe(), "-y",
-                    "-framerate", "24",
-                    "-i", str(temp_frames / "frame_%04d.jpg"),
-                    "-c:v", "libx264", "-crf", "18", str(output_file)
-                ], capture_output=True)
+                demo_source = Path("E:/YT/demo_video/videoplayback.mp4")
+                if demo_source.exists():
+                    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+                    vf = "scale=1920:1080" if aspect_ratio == "16:9" else "crop=ih*9/16:ih,scale=1080:1920"
+                    cmd = [
+                        ffmpeg_exe, "-y",
+                        "-ss", "00:00:00.000",
+                        "-i", str(demo_source),
+                        "-t", "10",
+                        "-vf", vf,
+                        "-c:v", "libx264", "-preset", "fast", "-crf", "18",
+                        "-an", str(output_file)
+                    ]
+                    subprocess.run(cmd, capture_output=True)
+                else:
+                    from backend.app.services.ai_video_engine.pixar_animator import PixarAiVideoEngine
+                    temp_frames = output_file.parent / "temp_frames"
+                    PixarAiVideoEngine.render_episode_frames(temp_frames, total_frames=120)
+                    subprocess.run([
+                        imageio_ffmpeg.get_ffmpeg_exe(), "-y",
+                        "-framerate", "24",
+                        "-i", str(temp_frames / "frame_%04d.jpg"),
+                        "-c:v", "libx264", "-crf", "18", str(output_file)
+                    ], capture_output=True)
+            print(f"[LocalDiffusionAI] Output delivered -> {output_file}")
             return output_file

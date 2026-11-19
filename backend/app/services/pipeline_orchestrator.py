@@ -1,4 +1,5 @@
 import os
+import subprocess
 import asyncio
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -134,16 +135,30 @@ class PipelineOrchestrator:
         # Generate combined dialogue track
         master_audio_path = str(audio_dir / "master_dialogue.mp3")
         if dialogue_records:
-            # Concatenate or copy first dialogue for test
-            shutil_copy = dialogue_records[0]["audio_path"]
-            import shutil
-            shutil.copy(shutil_copy, master_audio_path)
+            if len(dialogue_records) == 1:
+                import shutil
+                shutil.copy(dialogue_records[0]["audio_path"], master_audio_path)
+            else:
+                import imageio_ffmpeg
+                ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+                concat_txt = audio_dir / "concat_list.txt"
+                with open(concat_txt, "w", encoding="utf-8") as f:
+                    for d in dialogue_records:
+                        safe_path = d["audio_path"].replace("\\", "/")
+                        f.write(f"file '{safe_path}'\n")
+                subprocess.run([
+                    ffmpeg_exe, "-y",
+                    "-f", "concat", "-safe", "0",
+                    "-i", str(concat_txt),
+                    "-c:a", "libmp3lame", master_audio_path
+                ], capture_output=True)
         else:
             await VoiceEngine.generate_speech("Mystery awaits on Shadow Island.", output_path=master_audio_path)
 
         # STEP 3: Generate 3D Visual Frames & Lip-Sync
         await ProductionJobStateMachine.transition(job_id, JobState.LIPSYNCING)
         render_output_dir = str(settings.OUTPUT_DIR / "renders" / episode_slug)
+        os.makedirs(render_output_dir, exist_ok=True)
         viseme_keyframes = LipSyncEngine.generate_visemes_from_text_and_duration(
             text=" ".join(d["text"] for d in dialogue_records),
             total_duration_seconds=total_audio_duration
@@ -153,7 +168,7 @@ class PipelineOrchestrator:
         await ProductionJobStateMachine.transition(job_id, JobState.RENDERING)
 
         resolution = settings.BLENDER_RESOLUTION_SHORT if format_type == "SHORT" else settings.BLENDER_RESOLUTION_LONG
-        mode = getattr(settings, "ANIMATION_ENGINE_MODE", "VEO_AI")
+        mode = getattr(settings, "ANIMATION_ENGINE_MODE", "LOCAL_DIFFUSION")
         has_gemini_key = bool(getattr(settings, "GEMINI_API_KEY", None) or os.getenv("GEMINI_API_KEY"))
         has_wan_url = bool(getattr(settings, "WAN21_API_URL", None) or os.getenv("WAN21_API_URL"))
 
@@ -170,7 +185,8 @@ class PipelineOrchestrator:
                     prompt=scene_prompt,
                     output_file=local_raw_mp4,
                     num_frames=int(total_audio_duration * 24),
-                    fps=24
+                    fps=24,
+                    aspect_ratio="9:16" if format_type == "SHORT" else "16:9"
                 )
                 import imageio_ffmpeg
                 ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
@@ -274,9 +290,8 @@ class PipelineOrchestrator:
         final_video_dir = settings.OUTPUT_DIR / ("shorts" if format_type == "SHORT" else "episodes")
         final_video_path = str(final_video_dir / final_video_name)
         
-        frames_pattern = os.path.join(render_output_dir, "frame_%04d.jpg")
-        if not any(f.endswith(".jpg") for f in os.listdir(render_output_dir) if os.path.exists(render_output_dir)):
-            frames_pattern = os.path.join(render_output_dir, "frame_%04d.png")
+        has_jpg = os.path.exists(render_output_dir) and any(f.endswith(".jpg") for f in os.listdir(render_output_dir))
+        frames_pattern = os.path.join(render_output_dir, "frame_%04d.jpg") if has_jpg else os.path.join(render_output_dir, "frame_%04d.png")
         print("[PIPELINE] Assembling video, audio stems, and metadata via FFmpeg...")
         FFmpegCompositor.assemble_video_with_audio(
             frames_pattern=frames_pattern,
