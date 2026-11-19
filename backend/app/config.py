@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     VEO_MODEL: str = "veo-3.1-fast-generate-preview"
     VEO_FALLBACK_MODEL: str = "veo-2.0-generate-001"
     VEO_RESOLUTION: str = "720p"
+    WAN21_API_URL: Optional[str] = None  # Free Google Colab Gradio endpoint for 100% free unlimited video generation
     
     # Database
     DATABASE_URL: str = f"sqlite+aiosqlite:///{BASE_DIR / 'data' / 'cartoon_studio.db'}"

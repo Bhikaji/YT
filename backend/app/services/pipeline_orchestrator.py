@@ -154,8 +154,27 @@ class PipelineOrchestrator:
         resolution = settings.BLENDER_RESOLUTION_SHORT if format_type == "SHORT" else settings.BLENDER_RESOLUTION_LONG
         mode = getattr(settings, "ANIMATION_ENGINE_MODE", "VEO_AI")
         has_gemini_key = bool(getattr(settings, "GEMINI_API_KEY", None) or os.getenv("GEMINI_API_KEY"))
+        has_wan_url = bool(getattr(settings, "WAN21_API_URL", None) or os.getenv("WAN21_API_URL"))
 
-        if mode == "VEO_AI" and has_gemini_key:
+        if has_wan_url:
+            print(f"[PIPELINE] Launching 100% Free Open-Source Colab AI Video Generator (Wan 2.1)...")
+            scene_prompt = f"Disney Pixar 3D animation, cute adventurer boy in orange tshirt and puppy pointing excitedly at a huge friendly Stegosaurus dinosaur walking between palm trees, cinematic lighting, 8k render, masterpiece"
+            free_ai_mp4 = Path(render_output_dir) / "free_wan_master.mp4"
+            try:
+                GoogleVeoVideoGenerator.generate_from_free_colab_wan(
+                    prompt=scene_prompt,
+                    output_file=free_ai_mp4
+                )
+                import imageio_ffmpeg
+                ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+                subprocess.run([
+                    ffmpeg_exe, "-y", "-i", str(free_ai_mp4),
+                    "-vf", f"fps={fps}",
+                    os.path.join(render_output_dir, "frame_%04d.jpg")
+                ], capture_output=True)
+            except Exception as e:
+                print(f"[PIPELINE] Free Wan AI error: {e}. Falling back to default pipeline...")
+        elif mode == "VEO_AI" and has_gemini_key:
             print(f"[PIPELINE] Launching Google Veo / Gemini AI Video Engine ({settings.VEO_MODEL})...")
             scene_prompts = [
                 f"Disney Pixar 3D animated scene, cute young adventurer boy Leo in orange tshirt and blue shorts with playful golden retriever puppy Lumi in {s.environment}, {s.lighting_preset} lighting, dynamic cinematic camera movement, lifelike character animation and expressions, 8k render, masterpiece"

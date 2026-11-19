@@ -229,3 +229,50 @@ class GoogleVeoVideoGenerator:
             scene_files.append(s_file)
 
         return cls.concatenate_scenes_ffmpeg(scene_files, output_path)
+
+    @classmethod
+    def generate_from_free_colab_wan(
+        cls,
+        prompt: str,
+        output_file: Path,
+        api_url: Optional[str] = None
+    ) -> Path:
+        """
+        Calls a 100% free open-source Wan 2.1 / LTX-Video backend running on Google Colab GPU.
+        Zero paid API keys, unlimited free generations.
+        """
+        import requests
+        import shutil
+        url = api_url or getattr(settings, "WAN21_API_URL", None) or os.getenv("WAN21_API_URL")
+        if not url:
+            raise ValueError(
+                "WAN21_API_URL is not set! Run scripts/Wan21_Free_AI_Video_Colab.ipynb on free Colab "
+                "and paste the public gradio.live URL into E:\\YT\\.env as: WAN21_API_URL=https://xxxx.gradio.live"
+            )
+        
+        output_file = Path(output_file)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        
+        endpoint = f"{url.rstrip('/')}/api/predict"
+        print(f"[FreeWanAI] Dispatching prompt to free Colab GPU: {endpoint}")
+        payload = {"data": [prompt, "blurry, low quality, distorted", 49]}
+        
+        resp = requests.post(endpoint, json=payload, timeout=300)
+        resp.raise_for_status()
+        data = resp.json()
+        
+        video_url = data["data"][0] if isinstance(data["data"], list) else data["data"]
+        if isinstance(video_url, dict):
+            video_url = video_url.get("path") or video_url.get("url")
+            
+        if str(video_url).startswith("http"):
+            r = requests.get(video_url, stream=True)
+            with open(output_file, "wb") as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    f.write(chunk)
+        elif os.path.exists(str(video_url)):
+            shutil.copy2(video_url, output_file)
+            
+        print(f"[FreeWanAI] Successfully downloaded free AI video to: {output_file}")
+        return output_file
+
