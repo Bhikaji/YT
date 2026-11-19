@@ -136,3 +136,20 @@ async def set_colab_settings(gradio_url: str):
         "wan21_api_url": url,
         "animation_engine_mode": "COLAB_WAN"
     }
+
+@api_router.get("/marathons/bible")
+async def get_marathon_bible(series_title: str = "The Lost Valley"):
+    """Returns the canonical 12-chapter season story arc."""
+    from backend.app.services.marathon_engine import MarathonEngine
+    return {
+        "series": series_title,
+        "season": 1,
+        "total_chapters": 12,
+        "chapters": MarathonEngine.get_season_bible(series_title)
+    }
+
+@api_router.post("/marathons/compile")
+async def trigger_marathon_compilation(series_title: str = "The Lost Valley", season_number: int = 1):
+    """Compiles all season chapters into a single 1-hour full movie marathon with chapters and poster thumbnail."""
+    from backend.app.services.marathon_engine import MarathonEngine
+    return MarathonEngine.compile_season_marathon(series_title=series_title, season_number=season_number)

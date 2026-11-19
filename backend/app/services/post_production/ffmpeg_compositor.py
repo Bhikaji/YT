@@ -51,3 +51,53 @@ class FFmpegCompositor:
             raise RuntimeError(f"FFmpeg assembly failed: {result.stderr}")
 
         return output_video_path
+
+    @classmethod
+    def concatenate_episodes(
+        cls,
+        episode_paths: List[str],
+        output_marathon_path: str,
+        fps: int = 30
+    ) -> Dict[str, Any]:
+        """
+        Concatenates multiple episode videos into a single 1-hour/marathon movie with chapter timestamps.
+        """
+        ffmpeg_exe = cls.get_ffmpeg_path()
+        output_file = Path(output_marathon_path)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+
+        concat_list_file = output_file.parent / "marathon_concat.txt"
+        with open(concat_list_file, "w", encoding="utf-8") as f:
+            for p in episode_paths:
+                safe = str(Path(p).resolve()).replace("\\", "/")
+                f.write(f"file '{safe}'\n")
+
+        # Fast lossless copy concatenation
+        cmd = [
+            ffmpeg_exe, "-y",
+            "-f", "concat",
+            "-safe", "0",
+            "-i", str(concat_list_file),
+            "-c", "copy",
+            "-movflags", "+faststart",
+            str(output_file)
+        ]
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if result.returncode != 0:
+            # Fallback to re-encoding if codec profiles slightly differ
+            fallback_cmd = [
+                ffmpeg_exe, "-y",
+                "-f", "concat",
+                "-safe", "0",
+                "-i", str(concat_list_file),
+                "-c:v", "libx264", "-preset", "fast", "-crf", "18",
+                "-c:a", "aac", "-b:a", "192k",
+                "-movflags", "+faststart",
+                str(output_file)
+            ]
+            subprocess.run(fallback_cmd, check=True)
+
+        return {
+            "marathon_path": str(output_file),
+            "episodes_count": len(episode_paths)
+        }
