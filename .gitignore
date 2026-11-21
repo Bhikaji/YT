@@ -34,6 +34,7 @@ data/*.db-journal
 # Temporary Render Frame Dumps (keep folder, ignore thousands of individual frames)
 output/renders/*
 !output/renders/.gitkeep
+output/stick_shorts/*/frames/
 demo_video/analysis_frames/
 demo_video/current_output_frames/
 demo_video/new_pipeline_frames/

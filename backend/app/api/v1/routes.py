@@ -153,3 +153,84 @@ async def trigger_marathon_compilation(series_title: str = "The Lost Valley", se
     """Compiles all season chapters into a single 1-hour full movie marathon with chapters and poster thumbnail."""
     from backend.app.services.marathon_engine import MarathonEngine
     return MarathonEngine.compile_season_marathon(series_title=series_title, season_number=season_number)
+
+# -------------------------------------------------------------
+# AUTONOMOUS 2D STICK-FIGURE ANIMATION & SHORTS STUDIO ROUTES
+# -------------------------------------------------------------
+
+@api_router.get("/stick/trends")
+async def get_stick_trends(geo: str = "US", category: str = None):
+    """Fetches global trends, calculates 7-factor Trend Opportunity Scores, and classifies trends."""
+    from intelligence.trend_research.trend_intelligence import TrendIntelligenceEngine
+    from intelligence.topic_scoring.trend_scorer import TrendScorer
+    from intelligence.topic_scoring.trend_classifier import TrendClassifier
+
+    trends = TrendIntelligenceEngine.discover_global_trends(geo=geo, category_filter=category)
+    scored_trends = []
+    for t in trends[:15]:
+        score_res = TrendScorer.calculate_opportunity_score(
+            topic=t["topic"],
+            category=t["category"],
+            volume_numeric=t.get("volume_numeric", 100000)
+        )
+        opp_score = score_res["opportunity_score"]
+        classification = TrendClassifier.classify_trend(
+            topic=t["topic"],
+            opportunity_score=opp_score,
+            volume_numeric=t.get("volume_numeric", 100000)
+        )
+        tier = "HIGH" if opp_score >= 75 else ("MEDIUM" if opp_score >= 60 else "NORMAL")
+        scored_trends.append({
+            **t,
+            "opportunity_score": opp_score,
+            "opportunity_tier": tier,
+            "classification": classification,
+            "breakdown": score_res["factor_breakdown"]
+        })
+
+    # Sort descending by opportunity score
+    scored_trends.sort(key=lambda x: x["opportunity_score"], reverse=True)
+    return {
+        "geo": geo,
+        "total_trends": len(scored_trends),
+        "trends": scored_trends
+    }
+
+@api_router.post("/stick/produce")
+async def produce_stick_short(topic: str = None, category: str = None, geo: str = "US"):
+    """Triggers the full 14-stage autonomous stick-figure short production pipeline."""
+    from orchestrator.autonomous_studio_manager import AutonomousStudioManager
+    summary = AutonomousStudioManager.run_production_cycle(
+        target_topic=topic,
+        target_category=category,
+        geo=geo,
+        publish_privacy="private"
+    )
+    return {
+        "status": "SUCCESS",
+        "production_summary": summary
+    }
+
+@api_router.get("/stick/latest")
+async def get_latest_stick_short():
+    """Returns the most recently rendered stick-figure short and thumbnails."""
+    from pathlib import Path
+    stick_base = settings.BASE_DIR / "output" / "stick_shorts"
+    if not stick_base.exists():
+        return {"has_short": False}
+
+    jobs = sorted(list(stick_base.iterdir()), key=lambda p: p.stat().st_mtime, reverse=True)
+    for j in jobs:
+        master_mp4 = j / f"{j.name}_master.mp4"
+        if master_mp4.exists():
+            thumb_dir = j / "thumbnails"
+            thumbs = [f"/output/stick_shorts/{j.name}/thumbnails/{p.name}" for p in thumb_dir.glob("*.jpg")] if thumb_dir.exists() else []
+            return {
+                "has_short": True,
+                "job_id": j.name,
+                "video_url": f"/output/stick_shorts/{j.name}/{j.name}_master.mp4",
+                "thumbnails": thumbs,
+                "video_path": str(master_mp4)
+            }
+
+    return {"has_short": False}

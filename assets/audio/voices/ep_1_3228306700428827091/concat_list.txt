@@ -1,0 +1,4 @@
+file 'E:/YT/assets/audio/voices/ep_1_3228306700428827091/scene_1_diag_1.mp3'
+file 'E:/YT/assets/audio/voices/ep_1_3228306700428827091/scene_2_diag_1.mp3'
+file 'E:/YT/assets/audio/voices/ep_1_3228306700428827091/scene_2_diag_2.mp3'
+file 'E:/YT/assets/audio/voices/ep_1_3228306700428827091/scene_3_diag_1.mp3'
