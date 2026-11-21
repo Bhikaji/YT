@@ -154,6 +154,7 @@ class StickFigureRenderer:
             curr_y += line_spacing
 
     _SCENE_CACHE: Dict[str, Image.Image] = {}
+    _PATCH_CACHE: Dict[str, Image.Image] = {}
 
     @classmethod
     def _get_demo_scene_img(cls, name: str) -> Optional[Image.Image]:
@@ -167,6 +168,17 @@ class StickFigureRenderer:
         return None
 
     @classmethod
+    def _get_puppet_patch(cls, name: str) -> Optional[Image.Image]:
+        if name in cls._PATCH_CACHE:
+            return cls._PATCH_CACHE[name]
+        p = Path("assets/characters/demo_patches") / name
+        if p.exists():
+            img = Image.open(p).convert("RGBA")
+            cls._PATCH_CACHE[name] = img
+            return img
+        return None
+
+    @classmethod
     def _render_demo_puppet_scene(
         cls,
         width: int,
@@ -175,40 +187,55 @@ class StickFigureRenderer:
         t_sec: float
     ) -> Image.Image:
         """
-        Directly renders the authentic 1280x720 animation scenes from demo.mp4:
-        - Mother (peach skin, brown bun, bindi, royal blue saree, violet blouse)
-        - Bob (white cartoon head, spiky orange hair, red/white striped torso, black stick limbs)
-        - Friend (white cartoon head, purple hair, black stick limbs in bus doorway)
-        With real-time mouth articulation, dynamic speaker switching, and comedic punchline reaction.
+        Directly renders authentic 2D puppet lip-sync and expressions matching demo.mp4.
+        Anchored base frame with mouth articulation, character gesture states, and zero full-screen jitter.
         """
+        # Load base scene: Mother listening, Bob looking at Mother, Friend in doorway
+        base = cls._get_demo_scene_img("mother_listening.png")
+        if not base:
+            return Image.new("RGBA", (width, height), (248, 250, 252, 255))
+
         active_speaker = frame_data.get("active_speaker", "")
-        mouth_open = (math.sin(t_sec * 16.0) > 0)
+        diag_start = frame_data.get("dialogue_start", 0.0)
 
-        # Select the active authentic pose state
-        if "mother" in active_speaker.lower():
-            scene_name = "mother_speaking.png" if mouth_open else "mother_listening.png"
-        elif "bob" in active_speaker.lower():
-            scene_name = "bob_speaking.png" if mouth_open else "mother_listening.png"
-        elif "prof" in active_speaker.lower() or "friend" in active_speaker.lower() or "gampya" in active_speaker.lower():
-            scene_name = "friend_speaking.png" if mouth_open else "friend_gesture.png"
-        else:
-            # Listening or reaction state
-            if t_sec > 22.0:
-                scene_name = "bob_laughing.png"
-            else:
-                scene_name = "mother_listening.png"
+        # Climax / Payoff comedy punchline (Bob laughing heartily)
+        if frame_data.get("is_punchline", False) or t_sec > 50.0:
+            laugh = cls._get_demo_scene_img("bob_laughing.png")
+            if laugh:
+                if laugh.size != (width, height):
+                    return laugh.resize((width, height), Image.Resampling.LANCZOS)
+                return laugh.copy()
 
-        master_img = cls._get_demo_scene_img(scene_name)
-        if not master_img:
-            master_img = cls._get_demo_scene_img("mother_listening.png")
+        canvas = base.copy()
 
-        if master_img:
-            if master_img.size == (width, height):
-                return master_img.copy()
-            else:
-                return master_img.resize((width, height), Image.Resampling.LANCZOS)
+        # If a character is actively speaking, articulate mouth to exact dialogue syllable cadence
+        if active_speaker:
+            rel_t = max(0.0, t_sec - diag_start)
+            mouth_open = (math.sin(rel_t * 16.0) > 0)
 
-        return Image.new("RGBA", (width, height), (248, 250, 252, 255))
+            if "mother" in active_speaker.lower():
+                patch_name = "mother_mouth_open.png" if mouth_open else "mother_mouth_closed.png"
+                patch = cls._get_puppet_patch(patch_name)
+                if patch:
+                    canvas.paste(patch, (670, 430))
+            elif "bob" in active_speaker.lower():
+                patch_name = "bob_mouth_open.png" if mouth_open else "bob_mouth_closed.png"
+                patch = cls._get_puppet_patch(patch_name)
+                if patch:
+                    canvas.paste(patch, (800, 435))
+            elif "prof" in active_speaker.lower() or "friend" in active_speaker.lower() or "gampya" in active_speaker.lower():
+                # Friend speaking from bus doorway: gesturing upper body + articulating mouth
+                friend_body = cls._get_puppet_patch("friend_spk_body.png")
+                if friend_body:
+                    canvas.paste(friend_body, (880, 270))
+                patch_name = "friend_mouth_open.png" if mouth_open else "friend_mouth_closed.png"
+                patch = cls._get_puppet_patch(patch_name)
+                if patch:
+                    canvas.paste(patch, (920, 350))
+
+        if canvas.size != (width, height):
+            return canvas.resize((width, height), Image.Resampling.LANCZOS)
+        return canvas
 
     @classmethod
     def _draw_single_character(

@@ -36,13 +36,15 @@ class DialogueScheduler:
         cls,
         dialogue_items: List[Dict[str, Any]],
         natural_gap_sec: float = 0.25,
-        target_total_sec: float = 30.0
+        target_total_sec: float = 30.0,
+        start_offset_sec: float = 2.3
     ) -> List[Dict[str, Any]]:
         """
         Calculates exact non-overlapping start/end timestamps based on actual audio durations.
+        Starts after the opening disclaimer screen (start_offset_sec = 2.3s) for perfect A/V sync.
         """
         scheduled = []
-        current_time = 0.3  # Initial 0.3s breath/hook pause
+        current_time = start_offset_sec
 
         for idx, item in enumerate(dialogue_items):
             audio_path = Path(item["audio_path"])
