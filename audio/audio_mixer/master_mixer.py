@@ -23,17 +23,17 @@ class MasterAudioMixer:
         output_audio_path.parent.mkdir(parents=True, exist_ok=True)
         exe = imageio_ffmpeg.get_ffmpeg_exe()
 
-        # Step 1: Create background music / ambient track (upbeat subtle cartoon groove)
+        # Step 1: Create clean stereo silence background bed (Zero drone / zero F0 interference)
         bgm_path = output_audio_path.parent / "bgm_loop.mp3"
-        bgm_filter = f"sine=frequency=220:duration={total_duration},volume=0.08,afade=t=out:st={total_duration-1}:d=1"
+        bgm_filter = f"anullsrc=r=48000:cl=stereo,atrim=duration={total_duration}"
         subprocess.run([exe, "-y", "-f", "lavfi", "-i", bgm_filter, "-c:a", "libmp3lame", str(bgm_path)], capture_output=True)
 
         # Step 2: Build FFmpeg complex filter inputs
         inputs = ["-i", str(bgm_path)]
-        filter_complex = ["[0:a]volume=0.15[bgm];"]
+        filter_complex = ["[0:a]volume=0.01[bgm];"]
         mix_labels = ["[bgm]"]
 
-        # Add dialogue clips with adelay based on exact scheduled timestamps
+        # Add dialogue clips with presence boost and adelay based on exact scheduled timestamps
         clip_idx = 1
         for d in dialogue_clips:
             clip_path = d.get("audio_path")
@@ -42,7 +42,10 @@ class MasterAudioMixer:
                 start_ms = max(1, int(start_sec * 1000))
                 inputs.extend(["-i", str(clip_path)])
                 label = f"[diag{clip_idx}]"
-                filter_complex.append(f"[{clip_idx}:a]adelay={start_ms}|{start_ms},volume=1.0{label};")
+                # Consonant presence EQ (+2.5dB at 2.8kHz) and rumble cut (<80Hz) matching professional cartoon speech
+                filter_complex.append(
+                    f"[{clip_idx}:a]highpass=f=80,equalizer=f=2800:width_type=o:w=1.2:g=2.5,adelay={start_ms}|{start_ms},volume=1.15{label};"
+                )
                 mix_labels.append(label)
                 clip_idx += 1
 
@@ -55,7 +58,7 @@ class MasterAudioMixer:
             if os.path.exists(s_file):
                 inputs.extend(["-i", str(s_file)])
                 label = f"[sfx{clip_idx}]"
-                filter_complex.append(f"[{clip_idx}:a]adelay={sfx_time_ms}|{sfx_time_ms},volume=0.6{label};")
+                filter_complex.append(f"[{clip_idx}:a]adelay={sfx_time_ms}|{sfx_time_ms},volume=0.35{label};")
                 mix_labels.append(label)
                 clip_idx += 1
 
@@ -66,6 +69,7 @@ class MasterAudioMixer:
             "-filter_complex", "".join(filter_complex),
             "-map", "[outa]",
             "-t", str(total_duration),
+            "-ar", "48000",
             "-c:a", "aac",
             "-b:a", "192k",
             str(output_audio_path)

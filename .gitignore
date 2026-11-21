@@ -38,6 +38,7 @@ output/stick_shorts/*
 !output/stick_shorts/.gitkeep
 output/*.mp3
 output/*.png
+output/*.wav
 demo_video/analysis_frames/
 demo_video/current_output_frames/
 demo_video/new_pipeline_frames/

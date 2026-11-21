@@ -1,0 +1,155 @@
+{
+  "language": "mr",
+  "dialect": "varhadi",
+  "description": "Varhadi & Rangdi Marathi Pronunciation and Phonetic Integrity Dictionary",
+  "version": "1.0.0",
+  "vocabulary": [
+    {
+      "written_word": "बहिणमाय",
+      "spoken_form": "बैन माय",
+      "phonetic_guidance": "Short pause between bain and maay to prevent glottal slur",
+      "category": "exclamation",
+      "verified": true
+    },
+    {
+      "written_word": "फिरावाले",
+      "spoken_form": "फिरायला",
+      "phonetic_guidance": "Standard Marathi suffix so vocoder does not break syllables",
+      "category": "verb",
+      "verified": true
+    },
+    {
+      "written_word": "लढाले",
+      "spoken_form": "लढायला",
+      "phonetic_guidance": "Avoids aspirated dha-le collision",
+      "category": "verb",
+      "verified": true
+    },
+    {
+      "written_word": "तिकिटीचे",
+      "spoken_form": "तिकिटाचे",
+      "phonetic_guidance": "Open 'a' vowel prevents swallowing the final 'che'",
+      "category": "noun",
+      "verified": true
+    },
+    {
+      "written_word": "तुया बापानं",
+      "spoken_form": "तुझ्या बापानं",
+      "phonetic_guidance": "Ensures clean retroflex na without slurring",
+      "category": "pronoun_phrase",
+      "verified": true
+    },
+    {
+      "written_word": "दिलं न रं",
+      "spoken_form": "दिली ना रे",
+      "phonetic_guidance": "Clear vowel endings prevent vocoder chunking",
+      "category": "verb_phrase",
+      "verified": true
+    },
+    {
+      "written_word": "तुले",
+      "spoken_form": "तुला",
+      "phonetic_guidance": "Crisp direct object pronoun",
+      "category": "pronoun",
+      "verified": true
+    },
+    {
+      "written_word": "आम्हाले",
+      "spoken_form": "आम्हाला",
+      "phonetic_guidance": "Prevents swallowed end vowel",
+      "category": "pronoun",
+      "verified": true
+    },
+    {
+      "written_word": "बकऱ्या",
+      "spoken_form": "बकऱ्या",
+      "phonetic_guidance": "Keep with question/comma context so ya is sustained",
+      "category": "noun",
+      "verified": true
+    },
+    {
+      "written_word": "मस्त्या गिस्त्या",
+      "spoken_form": "मस्त्या, गिस्त्या",
+      "phonetic_guidance": "Comma insert gives crisp rhythmic separation",
+      "category": "echo_word",
+      "verified": true
+    },
+    {
+      "written_word": "नाही करायचा मा",
+      "spoken_form": "नाही करायच्या, मा!",
+      "phonetic_guidance": "Comma ensures 'ma' is an expressive exclamation",
+      "category": "phrase",
+      "verified": true
+    },
+    {
+      "written_word": "घेवा",
+      "spoken_form": "घ्या ना",
+      "phonetic_guidance": "Prevents unfamiliar suffix distortion in TTS",
+      "category": "verb",
+      "verified": true
+    },
+    {
+      "written_word": "दिसत्यान",
+      "spoken_form": "दिसतात",
+      "phonetic_guidance": "Prevents slurred ty-aan cluster",
+      "category": "verb",
+      "verified": true
+    },
+    {
+      "written_word": "सीटाच्या",
+      "spoken_form": "सीटांच्या",
+      "phonetic_guidance": "Full anusvara sustains vowel",
+      "category": "noun",
+      "verified": true
+    },
+    {
+      "written_word": "बसल्यात",
+      "spoken_form": "बसलेत",
+      "phonetic_guidance": "Colloquial standard spoken form",
+      "category": "verb",
+      "verified": true
+    },
+    {
+      "written_word": "हो का व",
+      "spoken_form": "हो का, व!",
+      "phonetic_guidance": "Comma creates natural Varhadi maternal cadence",
+      "category": "exclamation",
+      "verified": true
+    },
+    {
+      "written_word": "सबस्क्राईब",
+      "spoken_form": "सबस्क्राइब",
+      "phonetic_guidance": "Single conjunct avoids sub-ascribe splitting",
+      "category": "loan_word",
+      "verified": true
+    },
+    {
+      "written_word": "व्हडिओ",
+      "spoken_form": "व्हिडिओ",
+      "phonetic_guidance": "Standard vowel marker prevents staccato",
+      "category": "loan_word",
+      "verified": true
+    },
+    {
+      "written_word": "पोरं",
+      "spoken_form": "पोरं",
+      "phonetic_guidance": "Colloquial Marathi noun",
+      "category": "noun",
+      "verified": true
+    },
+    {
+      "written_word": "करायले",
+      "spoken_form": "करायला",
+      "phonetic_guidance": "Prevents swallowing -le suffix",
+      "category": "verb",
+      "verified": true
+    },
+    {
+      "written_word": "बसायले",
+      "spoken_form": "बसायला",
+      "phonetic_guidance": "Ensures clean infinitive pronunciation",
+      "category": "verb",
+      "verified": true
+    }
+  ]
+}

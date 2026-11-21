@@ -11,23 +11,31 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 import edge_tts
 
+from audio.voice_generation.speech_intelligence import (
+    RegionalDialectIntelligenceEngine,
+    SpeechGenerationIntegrityEngine,
+    DialogueRepairEngine
+)
+from audio.dialogue_coordination.speech_validator import SpeechRecognitionValidator
+
 class RealisticHumanVoiceEngine:
     """
-    Multilingual Neural Voice Generator with Emotion-Aware Modulation.
+    Multilingual Neural Voice Generator with Emotion-Aware Modulation and Phonetic Integrity.
     """
 
     CHARACTER_VOICE_MAP = {
         # Priority 1: Varhadi & Rangdi Marathi - Matching demo.mp4 Character Personalities
+        # Speech rates set to natural conversational velocity [0% to +1%] to ensure 100% word clarity
         "mr_rangdi": {
             # Bob (बब्या - Whiny energetic comedy boy)
-            "stick_bob": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+6%", "base_pitch": "+4Hz"},
+            "stick_bob": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+2Hz"},
             # Gampya (गंप्या - Sarcastic, mischievous teen friend)
-            "stick_prof": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+2%", "base_pitch": "-2Hz"},
-            # Mother (आई - Fast, scolding, high-energy Maharashtrian mother in saree)
-            "varhadi_mother": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "+10%", "base_pitch": "+5Hz"},
+            "stick_prof": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "-1%", "base_pitch": "-2Hz"},
+            # Mother (आई - Fast, scolding, crisp Maharashtrian mother in saree)
+            "varhadi_mother": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "+0%", "base_pitch": "+2Hz"},
             # Uncle (काका - Mature, dry village elder)
-            "varhadi_uncle": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "-1%", "base_pitch": "-4Hz"},
-            "stick_sam": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+2%", "base_pitch": "+0Hz"},
+            "varhadi_uncle": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "-2%", "base_pitch": "-4Hz"},
+            "stick_sam": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+0Hz"},
             "stick_alex": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "+0%", "base_pitch": "+0Hz"}
         },
         # Priority 2: Hindi
@@ -87,27 +95,30 @@ class RealisticHumanVoiceEngine:
         config = cls.get_voice_config_for_character(character_id, language_code)
         voice_id = config["voice"]
 
+        # Prepare high-intelligibility spoken text (Two-Tier Architecture)
+        spoken_text = SpeechGenerationIntegrityEngine.prepare_tts_prompt(text, dialect="varhadi")
+
         # Base character parameters
         base_rate_val = int(config.get("base_rate", "+0%").replace("%", ""))
         base_pitch_val = int(config.get("base_pitch", "+0Hz").replace("Hz", ""))
 
-        # Emotion modulation deltas
+        # Emotion modulation deltas (subtle modulation preserving consonant articulation)
         em_mod = cls.EMOTION_MODULATION.get(emotion.lower(), {"rate": "+0%", "pitch": "+0Hz"})
         em_rate_val = int(em_mod.get("rate", "+0%").replace("%", ""))
         em_pitch_val = int(em_mod.get("pitch", "+0Hz").replace("Hz", ""))
 
-        # Combined modulation values
+        # Combined modulation values - rate clamped to prevent phoneme swallowing
         final_rate_val = base_rate_val + em_rate_val
         final_pitch_val = base_pitch_val + em_pitch_val
 
-        # Edge-TTS enforces regex: ^[+-]\d+Hz$
-        rate_str = f"{final_rate_val:+d}%"
+        raw_rate_str = f"{final_rate_val:+d}%"
+        rate_str = SpeechGenerationIntegrityEngine.enforce_rate_integrity(raw_rate_str)
         pitch_str = f"{final_pitch_val:+d}Hz"
 
-        # Call Edge-TTS
+        # Call Edge-TTS with phonetic spoken text
         try:
             communicate = edge_tts.Communicate(
-                text=text,
+                text=spoken_text,
                 voice=voice_id,
                 rate=rate_str,
                 pitch=pitch_str
@@ -115,7 +126,15 @@ class RealisticHumanVoiceEngine:
             await communicate.save(str(output_path))
         except Exception:
             # Fallback without modulation if any error
-            communicate = edge_tts.Communicate(text=text, voice=voice_id)
+            communicate = edge_tts.Communicate(text=spoken_text, voice=voice_id)
             await communicate.save(str(output_path))
+
+        # Audio Quality & Intelligibility Check
+        try:
+            val_report = SpeechRecognitionValidator.validate_dialogue_audio(output_path, spoken_text)
+            if not val_report.get("passed", True):
+                print(f"[VoiceEngine] Warning: Speech clarity check below threshold for: '{text[:30]}...'")
+        except Exception:
+            pass
 
         return output_path
