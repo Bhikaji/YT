@@ -1,3 +1,4 @@
+import re
 from typing import Dict, Any, List, Optional
 from intelligence.script_generation.script_schema import StickFigureScript, ScriptScene
 from animation.character_engine.character_model import StickFigureCharacter
@@ -10,13 +11,15 @@ class AnimationTimelineDirector:
     """
     Directorial Timeline Compiler.
     Transforms a StickFigureScript into 900 frame-by-frame instructions (30s @ 30 FPS).
+    Synchronizes audio-measured lip-sync, mutual character gaze, and clean subtitles.
     """
 
     @classmethod
     def compile_timeline(
         cls,
         script: StickFigureScript,
-        fps: int = 30
+        fps: int = 30,
+        scheduled_dialogues: Optional[List[Dict[str, Any]]] = None
     ) -> List[Dict[str, Any]]:
         total_frames = int(script.total_duration * fps)
         timeline = []
@@ -26,6 +29,15 @@ class AnimationTimelineDirector:
         char2_info = script.cast[1]
         c1_id = char1_info["id"]
         c2_id = char2_info["id"]
+
+        # Global list of scheduled dialogues with exact audio timestamps
+        if scheduled_dialogues and len(scheduled_dialogues) > 0:
+            all_dialogues = scheduled_dialogues
+        else:
+            all_dialogues = []
+            for s in script.scenes:
+                for d in s.dialogues:
+                    all_dialogues.append(d.model_dump())
 
         for frame_idx in range(total_frames):
             t_sec = frame_idx / float(fps)
@@ -43,26 +55,23 @@ class AnimationTimelineDirector:
             # Camera calculation
             zoom, pan_x, pan_y = camera.update(active_scene.camera_movement, scene_progress, t_sec)
 
-            # Extract dialogues in scene
-            diag_dicts = [d.model_dump() for d in active_scene.dialogues]
-
             # Scene action map
             act_map = {}
             for a in active_scene.actions:
                 act_map[a.character_id] = a.action_type
 
-            # Multi-character coordination
+            # Multi-character coordination with global audio schedule
             coord = MultiCharacterCoordinator.coordinate_roles(
                 char1_id=c1_id,
                 char2_id=c2_id,
                 t_sec=t_sec,
-                dialogues=diag_dicts,
+                dialogues=all_dialogues,
                 scene_action_map=act_map
             )
 
-            # Expressions & mouth states
-            c1_mouth = SpeechSynchronizer.get_mouth_state(c1_id, t_sec, diag_dicts)
-            c2_mouth = SpeechSynchronizer.get_mouth_state(c2_id, t_sec, diag_dicts)
+            # Accurate Lip-Sync: Synchronized to exact synthesized audio timestamps
+            c1_mouth = SpeechSynchronizer.get_mouth_state(c1_id, t_sec, all_dialogues)
+            c2_mouth = SpeechSynchronizer.get_mouth_state(c2_id, t_sec, all_dialogues)
 
             # Determine facial expression
             c1_expr = "curious"
@@ -73,12 +82,13 @@ class AnimationTimelineDirector:
                 elif a.character_id == c2_id:
                     c2_expr = a.facial_expression
 
-            for d in active_scene.dialogues:
-                if d.start_second <= t_sec <= d.end_second:
-                    if d.speaker_id == c1_id:
-                        c1_expr = d.emotion
-                    elif d.speaker_id == c2_id:
-                        c2_expr = d.emotion
+            # Sync active speaking emotion from dialogue
+            for d in all_dialogues:
+                if d.get("start_second", 0.0) <= t_sec <= d.get("end_second", 0.0):
+                    if d.get("speaker_id") == c1_id:
+                        c1_expr = d.get("emotion", c1_expr)
+                    elif d.get("speaker_id") == c2_id:
+                        c2_expr = d.get("emotion", c2_expr)
 
             # Poses from movement presets
             c1_pose = MovementPresetEngine.get_pose_at_time(
@@ -97,11 +107,13 @@ class AnimationTimelineDirector:
                 facing_dir=coord[c2_id]["facing"]
             )
 
-            # Active Subtitle
+            # Active Subtitle: CLEAN SPOKEN TEXT ONLY (Never show speaker prefixes like "(Bob):")
             current_sub = ""
-            for d in active_scene.dialogues:
-                if d.start_second <= t_sec <= d.end_second:
-                    current_sub = f"{d.speaker_name}: {d.text}"
+            for d in all_dialogues:
+                if d.get("start_second", 0.0) <= t_sec <= d.get("end_second", 0.0):
+                    raw_text = d.get("text", "")
+                    clean_text = re.sub(r'^\s*\(?[A-Za-z0-9_\u0900-\u097F\s\.\-]+\)?\s*:\s*', '', raw_text)
+                    current_sub = clean_text.strip()
                     break
 
             # Sound effects triggered around start of scene

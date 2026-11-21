@@ -3,7 +3,7 @@ from typing import Dict, Any, Optional
 class StickFigureCharacter:
     """
     Data model & visual specification for a unique 2D stick-figure character.
-    Maintains visual continuity and recognizable identities across all episodes.
+    Maintains visual continuity, iconic costumes, and high-contrast recognizable identities across all episodes.
     """
 
     def __init__(
@@ -13,15 +13,18 @@ class StickFigureCharacter:
         personality_key: str = "funny",
         voice_id: str = "en-US-GuyNeural",
         line_color: str = "#0f172a",
-        line_thickness: int = 8,
-        head_radius: int = 40,
+        line_thickness: int = 11,
+        head_radius: int = 42,
         torso_length: int = 140,
         upper_arm_length: int = 70,
         forearm_length: int = 65,
         thigh_length: int = 80,
         calf_length: int = 75,
         accessory: Optional[str] = None,  # "red_tie", "blue_tie", "glasses", "sunglasses", "lab_coat", "cap"
-        hair_style: Optional[str] = None  # "spiky", "tuft", "curly", "none"
+        hair_style: Optional[str] = None,  # "spiky", "tuft", "curly", "none"
+        shirt_color: Optional[str] = "#ffffff",
+        shoe_color: str = "#ffffff",
+        glove_color: str = "#ffffff"
     ):
         self.id = character_id
         self.name = name
@@ -37,6 +40,9 @@ class StickFigureCharacter:
         self.calf_length = calf_length
         self.accessory = accessory
         self.hair_style = hair_style
+        self.shirt_color = shirt_color
+        self.shoe_color = shoe_color
+        self.glove_color = glove_color
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -53,7 +59,10 @@ class StickFigureCharacter:
             "thigh_length": self.thigh_length,
             "calf_length": self.calf_length,
             "accessory": self.accessory,
-            "hair_style": self.hair_style
+            "hair_style": self.hair_style,
+            "shirt_color": self.shirt_color,
+            "shoe_color": self.shoe_color,
+            "glove_color": self.glove_color
         }
 
     @classmethod
@@ -66,19 +75,27 @@ class StickFigureCharacter:
                 personality_key="funny",
                 voice_id="en-US-GuyNeural",
                 line_color="#0f172a",
-                line_thickness=9,
+                line_thickness=11,
+                head_radius=42,
                 accessory="red_tie",
-                hair_style="tuft"
+                hair_style="tuft",
+                shirt_color="#ffffff",
+                shoe_color="#ffffff",
+                glove_color="#ffffff"
             ),
             "stick_prof": cls(
                 character_id="stick_prof",
                 name="Prof. Pixel",
                 personality_key="scientist",
                 voice_id="en-US-ChristopherNeural",
-                line_color="#1e293b",
-                line_thickness=8,
+                line_color="#0f172a",
+                line_thickness=11,
+                head_radius=42,
                 accessory="glasses",
-                hair_style="spiky"
+                hair_style="spiky",
+                shirt_color="#ffffff",
+                shoe_color="#ffffff",
+                glove_color="#ffffff"
             ),
             "stick_sam": cls(
                 character_id="stick_sam",
@@ -86,18 +103,26 @@ class StickFigureCharacter:
                 personality_key="techie",
                 voice_id="en-US-EricNeural",
                 line_color="#0f172a",
-                line_thickness=8,
+                line_thickness=11,
+                head_radius=42,
                 accessory="sunglasses",
-                hair_style="spiky"
+                hair_style="spiky",
+                shirt_color="#0ea5e9",
+                shoe_color="#ffffff",
+                glove_color="#ffffff"
             ),
             "stick_alex": cls(
                 character_id="stick_alex",
                 name="Alex",
                 personality_key="intelligent",
                 voice_id="en-US-JennyNeural",
-                line_color="#334155",
-                line_thickness=8,
+                line_color="#0f172a",
+                line_thickness=11,
+                head_radius=42,
                 accessory="blue_tie",
-                hair_style="curly"
+                hair_style="curly",
+                shirt_color="#a855f7",
+                shoe_color="#ffffff",
+                glove_color="#ffffff"
             )
         }

@@ -200,7 +200,11 @@ class AutonomousStickStudioManager:
         # STAGE 9: Directorial Timeline Compilation
         # ---------------------------------------------------------
         print("[Stage 9/14] Compiling 900-frame directorial timeline with synced lip-sync & listener reactions...")
-        timeline = AnimationTimelineDirector.compile_timeline(script=script, fps=30)
+        timeline = AnimationTimelineDirector.compile_timeline(
+            script=script,
+            fps=30,
+            scheduled_dialogues=scheduled_dialogues
+        )
 
         # ---------------------------------------------------------
         # STAGE 10: 2D Video Rendering (High-Contrast Dual-Pass Outline)

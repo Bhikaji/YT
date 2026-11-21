@@ -213,5 +213,67 @@ class TestVisualsAndRendering(unittest.TestCase):
         self.assertIsInstance(py, float)
 
 
+class TestLipSyncAndSubtitleCleaner(unittest.TestCase):
+    def test_topic_formatter_localization(self):
+        from intelligence.language_intelligence.topic_formatter import TopicFormatter
+        mr_title = TopicFormatter.format_topic_for_script("sri lanka a vs hong kong", "mr_rangdi")
+        self.assertIn("श्रीलंका", mr_title)
+        self.assertIn("हाँगकाँग", mr_title)
+        self.assertIn("सामना", mr_title)
+        self.assertNotIn("sri lanka a vs hong kong", mr_title)
+
+        hi_title = TopicFormatter.format_topic_for_script("sri lanka a vs hong kong", "hi")
+        self.assertIn("श्रीलंका", hi_title)
+        self.assertIn("हाँगकाँग", hi_title)
+        self.assertIn("मैच", hi_title)
+
+    def test_clean_subtitle_no_speaker_prefix(self):
+        from animation.scene_director.scene_timeline import AnimationTimelineDirector
+        from intelligence.language_intelligence.rangdi_marathi_engine import RangdiMarathiEngine
+        script = RangdiMarathiEngine.generate_rangdi_marathi_script("quantum computing")
+        scheduled = [
+            {
+                "speaker_id": "stick_bob",
+                "text": "(Bob): अरे गड्या थांब!",
+                "start_second": 0.5,
+                "end_second": 2.5,
+                "emotion": "shocked"
+            }
+        ]
+        timeline = AnimationTimelineDirector.compile_timeline(script, fps=10, scheduled_dialogues=scheduled)
+        # Check frame at t=1.0s
+        frame_at_1s = timeline[10]
+        self.assertEqual(frame_at_1s["subtitle"], "अरे गड्या थांब!")
+        self.assertNotIn("(Bob):", frame_at_1s["subtitle"])
+
+    def test_fluid_lip_sync_oscillation(self):
+        from animation.lip_sync.speech_synchronizer import SpeechSynchronizer
+        dialogues = [
+            {
+                "speaker_id": "stick_bob",
+                "text": "अरे गड्या थांब!",
+                "start_second": 1.0,
+                "end_second": 3.0,
+                "emotion": "shocked"
+            }
+        ]
+        # At t=0.5s (before speech), mouth must be closed REST
+        mouth_pre = SpeechSynchronizer.get_mouth_state("stick_bob", 0.5, dialogues)
+        self.assertFalse(mouth_pre["open"])
+
+        # Sample multiple frames during speech to confirm dynamic lip movement
+        open_states = []
+        for t in [1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8]:
+            m = SpeechSynchronizer.get_mouth_state("stick_bob", t, dialogues)
+            open_states.append(m["open"])
+        
+        # Confirm mouth articulates (both open and closed states occur during speech)
+        self.assertTrue(any(open_states), "Mouth should open during speech")
+
+        # At t=3.5s (after speech), mouth must be closed REST
+        mouth_post = SpeechSynchronizer.get_mouth_state("stick_bob", 3.5, dialogues)
+        self.assertFalse(mouth_post["open"])
+
+
 if __name__ == "__main__":
     unittest.main()

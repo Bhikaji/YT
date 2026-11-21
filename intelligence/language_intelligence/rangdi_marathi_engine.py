@@ -8,6 +8,7 @@ Avoids formal textbook Marathi and avoids literal English/Hindi translations.
 import random
 from typing import Dict, Any, List
 from intelligence.script_generation.script_schema import StickFigureScript, ScriptScene, DialogueLine, SceneAction
+from intelligence.language_intelligence.topic_formatter import TopicFormatter
 
 class RangdiMarathiEngine:
     """
@@ -27,7 +28,7 @@ class RangdiMarathiEngine:
         Generates a culturally authentic 30-second Rangdi Marathi Short screenplay.
         Follows the strict 6-part YouTube Shorts retention formula.
         """
-        clean_topic = topic.replace("Why ", "").replace("How ", "").strip("?!. ")
+        clean_topic = TopicFormatter.format_topic_for_script(topic, "mr_rangdi")
 
         # Dynamic character cast
         char1_id = "stick_bob"

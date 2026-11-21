@@ -83,18 +83,18 @@ class StickFigureRenderer:
         pose = cdata["pose"]
         joints = ForwardKinematicsSolver.solve_joint_positions(char, pose)
         col = char.line_color
-        th = char.line_thickness
+        th = getattr(char, "line_thickness", 11)
 
         # Contact / Grounding Shadow under feet
         for foot_key in ["left_foot", "right_foot"]:
             fx, fy = joints[foot_key]
-            draw.ellipse([fx - 24, fy - 6, fx + 24, fy + 8], fill=(0, 0, 0, 130))
+            draw.ellipse([fx - 28, fy - 6, fx + 28, fy + 8], fill=(0, 0, 0, 110))
 
         # -------------------------------------------------------------
-        # PASS 1: HIGH-CONTRAST OUTER SILHOUETTE (White Halo / Sticker)
+        # PASS 1: HIGH-CONTRAST OUTER SILHOUETTE (Pure White Halo / Sticker)
         # Guarantees 100% limb visibility against ANY dark or busy background
         # -------------------------------------------------------------
-        halo_w = th + 7
+        halo_w = th + 8
         halo_col = (255, 255, 255)
 
         # Head Halo
@@ -103,70 +103,118 @@ class StickFigureRenderer:
         draw.ellipse([hx - r - 4, hy - r - 4, hx + r + 4, hy + r + 4], fill=halo_col)
 
         # Torso Halo
-        draw.line([joints["pelvis"], joints["neck"]], fill=halo_col, width=halo_w + 2)
+        draw.line([joints["pelvis"], joints["neck"]], fill=halo_col, width=halo_w + 4)
 
         # Legs Halo
         draw.line([joints["pelvis"], joints["left_knee"]], fill=halo_col, width=halo_w)
         draw.line([joints["left_knee"], joints["left_foot"]], fill=halo_col, width=halo_w)
-        draw.ellipse([joints["left_foot"][0]-16, joints["left_foot"][1]-10, joints["left_foot"][0]+16, joints["left_foot"][1]+10], fill=halo_col)
+        draw.ellipse([joints["left_foot"][0]-18, joints["left_foot"][1]-12, joints["left_foot"][0]+18, joints["left_foot"][1]+12], fill=halo_col)
 
         draw.line([joints["pelvis"], joints["right_knee"]], fill=halo_col, width=halo_w)
         draw.line([joints["right_knee"], joints["right_foot"]], fill=halo_col, width=halo_w)
-        draw.ellipse([joints["right_foot"][0]-16, joints["right_foot"][1]-10, joints["right_foot"][0]+16, joints["right_foot"][1]+10], fill=halo_col)
+        draw.ellipse([joints["right_foot"][0]-18, joints["right_foot"][1]-12, joints["right_foot"][0]+18, joints["right_foot"][1]+12], fill=halo_col)
 
         # Arms Halo
         draw.line([joints["left_shoulder"], joints["left_elbow"]], fill=halo_col, width=halo_w)
         draw.line([joints["left_elbow"], joints["left_hand"]], fill=halo_col, width=halo_w)
-        draw.ellipse([joints["left_hand"][0]-12, joints["left_hand"][1]-12, joints["left_hand"][0]+12, joints["left_hand"][1]+12], fill=halo_col)
+        draw.ellipse([joints["left_hand"][0]-16, joints["left_hand"][1]-16, joints["left_hand"][0]+16, joints["left_hand"][1]+16], fill=halo_col)
 
         draw.line([joints["right_shoulder"], joints["right_elbow"]], fill=halo_col, width=halo_w)
         draw.line([joints["right_elbow"], joints["right_hand"]], fill=halo_col, width=halo_w)
-        draw.ellipse([joints["right_hand"][0]-12, joints["right_hand"][1]-12, joints["right_hand"][0]+12, joints["right_hand"][1]+12], fill=halo_col)
+        draw.ellipse([joints["right_hand"][0]-16, joints["right_hand"][1]-16, joints["right_hand"][0]+16, joints["right_hand"][1]+16], fill=halo_col)
 
         # -------------------------------------------------------------
-        # PASS 2: INNER CORE SKELETON & ANATOMY
+        # PASS 2: INNER CORE SKELETON, CLOTHING & ANATOMY
         # -------------------------------------------------------------
         # 1. Legs (Pelvis -> Knees -> Feet)
         draw.line([joints["pelvis"], joints["left_knee"]], fill=col, width=th)
         draw.line([joints["left_knee"], joints["left_foot"]], fill=col, width=th)
-        draw.ellipse([joints["left_foot"][0]-12, joints["left_foot"][1]-6, joints["left_foot"][0]+12, joints["left_foot"][1]+6], fill=col)
 
         draw.line([joints["pelvis"], joints["right_knee"]], fill=col, width=th)
         draw.line([joints["right_knee"], joints["right_foot"]], fill=col, width=th)
-        draw.ellipse([joints["right_foot"][0]-12, joints["right_foot"][1]-6, joints["right_foot"][0]+12, joints["right_foot"][1]+6], fill=col)
 
-        # 2. Torso (Pelvis -> Neck)
+        # Cartoon Sneakers on Feet (High-Contrast White with Dark Sole)
+        for foot_key in ["left_foot", "right_foot"]:
+            fx, fy = joints[foot_key]
+            # Sneaker Body (White)
+            draw.ellipse([fx - 16, fy - 8, fx + 16, fy + 8], fill=(255, 255, 255), outline=col, width=3)
+            # Sneaker Sole
+            draw.line([(fx - 14, fy + 5), (fx + 14, fy + 5)], fill=col, width=3)
+            # Toe Cap Accent
+            draw.arc([fx - 16, fy - 6, fx - 4, fy + 6], 90, 270, fill=col, width=2)
+
+        # 2. Torso (Pelvis -> Neck) & Character Clothing
+        nx, ny = joints["neck"]
+        px, py = joints["pelvis"]
+        lsx, lsy = joints["left_shoulder"]
+        rsx, rsy = joints["right_shoulder"]
+
+        # Base Torso Bone
         draw.line([joints["pelvis"], joints["neck"]], fill=col, width=th + 2)
 
-        # Professor Lab Coat torso accent (if scientist)
+        # Stylized Clothing Torso (Makes character iconic, readable & impossible to blend)
         if char.personality_key == "scientist":
-            nx, ny = joints["neck"]
-            px, py = joints["pelvis"]
+            # Doctor Lab Coat (Extends past pelvis to mid-thighs)
             draw.polygon([
-                (nx - 16, ny + 10), (nx + 16, ny + 10),
-                (px + 22, py), (px - 22, py)
-            ], fill=(255, 255, 255), outline=col, width=2)
-            draw.line([(nx, ny + 10), (px, py)], fill=(100, 116, 139), width=2)
-            draw.rectangle([nx + 4, ny + 32, nx + 14, ny + 42], fill=(241, 245, 249), outline=(100, 116, 139), width=1)
+                (lsx - 4, ny + 6), (rsx + 4, ny + 6),
+                (px + 28, py + 36), (px - 28, py + 36)
+            ], fill=(255, 255, 255), outline=col, width=3)
+            # Coat Center Opening
+            draw.line([(nx, ny + 8), (px, py + 36)], fill=(148, 163, 184), width=2)
+            # Chest Pocket with Blue Pen & ID Badge
+            draw.rectangle([nx + 6, ny + 26, nx + 18, ny + 38], fill=(241, 245, 249), outline=(100, 116, 139), width=1)
+            draw.line([(nx + 10, ny + 22), (nx + 10, ny + 30)], fill=(37, 99, 235), width=3)
+            draw.rectangle([nx - 18, ny + 26, nx - 8, ny + 38], fill=(254, 240, 138), outline=(100, 116, 139), width=1)
+        elif char.personality_key == "techie":
+            # Electric Cyan Tech Hoodie
+            draw.polygon([
+                (lsx - 4, ny + 6), (rsx + 4, ny + 6),
+                (px + 20, py + 8), (px - 20, py + 8)
+            ], fill=(14, 165, 233), outline=col, width=3)
+            # Kangaroo Pocket
+            draw.rounded_rectangle([px - 14, py - 18, px + 14, py + 2], radius=4, fill=(2, 132, 199), outline=col, width=2)
+        elif char.personality_key == "intelligent":
+            # Royal Purple Sweater
+            draw.polygon([
+                (lsx - 4, ny + 6), (rsx + 4, ny + 6),
+                (px + 20, py + 8), (px - 20, py + 8)
+            ], fill=(168, 85, 247), outline=col, width=3)
+        else:
+            # Bob (Funny / Protagonist): Crisp White Collared Shirt with Tie
+            draw.polygon([
+                (lsx - 4, ny + 6), (rsx + 4, ny + 6),
+                (px + 18, py + 6), (px - 18, py + 6)
+            ], fill=(255, 255, 255), outline=col, width=3)
+            # Shirt V-Collar
+            draw.polygon([(nx - 8, ny + 6), (nx, ny + 16), (nx + 8, ny + 6)], fill=(241, 245, 249), outline=col, width=2)
 
-        # Accessory: Tie with high-contrast outline
+        # Necktie Accessory
         if char.accessory == "red_tie":
             tx, ty = joints["neck"][0], joints["neck"][1] + 8
-            draw.polygon([(tx-9, ty-2), (tx+9, ty-2), (tx+13, ty+65), (tx, ty+82), (tx-13, ty+65)], fill=(255, 255, 255))
-            draw.polygon([(tx-6, ty), (tx+6, ty), (tx+10, ty+60), (tx, ty+75), (tx-10, ty+60)], fill=(220, 38, 38))
+            draw.polygon([(tx-10, ty-2), (tx+10, ty-2), (tx+14, ty+65), (tx, ty+82), (tx-14, ty+65)], fill=(255, 255, 255))
+            draw.polygon([(tx-7, ty), (tx+7, ty), (tx+11, ty+62), (tx, ty+78), (tx-11, ty+62)], fill=(220, 38, 38), outline=col, width=2)
+            draw.ellipse([tx - 5, ty, tx + 5, ty + 10], fill=(185, 28, 28))
         elif char.accessory == "blue_tie":
             tx, ty = joints["neck"][0], joints["neck"][1] + 8
-            draw.polygon([(tx-8, ty-2), (tx+8, ty-2), (tx+11, ty+55), (tx, ty+70), (tx-11, ty+55)], fill=(255, 255, 255))
-            draw.polygon([(tx-6, ty), (tx+6, ty), (tx+8, ty+50), (tx, ty+65), (tx-8, ty+50)], fill=(37, 99, 235))
+            draw.polygon([(tx-9, ty-2), (tx+9, ty-2), (tx+12, ty+58), (tx, ty+72), (tx-12, ty+58)], fill=(255, 255, 255))
+            draw.polygon([(tx-6, ty), (tx+6, ty), (tx+9, ty+54), (tx, ty+68), (tx-9, ty+54)], fill=(37, 99, 235), outline=col, width=2)
 
         # 3. Arms (Shoulders -> Elbows -> Hands)
         draw.line([joints["left_shoulder"], joints["left_elbow"]], fill=col, width=th)
         draw.line([joints["left_elbow"], joints["left_hand"]], fill=col, width=th)
-        draw.ellipse([joints["left_hand"][0]-8, joints["left_hand"][1]-8, joints["left_hand"][0]+8, joints["left_hand"][1]+8], fill=col)
 
         draw.line([joints["right_shoulder"], joints["right_elbow"]], fill=col, width=th)
         draw.line([joints["right_elbow"], joints["right_hand"]], fill=col, width=th)
-        draw.ellipse([joints["right_hand"][0]-8, joints["right_hand"][1]-8, joints["right_hand"][0]+8, joints["right_hand"][1]+8], fill=col)
+
+        # Cartoon White Gloves on Hands (Guarantees hand gesture visibility)
+        for hand_key in ["left_hand", "right_hand"]:
+            hx_g, hy_g = joints[hand_key]
+            # Glove Circle (Crisp White with dark outline)
+            draw.ellipse([hx_g - 12, hy_g - 12, hx_g + 12, hy_g + 12], fill=(255, 255, 255), outline=col, width=3)
+            # Glove knuckle stitch marks
+            draw.line([(hx_g - 4, hy_g - 4), (hx_g - 4, hy_g + 4)], fill=(148, 163, 184), width=2)
+            draw.line([(hx_g, hy_g - 4), (hx_g, hy_g + 4)], fill=(148, 163, 184), width=2)
+            draw.line([(hx_g + 4, hy_g - 4), (hx_g + 4, hy_g + 4)], fill=(148, 163, 184), width=2)
 
         # Draw Prop in right or left hand if speaking or active
         if cdata.get("is_speaking") and char.personality_key in ["techie", "funny"]:
@@ -174,7 +222,7 @@ class StickFigureRenderer:
         elif char.personality_key == "scientist":
             PropsLibrary.draw_prop(draw, "test_tube", joints["left_hand"][0], joints["left_hand"][1] - 15, scale=1.0)
 
-        # 4. Head (Circle)
+        # 4. Head (High-Contrast White Circle with Dark Outline)
         hx, hy = joints["head"]
         r = char.head_radius
         draw.ellipse([hx - r, hy - r, hx + r, hy + r], fill=(255, 255, 255), outline=col, width=th)
@@ -186,16 +234,25 @@ class StickFigureRenderer:
         elif char.hair_style == "spiky":
             for ox in [-18, 0, 18]:
                 draw.line([(hx + ox, hy - r), (hx + ox, hy - r - 20)], fill=col, width=th - 2)
+        elif char.hair_style == "curly":
+            for ox in [-16, 0, 16]:
+                draw.arc([hx + ox - 8, hy - r - 16, hx + ox + 8, hy - r], 180, 0, fill=col, width=th - 2)
 
         # Accessory: Glasses
         if char.accessory == "glasses":
             draw.ellipse([hx - 24, hy - 12, hx - 4, hy + 8], fill=(255, 255, 255, 200), outline=col, width=3)
             draw.ellipse([hx + 4, hy - 12, hx + 24, hy + 8], fill=(255, 255, 255, 200), outline=col, width=3)
             draw.line([(hx - 4, hy - 2), (hx + 4, hy - 2)], fill=col, width=3)
+            # Specular shine on glass lens
+            draw.line([(hx - 20, hy - 8), (hx - 14, hy - 2)], fill=(255, 255, 255), width=2)
+            draw.line([(hx + 8, hy - 8), (hx + 14, hy - 2)], fill=(255, 255, 255), width=2)
         elif char.accessory == "sunglasses":
             draw.rounded_rectangle([hx - 26, hy - 14, hx - 2, hy + 8], radius=3, fill=(15, 23, 42), outline=col, width=2)
             draw.rounded_rectangle([hx + 2, hy - 14, hx + 26, hy + 8], radius=3, fill=(15, 23, 42), outline=col, width=2)
             draw.line([(hx - 2, hy - 4), (hx + 2, hy - 4)], fill=col, width=3)
+            # White glare line across shades
+            draw.line([(hx - 22, hy - 10), (hx - 12, hy + 4)], fill=(255, 255, 255), width=2)
+            draw.line([(hx + 6, hy - 10), (hx + 16, hy + 4)], fill=(255, 255, 255), width=2)
 
         # 5. Face Rig (Eyes, Eyebrows, Mouth)
         expr_key = cdata.get("expression", "curious")
@@ -210,7 +267,7 @@ class StickFigureRenderer:
         # Right Eyebrow
         draw.line([(hx + 6, hy - 16 + eb_off_y + eb_angle*0.3), (hx + 22, hy - 16 + eb_off_y)], fill=col, width=th - 4)
 
-        # Eyes (Dots / Circles / Wide)
+        # Eyes (With Specular Catchlights)
         eye_t = expr.get("eye_type", "circle")
         if eye_t in ["wide_circle", "huge_circle"]:
             ew = 8 if eye_t == "wide_circle" else 12
@@ -219,6 +276,9 @@ class StickFigureRenderer:
             # Pupils
             draw.ellipse([hx - 16 - 3, hy - 6 - 3, hx - 16 + 3, hy - 6 + 3], fill=col)
             draw.ellipse([hx + 16 - 3, hy - 6 - 3, hx + 16 + 3, hy - 6 + 3], fill=col)
+            # Catchlights
+            draw.ellipse([hx - 17, hy - 8, hx - 14, hy - 5], fill=(255, 255, 255))
+            draw.ellipse([hx + 15, hy - 8, hx + 18, hy - 5], fill=(255, 255, 255))
         elif eye_t == "arc_up":
             # ^^ happy eyes
             draw.arc([hx - 22, hy - 10, hx - 8, hy], 180, 0, fill=col, width=4)
@@ -230,9 +290,11 @@ class StickFigureRenderer:
             draw.line([(hx + 22, hy - 8), (hx + 12, hy - 2)], fill=col, width=3)
             draw.line([(hx + 12, hy - 2), (hx + 22, hy + 4)], fill=col, width=3)
         else:
-            # Classic expressive circular eye dots
+            # Classic expressive circular eye dots with cute catchlights
             draw.ellipse([hx - 18, hy - 6, hx - 10, hy + 2], fill=col)
             draw.ellipse([hx + 10, hy - 6, hx + 18, hy + 2], fill=col)
+            draw.ellipse([hx - 16, hy - 5, hx - 13, hy - 2], fill=(255, 255, 255))
+            draw.ellipse([hx + 12, hy - 5, hx + 15, hy - 2], fill=(255, 255, 255))
 
         # Mouth (Dynamic Lip-Sync & Emotion)
         mw = mouth_info.get("width", 14)
@@ -242,6 +304,8 @@ class StickFigureRenderer:
         my = hy + 16
         if m_open and mh > 4:
             draw.ellipse([hx - mw/2, my - mh/2, hx + mw/2, my + mh/2], fill=(220, 38, 38), outline=col, width=3)
+            # Upper Teeth
+            draw.line([(hx - mw/3, my - mh/4), (hx + mw/3, my - mh/4)], fill=(255, 255, 255), width=2)
         else:
             # Curved or flat line
             if expr_key in ["happy", "laughing", "confident"]:
@@ -258,7 +322,7 @@ class StickFigureRenderer:
     @classmethod
     def _draw_subtitles(cls, draw: ImageDraw.ImageDraw, text: str, w: int, h: int):
         """Draws high-contrast yellow/white viral Shorts subtitle banner supporting Marathi/Hindi/English."""
-        sy = 1630
+        sy = 1660
         font = None
         font_paths = [
             "C:/Windows/Fonts/Nirmala.ttc",

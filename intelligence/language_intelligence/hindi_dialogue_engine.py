@@ -7,6 +7,7 @@ Avoids stiff, textbook or formal Hindi.
 
 from typing import Dict, Any, List
 from intelligence.script_generation.script_schema import StickFigureScript, ScriptScene, DialogueLine, SceneAction
+from intelligence.language_intelligence.topic_formatter import TopicFormatter
 
 class HindiDialogueEngine:
     """
@@ -15,7 +16,7 @@ class HindiDialogueEngine:
 
     @classmethod
     def generate_hindi_script(cls, topic: str, category: str = "technology") -> StickFigureScript:
-        clean_topic = topic.replace("Why ", "").replace("How ", "").strip("?!. ")
+        clean_topic = TopicFormatter.format_topic_for_script(topic, "hi")
 
         char1_id = "stick_bob"
         char1_name = "बॉब (Bob)"

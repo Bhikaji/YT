@@ -122,40 +122,83 @@ class ProceduralBackgroundRenderer:
 
     @classmethod
     def _draw_tech_showroom(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
-        floor_y = int(h * 0.68)
-        # Upper Cyber Wall (Deep Midnight Blue with Ambient Stage Lighting)
-        draw.rectangle([0, 0, w, floor_y], fill=(18, 26, 44))
-        # Soft ambient stage light / backlight behind characters for dramatic silhouette contrast
-        draw.ellipse([int(w*0.05), floor_y - int(h*0.45), int(w*0.95), floor_y + int(h*0.1)], fill=(28, 45, 78))
-        draw.ellipse([int(w*0.2), floor_y - int(h*0.35), int(w*0.8), floor_y], fill=(37, 60, 102))
+        floor_y = 1220
 
-        # Pedestal & Central Futuristic Display
+        # 1. Sleek Cyber Studio Backdrop (Midnight Navy Gradient with Ambient Neon Pillars)
+        draw.rectangle([0, 0, w, h], fill=(15, 23, 42))
+
+        # Vertical ambient neon LED pillars on left and right borders
+        for x_edge in [30, w - 30]:
+            draw.rectangle([x_edge - 6, 80, x_edge + 6, h - 80], fill=(14, 165, 233, 180), outline=(56, 189, 248), width=2)
+            draw.line([(x_edge, 80), (x_edge, h - 80)], fill=(255, 255, 255), width=2)
+
+        # 2. RADIANT ILLUMINATED STAGE PLATFORM (High-Contrast Hero Staging Deck)
+        # Characters stand at y=1380 with feet at y=1535. Platform spans y=1210 to y=1630.
         ped_x = w // 2
-        # Vertical illuminated pillar
-        draw.rectangle([ped_x - 12, floor_y - int(h*0.35), ped_x + 12, floor_y], fill=(14, 116, 144))
-        # Hologram Pedestal Base with glowing cyan ring
-        draw.ellipse([ped_x - 130, floor_y - 35, ped_x + 130, floor_y + 35], fill=(8, 145, 178), outline=(56, 189, 248), width=4)
-        draw.ellipse([ped_x - 80, floor_y - 20, ped_x + 80, floor_y + 20], fill=(6, 182, 212))
+        stage_cy = 1420
+        stage_rx = int(w * 0.44)  # ~475 px
+        stage_ry = 210
 
-        # Floating Holographic Display Screen
-        pulse = abs(math.sin(t_sec * 3.0)) * 20
-        box_top = floor_y - int(h * 0.32)
-        box_bot = floor_y - int(h * 0.16)
-        draw.rectangle([ped_x - 110 - pulse/4, box_top - pulse/4, ped_x + 110 + pulse/4, box_bot + pulse/4], outline=(192, 132, 252), width=4)
-        draw.rectangle([ped_x - 100, box_top + 10, ped_x + 100, box_bot - 10], fill=(168, 85, 247, 50))
-        draw.text((int(w * 0.28), int(h * 0.12)), "QUANTUM TECH SHOWROOM", fill=(56, 189, 248))
+        # Studio Spotlight Cone beaming down from ceiling directly onto the stage deck
+        draw.polygon([
+            (int(w * 0.35), 0), (int(w * 0.65), 0),
+            (ped_x + stage_rx, stage_cy), (ped_x - stage_rx, stage_cy)
+        ], fill=(30, 58, 138, 55))
 
-        # Tech Showroom Floor (Distinct Surface with Glowing Stage Horizon)
-        draw.rectangle([0, floor_y, w, h], fill=(24, 34, 56))
-        # Horizon Glowing Neon Line
-        draw.line([(0, floor_y), (w, floor_y)], fill=(56, 189, 248), width=4)
-        draw.line([(0, floor_y + 3), (w, floor_y + 3)], fill=(14, 165, 233), width=2)
+        # Outer glowing neon rim
+        draw.ellipse([ped_x - stage_rx - 14, stage_cy - stage_ry - 14, ped_x + stage_rx + 14, stage_cy + stage_ry + 14], fill=(14, 165, 233, 130))
+        # Glossy Stage Deck (Crisp, High-Key Light Cyan-White Reflective Surface)
+        draw.ellipse([ped_x - stage_rx, stage_cy - stage_ry, ped_x + stage_rx, stage_cy + stage_ry], fill=(240, 249, 255), outline=(56, 189, 248), width=6)
+        # Inner accent light ring
+        draw.ellipse([ped_x - stage_rx + 35, stage_cy - stage_ry + 18, ped_x + stage_rx - 35, stage_cy + stage_ry - 18], outline=(186, 230, 253), width=3)
 
-        # Neon Floor Grid Lines
-        for y in range(floor_y + 40, h, 60):
-            draw.line([(0, y), (w, y)], fill=(6, 182, 212), width=2)
-        for x in range(0, w, 100):
-            draw.line([(x, floor_y), (x, h)], fill=(147, 51, 234), width=2)
+        # 3. Central Futuristic Holographic Display Prop
+        # Sleek glass pedestal pillar behind the characters
+        pillar_bot = stage_cy - 70
+        pillar_top = pillar_bot - 240
+        draw.rectangle([ped_x - 14, pillar_top, ped_x + 14, pillar_bot], fill=(30, 41, 59), outline=(56, 189, 248), width=3)
+        draw.ellipse([ped_x - 55, pillar_bot - 18, ped_x + 55, pillar_bot + 18], fill=(14, 116, 144), outline=(56, 189, 248), width=3)
+
+        # Holographic Display Panel
+        pulse = math.sin(t_sec * 3.5) * 8
+        holo_top = pillar_top - 200
+        holo_bot = pillar_top + 10
+        hw = 130 + int(pulse)
+        hh_top = holo_top - int(pulse / 2)
+        hh_bot = holo_bot + int(pulse / 2)
+
+        # Glowing holographic translucent screen
+        draw.rectangle([ped_x - hw, hh_top, ped_x + hw, hh_bot], fill=(14, 165, 233, 40), outline=(56, 189, 248), width=4)
+
+        # Tech Corner Brackets
+        c_len = 16
+        # Top-Left
+        draw.line([(ped_x - hw, hh_top), (ped_x - hw + c_len, hh_top)], fill=(255, 255, 255), width=3)
+        draw.line([(ped_x - hw, hh_top), (ped_x - hw, hh_top + c_len)], fill=(255, 255, 255), width=3)
+        # Top-Right
+        draw.line([(ped_x + hw, hh_top), (ped_x + hw - c_len, hh_top)], fill=(255, 255, 255), width=3)
+        draw.line([(ped_x + hw, hh_top), (ped_x + hw, hh_top + c_len)], fill=(255, 255, 255), width=3)
+        # Bottom-Left
+        draw.line([(ped_x - hw, hh_bot), (ped_x - hw + c_len, hh_bot)], fill=(255, 255, 255), width=3)
+        draw.line([(ped_x - hw, hh_bot), (ped_x - hw, hh_bot - c_len)], fill=(255, 255, 255), width=3)
+        # Bottom-Right
+        draw.line([(ped_x + hw, hh_bot), (ped_x + hw - c_len, hh_bot)], fill=(255, 255, 255), width=3)
+        draw.line([(ped_x + hw, hh_bot), (ped_x + hw, hh_bot - c_len)], fill=(255, 255, 255), width=3)
+
+        # Hologram Contents: Concentric Gyro Rings & Waveform
+        hc_y = (hh_top + hh_bot) // 2
+        draw.ellipse([ped_x - 50, hc_y - 50, ped_x + 50, hc_y + 50], outline=(147, 51, 234), width=3)
+        draw.ellipse([ped_x - 32, hc_y - 32, ped_x + 32, hc_y + 32], outline=(56, 189, 248), width=3)
+        draw.ellipse([ped_x - 14, hc_y - 14, ped_x + 14, hc_y + 14], fill=(255, 255, 255))
+
+        # Animated Audio / Data Waveform inside Hologram
+        for xi in range(-80, 81, 14):
+            bar_h = int(abs(math.sin(t_sec * 4.0 + xi * 0.1)) * 22) + 4
+            draw.line([(ped_x + xi, hh_bot - 18 - bar_h), (ped_x + xi, hh_bot - 18)], fill=(56, 189, 248), width=3)
+
+        # Header Title in Showroom
+        draw.text((int(w * 0.32), int(h * 0.08)), "QUANTUM TECH SHOWROOM", fill=(56, 189, 248))
+        draw.line([(int(w * 0.28), int(h * 0.11)), (int(w * 0.72), int(h * 0.11))], fill=(14, 165, 233), width=3)
 
     @classmethod
     def _draw_space_station(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
@@ -170,11 +213,15 @@ class ProceduralBackgroundRenderer:
         # Big alien planet in viewport
         draw.ellipse([700, 150, 1020, 470], fill=(168, 85, 247), outline=(236, 72, 153), width=4)
         draw.arc([660, 270, 1060, 350], 0, 360, fill=(244, 114, 182), width=6)
-        # Station interior frame
-        draw.rectangle([0, 1250, w, h], fill=(30, 41, 59))
-        draw.rectangle([0, 0, 100, h], fill=(15, 23, 42))
-        draw.rectangle([w-100, 0, w, h], fill=(15, 23, 42))
-        draw.rectangle([0, 0, w, 100], fill=(15, 23, 42))
+        # Station interior frame (Sleek light-grey sci-fi bulkheads)
+        floor_y = int(h * 0.65)
+        draw.rectangle([0, floor_y, w, h], fill=(226, 232, 240))
+        # Illuminated deck runner for character staging contrast
+        draw.rectangle([0, floor_y, w, floor_y + 16], fill=(14, 165, 233))
+        draw.rectangle([int(w * 0.1), floor_y + 40, int(w * 0.9), h], fill=(241, 245, 249), outline=(148, 163, 184), width=3)
+        draw.rectangle([0, 0, 80, h], fill=(30, 41, 59))
+        draw.rectangle([w-80, 0, w, h], fill=(30, 41, 59))
+        draw.rectangle([0, 0, w, 80], fill=(30, 41, 59))
 
     @classmethod
     def _draw_retail_shop(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
