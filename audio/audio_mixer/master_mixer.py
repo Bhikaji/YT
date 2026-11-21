@@ -33,12 +33,13 @@ class MasterAudioMixer:
         filter_complex = ["[0:a]volume=0.15[bgm];"]
         mix_labels = ["[bgm]"]
 
-        # Add dialogue clips with adelay
+        # Add dialogue clips with adelay based on exact scheduled timestamps
         clip_idx = 1
         for d in dialogue_clips:
             clip_path = d.get("audio_path")
             if clip_path and os.path.exists(clip_path):
-                start_ms = int(d.get("start", 0.0) * 1000)
+                start_sec = float(d.get("start_second", d.get("start", 0.0)))
+                start_ms = max(1, int(start_sec * 1000))
                 inputs.extend(["-i", str(clip_path)])
                 label = f"[diag{clip_idx}]"
                 filter_complex.append(f"[{clip_idx}:a]adelay={start_ms}|{start_ms},volume=1.0{label};")
@@ -49,7 +50,7 @@ class MasterAudioMixer:
         sfx_dir = output_audio_path.parent / "sfx_stems"
         for s in sfx_cues[:4]:
             sfx_name = s.get("name", "pop")
-            sfx_time_ms = int(s.get("time", 0.0) * 1000)
+            sfx_time_ms = max(1, int(s.get("time", 0.0) * 1000))
             s_file = CartoonSFXManager.generate_sfx(sfx_name, sfx_dir / f"{sfx_name}.mp3")
             if os.path.exists(s_file):
                 inputs.extend(["-i", str(s_file)])
@@ -58,8 +59,8 @@ class MasterAudioMixer:
                 mix_labels.append(label)
                 clip_idx += 1
 
-        # Final amix
-        filter_complex.append("".join(mix_labels) + f"amix=inputs={len(mix_labels)}:duration=first:dropout_transition=2[outa]")
+        # Final amix with normalize=0 to maintain full voice volume
+        filter_complex.append("".join(mix_labels) + f"amix=inputs={len(mix_labels)}:duration=first:dropout_transition=0:normalize=0[outa]")
 
         cmd = [exe, "-y"] + inputs + [
             "-filter_complex", "".join(filter_complex),

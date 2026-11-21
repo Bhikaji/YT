@@ -39,14 +39,14 @@ class RangdiMarathiEngine:
         scenes: List[ScriptScene] = []
 
         # -------------------------------------------------------------
-        # PART 1: 0–3 sec - POWERFUL HOOK (Stop Scrolling)
+        # PART 1: 0–5 sec - POWERFUL HOOK (Stop Scrolling)
         # -------------------------------------------------------------
         hook_text = f"अर्रे गड्या थांब! {clean_topic} बद्दल हे ऐकलंस का?"
         scenes.append(ScriptScene(
             scene_id=1,
             environment="tech_showroom" if "tech" in category else "modern_office",
             start_second=0.0,
-            end_second=3.0,
+            end_second=5.0,
             description="बब्या स्क्रीनकडे बोट दाखवून जोरात ओरडतो.",
             camera_movement="ZOOM_IN",
             dialogues=[
@@ -55,8 +55,8 @@ class RangdiMarathiEngine:
                     speaker_name=char1_name,
                     text=hook_text,
                     emotion="shocked",
-                    start_second=0.2,
-                    end_second=2.8
+                    start_second=0.3,
+                    end_second=4.5
                 )
             ],
             actions=[
@@ -66,22 +66,21 @@ class RangdiMarathiEngine:
                     gesture="point",
                     facial_expression="shocked",
                     start_second=0.0,
-                    end_second=3.0
+                    end_second=5.0
                 )
             ],
             sound_effects=["whoosh"]
         ))
 
         # -------------------------------------------------------------
-        # PART 2: 3–7 sec - SITUATION (Introduce Premise)
+        # PART 2: 5–10 sec - SITUATION (Introduce Premise)
         # -------------------------------------------------------------
-        diag_prof_1 = f"काय राव बब्या, उगाच काहीपण थापा मारू नकोस!"
-        diag_bob_1 = f"अहो प्रोफेसर, थापा नाही, १०० टक्के खरा विषय आहे!"
+        diag_prof_1 = "काय सांगतोस बब्या, उगाच काहीपण थापा मारू नकोस, खरं काय?"
         scenes.append(ScriptScene(
             scene_id=2,
             environment="tech_showroom" if "tech" in category else "modern_office",
-            start_second=3.0,
-            end_second=7.0,
+            start_second=5.0,
+            end_second=10.0,
             description="प्रोफेसर चष्मा सावरून अविश्वास दाखवतो, बब्या फोन दाखवतो.",
             camera_movement="PAN_RIGHT",
             dialogues=[
@@ -90,16 +89,8 @@ class RangdiMarathiEngine:
                     speaker_name=char2_name,
                     text=diag_prof_1,
                     emotion="suspicious",
-                    start_second=3.2,
-                    end_second=5.1
-                ),
-                DialogueLine(
-                    speaker_id=char1_id,
-                    speaker_name=char1_name,
-                    text=diag_bob_1,
-                    emotion="excited",
                     start_second=5.3,
-                    end_second=6.8
+                    end_second=9.5
                 )
             ],
             actions=[
@@ -108,82 +99,56 @@ class RangdiMarathiEngine:
                     action_type="inspect",
                     gesture="cross_arms",
                     facial_expression="suspicious",
-                    start_second=3.0,
-                    end_second=5.2
-                ),
-                SceneAction(
-                    character_id=char1_id,
-                    action_type="point",
-                    gesture="wave",
-                    facial_expression="confident",
-                    start_second=5.2,
-                    end_second=7.0
+                    start_second=5.0,
+                    end_second=10.0
                 )
             ],
             sound_effects=["pop"]
         ))
 
         # -------------------------------------------------------------
-        # PART 3: 7–14 sec - DEVELOPMENT (Create Intrigue)
+        # PART 3: 10–15 sec - DEVELOPMENT (Create Intrigue)
         # -------------------------------------------------------------
-        diag_prof_2 = f"थांब बघू दे मला... अरे देवा, यातलं विज्ञान तर लय खतरनाक दिसतंय!"
-        diag_bob_2 = f"सांगत होतो ना! सगळ्या जगाचं डोकं फिरलंय यावर!"
+        diag_bob_2 = "अहो प्रोफेसर, थापा नाही, यातलं सत्य बघून डोक्यात मुंग्या आल्या!"
         scenes.append(ScriptScene(
             scene_id=3,
             environment="tech_showroom" if "tech" in category else "modern_office",
-            start_second=7.0,
-            end_second=14.0,
-            description="दोघे मिळून गॅझेटची तपासणी करतात, डोळ्यात कुतूहल.",
+            start_second=10.0,
+            end_second=15.0,
+            description="बब्या उत्साहाने फोन दाखवतो, डोळ्यात कुतूहल.",
             camera_movement="STATIC",
             dialogues=[
-                DialogueLine(
-                    speaker_id=char2_id,
-                    speaker_name=char2_name,
-                    text=diag_prof_2,
-                    emotion="surprised",
-                    start_second=7.3,
-                    end_second=10.5
-                ),
                 DialogueLine(
                     speaker_id=char1_id,
                     speaker_name=char1_name,
                     text=diag_bob_2,
-                    emotion="laughing",
-                    start_second=10.8,
-                    end_second=13.6
+                    emotion="excited",
+                    start_second=10.3,
+                    end_second=14.5
                 )
             ],
             actions=[
-                SceneAction(
-                    character_id=char2_id,
-                    action_type="think",
-                    gesture="scratch_head",
-                    facial_expression="curious",
-                    start_second=7.0,
-                    end_second=10.6
-                ),
                 SceneAction(
                     character_id=char1_id,
                     action_type="dance",
                     gesture="wave",
                     facial_expression="laughing",
-                    start_second=10.6,
-                    end_second=14.0
+                    start_second=10.0,
+                    end_second=15.0
                 )
             ],
             sound_effects=["ding_lightbulb"]
         ))
 
         # -------------------------------------------------------------
-        # PART 4: 14–21 sec - CONFLICT / SURPRISE (Twist)
+        # PART 4: 15–20 sec - CONFLICT / SURPRISE (Twist)
         # -------------------------------------------------------------
-        diag_prof_3 = f"पण बब्या, यात एक भयंकर मोठी गोम आहे!"
-        diag_bob_3 = f"काय? आरारारा, फिसकटलं का सगळं?!"
+        diag_prof_3 = "पण बब्या यात एक भयंकर मोठी गोम आहे, नीट समजून घे!"
         scenes.append(ScriptScene(
             scene_id=4,
             environment="tech_showroom" if "tech" in category else "modern_office",
-            start_second=14.0,
-            end_second=21.0,
+            start_second=15.0,
+            end_second=20.0,
             description="प्रोफेसर धोक्याचा इशारा देतो, बब्याच्या डोक्यातून घाम फुटतो.",
             camera_movement="SHAKE",
             dialogues=[
@@ -192,16 +157,8 @@ class RangdiMarathiEngine:
                     speaker_name=char2_name,
                     text=diag_prof_3,
                     emotion="angry",
-                    start_second=14.3,
-                    end_second=17.2
-                ),
-                DialogueLine(
-                    speaker_id=char1_id,
-                    speaker_name=char1_name,
-                    text=diag_bob_3,
-                    emotion="fearful",
-                    start_second=17.5,
-                    end_second=20.5
+                    start_second=15.3,
+                    end_second=19.5
                 )
             ],
             actions=[
@@ -210,108 +167,75 @@ class RangdiMarathiEngine:
                     action_type="point",
                     gesture="point",
                     facial_expression="angry",
-                    start_second=14.0,
-                    end_second=17.3
-                ),
-                SceneAction(
-                    character_id=char1_id,
-                    action_type="slapstick_react",
-                    gesture="shrug",
-                    facial_expression="shocked",
-                    start_second=17.3,
-                    end_second=21.0
+                    start_second=15.0,
+                    end_second=20.0
                 )
             ],
             sound_effects=["punchline_impact"]
         ))
 
         # -------------------------------------------------------------
-        # PART 5: 21–27 sec - PAYOFF (Main Value Punchline)
+        # PART 5: 20–25 sec - PAYOFF (Main Value Punchline)
         # -------------------------------------------------------------
-        diag_prof_4 = f"शांत हो! खरी ट्रिक ही आहे की फक्त १ सेटिंग बदलली की काम फत्ते!"
-        diag_bob_4 = f"लय भारी राव! डोकं चालवलंस एकदम झकास!"
+        diag_bob_4 = "म्हणून म्हणतो डोकं चालवा, एका झटक्यात विषयच संपला!"
         scenes.append(ScriptScene(
             scene_id=5,
             environment="tech_showroom" if "tech" in category else "modern_office",
-            start_second=21.0,
-            end_second=27.0,
-            description="प्रोफेसर गुप्त उपाय सांगतो, दोघे टाळी देतात.",
+            start_second=20.0,
+            end_second=25.0,
+            description="बब्या कॉलर उडवून हसतो, प्रोफेसर टाळी देतो.",
             camera_movement="ZOOM_IN",
             dialogues=[
-                DialogueLine(
-                    speaker_id=char2_id,
-                    speaker_name=char2_name,
-                    text=diag_prof_4,
-                    emotion="confident",
-                    start_second=21.3,
-                    end_second=24.4
-                ),
                 DialogueLine(
                     speaker_id=char1_id,
                     speaker_name=char1_name,
                     text=diag_bob_4,
-                    emotion="happy",
-                    start_second=24.6,
-                    end_second=26.8
+                    emotion="confident",
+                    start_second=20.3,
+                    end_second=24.5
                 )
             ],
             actions=[
                 SceneAction(
-                    character_id=char2_id,
-                    action_type="stand",
-                    gesture="thumbs_up",
-                    facial_expression="confident",
-                    start_second=21.0,
-                    end_second=24.5
-                ),
-                SceneAction(
                     character_id=char1_id,
-                    action_type="wave",
-                    gesture="cheer",
-                    facial_expression="happy",
-                    start_second=24.5,
-                    end_second=27.0
+                    action_type="laugh",
+                    gesture="shrug",
+                    facial_expression="confident",
+                    start_second=20.0,
+                    end_second=25.0
                 )
             ],
-            sound_effects=["ding_lightbulb"]
+            sound_effects=["pop"]
         ))
 
         # -------------------------------------------------------------
-        # PART 6: 27–30 sec - ENDING & CALL TO ACTION
+        # PART 6: 25–30 sec - ENDING & CALL TO ACTION
         # -------------------------------------------------------------
-        diag_bob_5 = f"तुम्हाला ही ट्रिक ठाऊक होती का? कमेंट करा आणि लगेच सबस्क्राईब ठोका!"
+        diag_prof_5 = "बघितलंस का चमत्कार? अशाच कडक माहितीसाठी आत्ताच सबस्क्राईब करा!"
         scenes.append(ScriptScene(
             scene_id=6,
             environment="tech_showroom" if "tech" in category else "modern_office",
-            start_second=27.0,
+            start_second=25.0,
             end_second=30.0,
             description="दोघे प्रेक्षकांकडे हात हलवून सबस्क्राईब करायला सांगतात.",
             camera_movement="STATIC",
             dialogues=[
                 DialogueLine(
-                    speaker_id=char1_id,
-                    speaker_name=char1_name,
-                    text=diag_bob_5,
+                    speaker_id=char2_id,
+                    speaker_name=char2_name,
+                    text=diag_prof_5,
                     emotion="excited",
-                    start_second=27.2,
-                    end_second=29.7
+                    start_second=25.3,
+                    end_second=29.5
                 )
             ],
             actions=[
                 SceneAction(
-                    character_id=char1_id,
+                    character_id=char2_id,
                     action_type="wave",
                     gesture="wave",
-                    facial_expression="excited",
-                    start_second=27.0,
-                    end_second=30.0
-                ),
-                SceneAction(
-                    character_id=char2_id,
-                    action_type="stand",
-                    gesture="thumbs_up",
-                    facial_expression="confident",
-                    start_second=27.0,
+                    facial_expression="happy",
+                    start_second=25.0,
                     end_second=30.0
                 )
             ],
@@ -324,10 +248,10 @@ class RangdiMarathiEngine:
             category=category,
             hook=hook_text,
             situation=diag_prof_1,
-            development=diag_prof_2,
+            development=diag_bob_2,
             conflict=diag_prof_3,
-            payoff=diag_prof_4,
-            ending_cta=diag_bob_5,
+            payoff=diag_bob_4,
+            ending_cta=diag_prof_5,
             total_duration=30.0,
             cast=[
                 {"id": char1_id, "name": char1_name, "personality": "funny", "voice_id": "mr-IN-ManoharNeural"},
