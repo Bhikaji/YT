@@ -197,18 +197,30 @@ async def get_stick_trends(geo: str = "US", category: str = None):
     }
 
 @api_router.post("/stick/produce")
-async def produce_stick_short(topic: str = None, category: str = None, geo: str = "US"):
-    """Triggers the full 14-stage autonomous stick-figure short production pipeline."""
-    from orchestrator.autonomous_studio_manager import AutonomousStudioManager
-    summary = AutonomousStudioManager.run_production_cycle(
+async def produce_stick_short(topic: str = None, category: str = None, geo: str = "IN", language: str = "mr_rangdi"):
+    """Triggers the full 14-stage autonomous stick-figure short production pipeline in Rangdi Marathi, Hindi, or English."""
+    from orchestrator.autonomous_studio_manager import AutonomousStickStudioManager
+    summary = AutonomousStickStudioManager.run_production_cycle(
         target_topic=topic,
         target_category=category,
+        target_language=language,
         geo=geo,
         publish_privacy="private"
     )
     return {
         "status": "SUCCESS",
         "production_summary": summary
+    }
+
+@api_router.get("/stick/languages")
+async def get_stick_languages():
+    """Returns available language tiers, dialects, and default neural voices."""
+    from intelligence.language_intelligence.language_selector import LanguageSelectionEngine
+    return {
+        "priority_1": "mr_rangdi (Rangdi Marathi - Primary)",
+        "priority_2": "hi (Conversational Hindi - Secondary)",
+        "priority_3": "en (English & International)",
+        "languages": LanguageSelectionEngine.LANGUAGE_METADATA
     }
 
 @api_router.get("/stick/latest")

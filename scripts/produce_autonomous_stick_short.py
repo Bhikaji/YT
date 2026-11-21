@@ -13,7 +13,8 @@ async def main():
     parser = argparse.ArgumentParser(description="Autonomous AI 2D Stick-Figure Animation & YouTube Shorts Studio")
     parser.add_argument("--topic", type=str, default=None, help="Force a specific topic (or leave empty for autonomous trend discovery)")
     parser.add_argument("--category", type=str, default=None, help="Force a specific category (e.g. science_discovery, technology, comedy_entertainment)")
-    parser.add_argument("--geo", type=str, default="US", help="Target country code: US, IN, GB, CA, AU, WORLDWIDE")
+    parser.add_argument("--geo", type=str, default="IN", help="Target country code: IN, US, GB, CA, AU, WORLDWIDE")
+    parser.add_argument("--language", type=str, default="mr_rangdi", choices=["mr_rangdi", "hi", "en"], help="Target language (Default: Priority 1 - Rangdi Marathi)")
     parser.add_argument("--privacy", type=str, default="private", choices=["private", "unlisted", "public"], help="YouTube publishing visibility")
 
     args = parser.parse_args()
@@ -22,6 +23,7 @@ async def main():
         geo=args.geo,
         forced_category=args.category,
         forced_topic=args.topic,
+        language_override=args.language,
         privacy_status=args.privacy
     )
 

@@ -149,4 +149,33 @@ async def init_db():
             );
         """)
 
+        # 8. Multilingual & Realistic Human Voice Studio Tables
+        from backend.app.models.multilingual_schema import MULTILINGUAL_TABLE_DEFINITIONS
+        for ddl in MULTILINGUAL_TABLE_DEFINITIONS:
+            await db.execute(ddl)
+
+        # Seed default languages and dialect vocabulary
+        await db.execute("""
+            INSERT OR IGNORE INTO languages (code, name, native_name, priority_rank, is_active)
+            VALUES 
+                ('mr_rangdi', 'Rangdi Marathi', 'रांगडी मराठी', 1, 1),
+                ('hi', 'Hindi', 'हिन्दी', 2, 1),
+                ('en', 'English', 'English', 3, 1),
+                ('es', 'Spanish', 'Español', 4, 1),
+                ('pt', 'Portuguese', 'Português', 4, 1),
+                ('fr', 'French', 'Français', 4, 1),
+                ('de', 'German', 'Deutsch', 4, 1),
+                ('ja', 'Japanese', '日本語', 4, 1),
+                ('ko', 'Korean', '한국어', 4, 1);
+        """)
+
+        await db.execute("""
+            INSERT OR IGNORE INTO regional_dialects (id, language_code, dialect_name, region, is_colloquial)
+            VALUES
+                ('mr_deshi_rangdi', 'mr_rangdi', 'Deshi Rangdi', 'Western Maharashtra / Rural Heartland', 1),
+                ('mr_varhadi', 'mr_rangdi', 'Varhadi', 'Vidarbha', 1),
+                ('mr_marathwada', 'mr_rangdi', 'Marathwadi', 'Marathwada', 1),
+                ('hi_street', 'hi', 'Conversational Bambaiya/Street Hindi', 'North & Western Urban', 1);
+        """)
+
         await db.commit()

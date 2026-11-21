@@ -327,14 +327,24 @@
                                 <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
                                 <span>High-Opportunity Scored Topics (7-Factor Model)</span>
                             </p>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-[11px] text-slate-400">Region:</span>
-                                <select id="stick-geo-select" onchange="refreshStickTrends()" class="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-xs text-slate-300">
-                                    <option value="US">United States (US)</option>
-                                    <option value="IN">India (IN)</option>
-                                    <option value="GB">United Kingdom (GB)</option>
-                                    <option value="WORLDWIDE">Worldwide</option>
-                                </select>
+                            <div class="flex items-center space-x-3">
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-[11px] text-slate-400">Language:</span>
+                                    <select id="stick-lang-select" class="bg-slate-950 border border-emerald-500/50 rounded px-2 py-0.5 text-xs text-emerald-300 font-medium">
+                                        <option value="mr_rangdi" selected>Priority 1: Rangdi Marathi (रांगडी मराठी)</option>
+                                        <option value="hi">Priority 2: Conversational Hindi (हिन्दी)</option>
+                                        <option value="en">Priority 3: English (Global)</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-[11px] text-slate-400">Region:</span>
+                                    <select id="stick-geo-select" onchange="refreshStickTrends()" class="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-xs text-slate-300">
+                                        <option value="IN" selected>India (IN)</option>
+                                        <option value="US">United States (US)</option>
+                                        <option value="GB">United Kingdom (GB)</option>
+                                        <option value="WORLDWIDE">Worldwide</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -749,14 +759,16 @@
 
         async function launchAutonomousStickShort() {
             const btn = document.getElementById('btn-auto-stick');
+            const lang = document.getElementById('stick-lang-select') ? document.getElementById('stick-lang-select').value : 'mr_rangdi';
+            const geo = document.getElementById('stick-geo-select') ? document.getElementById('stick-geo-select').value : 'IN';
             btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i><span>Producing Short...</span>`;
             lucide.createIcons();
             btn.disabled = true;
 
             try {
-                const res = await fetch('/api/v1/stick/produce', { method: 'POST' });
+                const res = await fetch(`/api/v1/stick/produce?geo=${geo}&language=${lang}`, { method: 'POST' });
                 const data = await res.json();
-                alert(`Produced "${data.production_summary.title}"! QC Score: ${data.production_summary.qc_score}/100`);
+                alert(`Produced "${data.production_summary.script_title}" in ${data.production_summary.language}! QC Score: ${data.production_summary.qc_audit.quality_score}/100`);
                 loadLatestStickShort();
             } catch (e) {
                 alert("Production error: " + e.message);
@@ -769,16 +781,18 @@
 
         async function produceStickShort(encodedTopic, category) {
             const topic = decodeURIComponent(encodedTopic);
+            const lang = document.getElementById('stick-lang-select') ? document.getElementById('stick-lang-select').value : 'mr_rangdi';
+            const geo = document.getElementById('stick-geo-select') ? document.getElementById('stick-geo-select').value : 'IN';
             const status = document.getElementById('system-status');
-            status.textContent = `Producing "${topic}"...`;
+            status.textContent = `Producing "${topic}" in ${lang}...`;
             status.className = "text-amber-400 font-medium";
 
             try {
-                const res = await fetch(`/api/v1/stick/produce?topic=${encodeURIComponent(topic)}&category=${encodeURIComponent(category)}`, { method: 'POST' });
+                const res = await fetch(`/api/v1/stick/produce?topic=${encodeURIComponent(topic)}&category=${encodeURIComponent(category)}&geo=${geo}&language=${lang}`, { method: 'POST' });
                 const data = await res.json();
                 status.textContent = "Production Completed";
                 status.className = "text-emerald-400 font-medium";
-                alert(`Short Completed: "${data.production_summary.title}" in ${data.production_summary.elapsed_time}!`);
+                alert(`Short Completed: "${data.production_summary.script_title}" in ${data.production_summary.production_time_seconds}s!`);
                 loadLatestStickShort();
             } catch (e) {
                 alert("Production error: " + e.message);

@@ -122,20 +122,40 @@ class ProceduralBackgroundRenderer:
 
     @classmethod
     def _draw_tech_showroom(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
-        # Cyber dark theme
-        draw.rectangle([0, 0, w, h], fill=(10, 15, 30))
-        # Neon grid lines on floor
-        for y in range(1250, h, 50):
-            draw.line([(0, y), (w, y)], fill=(6, 182, 212, 120), width=2)
-        for x in range(0, w, 90):
-            draw.line([(x, 1250), (x, h)], fill=(147, 51, 234, 100), width=2)
-        # Hologram pedestal
-        pulse = abs(math.sin(t_sec * 3.0)) * 40
-        draw.ellipse([440, 1200, 640, 1270], fill=(6, 182, 212, 180), outline=(56, 189, 248), width=3)
-        draw.rectangle([530, 850, 550, 1210], fill=(6, 182, 212, 100))
-        # Floating holo cube
-        draw.rectangle([480 - pulse/4, 900 - pulse/2, 600 + pulse/4, 1020 + pulse/2], outline=(168, 85, 247), width=3)
-        draw.text((360, 300), "FUTURE TECHNOLOGY LAB", fill=(6, 182, 212))
+        floor_y = int(h * 0.68)
+        # Upper Cyber Wall (Deep Midnight Blue with Ambient Stage Lighting)
+        draw.rectangle([0, 0, w, floor_y], fill=(18, 26, 44))
+        # Soft ambient stage light / backlight behind characters for dramatic silhouette contrast
+        draw.ellipse([int(w*0.05), floor_y - int(h*0.45), int(w*0.95), floor_y + int(h*0.1)], fill=(28, 45, 78))
+        draw.ellipse([int(w*0.2), floor_y - int(h*0.35), int(w*0.8), floor_y], fill=(37, 60, 102))
+
+        # Pedestal & Central Futuristic Display
+        ped_x = w // 2
+        # Vertical illuminated pillar
+        draw.rectangle([ped_x - 12, floor_y - int(h*0.35), ped_x + 12, floor_y], fill=(14, 116, 144))
+        # Hologram Pedestal Base with glowing cyan ring
+        draw.ellipse([ped_x - 130, floor_y - 35, ped_x + 130, floor_y + 35], fill=(8, 145, 178), outline=(56, 189, 248), width=4)
+        draw.ellipse([ped_x - 80, floor_y - 20, ped_x + 80, floor_y + 20], fill=(6, 182, 212))
+
+        # Floating Holographic Display Screen
+        pulse = abs(math.sin(t_sec * 3.0)) * 20
+        box_top = floor_y - int(h * 0.32)
+        box_bot = floor_y - int(h * 0.16)
+        draw.rectangle([ped_x - 110 - pulse/4, box_top - pulse/4, ped_x + 110 + pulse/4, box_bot + pulse/4], outline=(192, 132, 252), width=4)
+        draw.rectangle([ped_x - 100, box_top + 10, ped_x + 100, box_bot - 10], fill=(168, 85, 247, 50))
+        draw.text((int(w * 0.28), int(h * 0.12)), "QUANTUM TECH SHOWROOM", fill=(56, 189, 248))
+
+        # Tech Showroom Floor (Distinct Surface with Glowing Stage Horizon)
+        draw.rectangle([0, floor_y, w, h], fill=(24, 34, 56))
+        # Horizon Glowing Neon Line
+        draw.line([(0, floor_y), (w, floor_y)], fill=(56, 189, 248), width=4)
+        draw.line([(0, floor_y + 3), (w, floor_y + 3)], fill=(14, 165, 233), width=2)
+
+        # Neon Floor Grid Lines
+        for y in range(floor_y + 40, h, 60):
+            draw.line([(0, y), (w, y)], fill=(6, 182, 212), width=2)
+        for x in range(0, w, 100):
+            draw.line([(x, floor_y), (x, h)], fill=(147, 51, 234), width=2)
 
     @classmethod
     def _draw_space_station(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
