@@ -25,21 +25,46 @@ class RealisticHumanVoiceEngine:
 
     CHARACTER_VOICE_MAP = {
         # Priority 1: Varhadi & Rangdi Marathi - Matching demo.mp4 Character Personalities
-        # Bob voiced with natural crisp Maharashtrian young tone, Mother voiced with silky smooth maternal scold, Friend with playful pitch
         "mr_rangdi": {
-            # Bob (बब्या - Energetic comedy cartoon boy, crystal clear natural male enunciation)
+            # Ganya (गण्या - Energetic comedy hero boy, crisp natural Maharashtrian enunciation)
+            "ganya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+3Hz"},
+            "stick_ganya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+3Hz"},
             "stick_bob": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+3Hz"},
-            # Gampya (गंप्या - Sarcastic, mischievous teen friend in bus doorway)
-            "stick_prof": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+8Hz"},
-            # Mother (आई - Smooth, authoritative, crisp Maharashtrian mother in saree)
+
+            # Sonya (सोन्या - Playful brother/friend, slightly higher pitch)
+            "sonya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+1Hz"},
+            "stick_sonya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+1Hz"},
+
+            # Shanti (शांती / शांताबाई - Authoritative, crisp Maharashtrian mother in saree)
+            "shanti": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "-2%", "base_pitch": "+4Hz"},
+            "varhadi_shanti": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "-2%", "base_pitch": "+4Hz"},
             "varhadi_mother": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "-2%", "base_pitch": "+4Hz"},
-            # Uncle (काका - Mature, dry village elder)
-            "varhadi_uncle": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "-2%", "base_pitch": "-4Hz"},
+
+            # Rohya (रोह्या - Sarcastic, mischievous teen friend in bus doorway)
+            "rohya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+7Hz"},
+            "stick_rohya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+7Hz"},
+            "stick_prof": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+7Hz"},
+
+            # Yogya (योग्या - Village katta buddy)
+            "yogya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+5Hz"},
+            "stick_yogya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+5Hz"},
+
+            # Aakya (आक्या - Dry elder village friend)
+            "aakya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "-2%", "base_pitch": "-3Hz"},
+            "stick_aakya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "-2%", "base_pitch": "-3Hz"},
+            "varhadi_uncle": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "-2%", "base_pitch": "-3Hz"},
+
             "stick_sam": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+0Hz"},
             "stick_alex": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "+0%", "base_pitch": "+0Hz"}
         },
         # Priority 2: Hindi
         "hi": {
+            "ganya": {"voice": "hi-IN-MadhurNeural", "gender": "male", "base_rate": "+2%", "base_pitch": "+2Hz"},
+            "sonya": {"voice": "hi-IN-MadhurNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+1Hz"},
+            "shanti": {"voice": "hi-IN-SwaraNeural", "gender": "female", "base_rate": "+0%", "base_pitch": "+1Hz"},
+            "rohya": {"voice": "hi-IN-MadhurNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "-1Hz"},
+            "yogya": {"voice": "hi-IN-MadhurNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+0Hz"},
+            "aakya": {"voice": "hi-IN-MadhurNeural", "gender": "male", "base_rate": "-1%", "base_pitch": "-2Hz"},
             "stick_bob": {"voice": "hi-IN-MadhurNeural", "gender": "male", "base_rate": "+3%", "base_pitch": "+1Hz"},
             "stick_prof": {"voice": "hi-IN-MadhurNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "-2Hz"},
             "stick_sam": {"voice": "hi-IN-MadhurNeural", "gender": "male", "base_rate": "+2%", "base_pitch": "+0Hz"},
@@ -47,6 +72,12 @@ class RealisticHumanVoiceEngine:
         },
         # Priority 3: English
         "en": {
+            "ganya": {"voice": "en-US-GuyNeural", "gender": "male", "base_rate": "+4%", "base_pitch": "+1Hz"},
+            "sonya": {"voice": "en-US-GuyNeural", "gender": "male", "base_rate": "+2%", "base_pitch": "+2Hz"},
+            "shanti": {"voice": "en-US-JennyNeural", "gender": "female", "base_rate": "+1%", "base_pitch": "+0Hz"},
+            "rohya": {"voice": "en-US-ChristopherNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+0Hz"},
+            "yogya": {"voice": "en-US-GuyNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+0Hz"},
+            "aakya": {"voice": "en-US-EricNeural", "gender": "male", "base_rate": "-1%", "base_pitch": "-1Hz"},
             "stick_bob": {"voice": "en-US-GuyNeural", "gender": "male", "base_rate": "+4%", "base_pitch": "+1Hz"},
             "stick_prof": {"voice": "en-US-ChristopherNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+0Hz"},
             "stick_sam": {"voice": "en-US-EricNeural", "gender": "male", "base_rate": "+5%", "base_pitch": "+1Hz"},
@@ -60,6 +91,8 @@ class RealisticHumanVoiceEngine:
         "laughing": {"rate": "+2%", "pitch": "+0Hz"},
         "angry": {"rate": "+1%", "pitch": "-1Hz"},
         "fearful": {"rate": "+2%", "pitch": "+1Hz"},
+        "cry": {"rate": "-1%", "pitch": "+2Hz"},
+        "crying": {"rate": "-1%", "pitch": "+2Hz"},
         "suspicious": {"rate": "-2%", "pitch": "-1Hz"},
         "curious": {"rate": "+1%", "pitch": "+0Hz"},
         "confident": {"rate": "+1%", "pitch": "+0Hz"},

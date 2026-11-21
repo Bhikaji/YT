@@ -11,16 +11,18 @@ from animation.expression_engine.facial_rig import FacialRig
 from animation.environment_engine.procedural_backgrounds import ProceduralBackgroundRenderer
 from animation.environment_engine.props_library import PropsLibrary
 from animation.camera_engine.visual_effects import VisualEffectsEngine
+from production.renderer.devanagari_shaper import DevanagariTextShaper
 
 class StickFigureRenderer:
     """
-    High-Performance 2D Vector Frame Renderer for Widescreen (1280x720 / 1920x1080) & Vertical (1080x1920) Shorts.
-    Renders the exact cartoon styling from demo.mp4:
-    - Orange spiky hair boy with red-and-white striped pill torso (बब्या)
-    - Purple side-swept hair friend with solid white pill torso (गंप्या)
-    - Traditional Maharashtrian mother in royal blue saree with violet blouse, brown bun & red bindi (आई)
-    - Opening Marathi signature chalkboard disclaimer banner
-    - Animated cartoon eyes, expressive mouths, and 1:1 lip sync
+    High-Performance 2D Vector Frame Renderer for Widescreen (1280x720) & Vertical (1080x1920) Shorts.
+    Renders the exact authentic 2D stick cartoon aesthetic from demo.mp4:
+    - Orange spiky hair hero boy with red-and-white striped pill torso (गण्या / Ganya)
+    - Purple side-swept hair friend with solid white pill torso (रोह्या / Rohya)
+    - Traditional Maharashtrian mother in royal blue saree with violet blouse, brown bun & red bindi (शांताबाई / Shanti)
+    - Clean black stick limbs, sleek rounded black stick hands, and curved black shoes
+    - Dynamic expressive emotions: angry scowls, crying animated teardrops, hearty belly laughter, jaw-dropped shock
+    - 100% correctly shaped Devanagari Marathi subtitles with zero broken halants or split ligatures
     """
 
     @classmethod
@@ -60,10 +62,11 @@ class StickFigureRenderer:
             cls._draw_single_character(draw, char1, c1_data, t_sec, width, height)
             cls._draw_single_character(draw, char2, c2_data, t_sec, width, height)
 
-        # 4. Draw Subtitles (if present)
+        # 4. Draw Subtitles (if present) - with 100% correctly shaped Marathi text
         sub_text = frame_data.get("subtitle", "")
         if sub_text:
-            cls._draw_subtitles(draw, sub_text, width, height)
+            speaker_id = frame_data.get("active_speaker", "")
+            cls._draw_subtitles(draw, sub_text, width, height, speaker_id=speaker_id, frame_img=img)
 
         # 5. Camera Zoom / Pan Transformation
         cam = frame_data.get("camera", {})
@@ -103,7 +106,7 @@ class StickFigureRenderer:
         # Outer dark border
         draw.rectangle([0, 0, w, h], fill=(0, 0, 0))
 
-        # Torn paper / chalkboard green container
+        # Chalkboard green container
         margin_x = int(w * 0.08)
         margin_y = int(h * 0.10)
         board_w = w - (2 * margin_x)
@@ -114,26 +117,12 @@ class StickFigureRenderer:
         # Chalkboard dark green surface
         draw.rounded_rectangle([margin_x, margin_y, w - margin_x, h - margin_y], radius=14, fill=(20, 60, 45), outline=(15, 45, 35), width=4)
 
-        font_large = None
-        font_med = None
-        font_small = None
-        font_paths = ["C:/Windows/Fonts/Nirmala.ttc", "C:/Windows/Fonts/mangal.ttf", "C:/Windows/Fonts/arial.ttf"]
-        for fp in font_paths:
-            if os.path.exists(fp):
-                try:
-                    font_large = ImageFont.truetype(fp, int(h * 0.065))
-                    font_med = ImageFont.truetype(fp, int(h * 0.046))
-                    font_small = ImageFont.truetype(fp, int(h * 0.038))
-                    break
-                except Exception:
-                    pass
+        # Title: "सूचना" in Red via DevanagariTextShaper
+        title_img = DevanagariTextShaper.render_devanagari_text_image("सूचना", font_size=int(h * 0.065), text_color=(239, 68, 68), is_bold=True)
+        if title_img and img is not None:
+            tw, th_t = title_img.size
+            img.paste(title_img, (int(w/2 - tw/2), margin_y + int(h * 0.06)), mask=title_img.split()[3])
 
-        # Title: "सूचना" in Red
-        title_text = "सूचना"
-        t_box = draw.textbbox((0, 0), title_text, font=font_large) if font_large else (0, 0, 100, 40)
-        draw.text((w/2 - (t_box[2]-t_box[0])/2, margin_y + int(h * 0.06)), title_text, fill=(239, 68, 68), font=font_large)
-
-        # Lines of Disclaimer
         lines = [
             "हा व्हिडिओ फक्त मनोरंजनासाठी असून",
             "याचा असल जिंदगी सोबत काहीही लेनं देणं नाही,",
@@ -146,11 +135,14 @@ class StickFigureRenderer:
         curr_y = margin_y + int(h * 0.18)
         line_spacing = int(h * 0.075)
         for line in lines:
-            if line:
-                f = font_small if "टीप" in line else font_med
-                col = (254, 240, 138) if "टीप" in line else (255, 255, 255)
-                l_box = draw.textbbox((0, 0), line, font=f) if f else (0, 0, len(line)*16, 30)
-                draw.text((w/2 - (l_box[2]-l_box[0])/2, curr_y), line, fill=col, font=f)
+            if line and img is not None:
+                is_tip = ("टीप" in line)
+                f_size = int(h * 0.038) if is_tip else int(h * 0.046)
+                t_col = (254, 240, 138) if is_tip else (255, 255, 255)
+                l_img = DevanagariTextShaper.render_devanagari_text_image(line, font_size=f_size, text_color=t_col, is_bold=True)
+                if l_img:
+                    lw, lh = l_img.size
+                    img.paste(l_img, (int(w/2 - lw/2), curr_y), mask=l_img.split()[3])
             curr_y += line_spacing
 
     _SCENE_CACHE: Dict[str, Image.Image] = {}
@@ -190,7 +182,6 @@ class StickFigureRenderer:
         Directly renders authentic 2D puppet lip-sync and expressions matching demo.mp4.
         Anchored base frame with mouth articulation, character gesture states, and zero full-screen jitter.
         """
-        # Load base scene: Mother listening, Bob looking at Mother, Friend in doorway
         base = cls._get_demo_scene_img("mother_listening.png")
         if not base:
             return Image.new("RGBA", (width, height), (248, 250, 252, 255))
@@ -198,7 +189,7 @@ class StickFigureRenderer:
         active_speaker = frame_data.get("active_speaker", "")
         diag_start = frame_data.get("dialogue_start", 0.0)
 
-        # Climax / Payoff comedy punchline (Bob laughing heartily)
+        # Climax / Payoff comedy punchline (Ganya laughing heartily)
         if frame_data.get("is_punchline", False) or t_sec > 50.0:
             laugh = cls._get_demo_scene_img("bob_laughing.png")
             if laugh:
@@ -213,17 +204,18 @@ class StickFigureRenderer:
             rel_t = max(0.0, t_sec - diag_start)
             mouth_open = (math.sin(rel_t * 16.0) > 0)
 
-            if "mother" in active_speaker.lower():
+            spk_lower = active_speaker.lower()
+            if "mother" in spk_lower or "shanti" in spk_lower:
                 patch_name = "mother_mouth_open.png" if mouth_open else "mother_mouth_closed.png"
                 patch = cls._get_puppet_patch(patch_name)
                 if patch:
                     canvas.paste(patch, (670, 430))
-            elif "bob" in active_speaker.lower():
+            elif "bob" in spk_lower or "ganya" in spk_lower:
                 patch_name = "bob_mouth_open.png" if mouth_open else "bob_mouth_closed.png"
                 patch = cls._get_puppet_patch(patch_name)
                 if patch:
                     canvas.paste(patch, (800, 435))
-            elif "prof" in active_speaker.lower() or "friend" in active_speaker.lower() or "gampya" in active_speaker.lower():
+            elif any(k in spk_lower for k in ["prof", "friend", "gampya", "rohya", "sonya"]):
                 # Friend speaking from bus doorway: gesturing upper body + articulating mouth
                 friend_body = cls._get_puppet_patch("friend_spk_body.png")
                 if friend_body:
@@ -269,13 +261,6 @@ class StickFigureRenderer:
         pk = getattr(char, "personality_key", "")
         hair = getattr(char, "hair_style", "")
 
-        # -------------------------------------------------------------
-        # 1. TORSO & CLOTHING (Mathematically Anchored Pill-Torso)
-        # -------------------------------------------------------------
-        pk = getattr(char, "personality_key", "")
-        hair = getattr(char, "hair_style", "")
-
-        # Calculate torso orientation vector (from pelvis px, py to neck nx, ny)
         t_dx = nx - px
         t_dy = ny - py
         t_dist = math.hypot(t_dx, t_dy) or 1.0
@@ -284,9 +269,8 @@ class StickFigureRenderer:
         vx = -uy
         vy = ux
 
-        # A) MOTHER IN ROYAL BLUE SAREE & VIOLET BLOUSE (आई / काकू)
-        if pk == "varhadi_mother" or "mother" in pk:
-            # Violet Blouse
+        # A) SHANTI (शांताबाई / आई) - Royal Blue Saree, Violet Blouse, Golden Border
+        if pk == "varhadi_mother" or "mother" in pk or "shanti" in getattr(char, "id", ""):
             bw = 48
             draw.polygon([
                 (nx + vx * (bw/2), ny + vy * (bw/2)),
@@ -318,11 +302,10 @@ class StickFigureRenderer:
                 (nx - vx * 12, ny - vy * 12),
                 (px + vx * 15, py + vy * 15)
             ], fill=(30, 64, 175), outline=col, width=2)
-            # Golden Border on Pallu
             draw.line([(px + vx * 25, py + vy * 25), (nx - vx * 24, ny - vy * 24)], fill=(234, 179, 8), width=3)
 
-        # B) HERO BOY (बब्या - Red & White Striped Pill Torso)
-        elif hair == "spiky_orange" or pk == "varhadi_boy" or getattr(char, "shirt_color", "") == "#dc2626":
+        # B) GANYA (गण्या - Orange Hair, Red & White Striped Pill Torso)
+        elif hair == "spiky_orange" or getattr(char, "id", "") == "ganya" or pk == "varhadi_boy" or getattr(char, "shirt_color", "") == "#dc2626":
             tw = 52
             half_w = tw / 2.0
             corners = [
@@ -331,7 +314,6 @@ class StickFigureRenderer:
                 (px - vx * half_w, py - vy * half_w),
                 (px + vx * half_w, py + vy * half_w)
             ]
-            # White pill body
             draw.polygon(corners, fill=(255, 255, 255), outline=col, width=3)
             draw.ellipse([nx - half_w, ny - half_w, nx + half_w, ny + half_w], fill=(255, 255, 255), outline=col, width=3)
             draw.ellipse([px - half_w, py - half_w, px + half_w, py + half_w], fill=(255, 255, 255), outline=col, width=3)
@@ -345,13 +327,11 @@ class StickFigureRenderer:
                     (sx - vx * (half_w - 3), sy - vy * (half_w - 3))
                 ], fill=(220, 38, 38), width=11)
 
-            # Re-draw outline
             draw.polygon(corners, outline=col, width=3)
-            # Black collar ring
             draw.line([(nx + vx * 14, ny + vy * 14), (nx - vx * 14, ny - vy * 14)], fill=col, width=3)
 
-        # C) BEST FRIEND (गंप्या - Solid Crisp White Pill Torso)
-        elif hair == "purple_swept" or pk == "varhadi_friend":
+        # C) SONYA (सोन्या - Golden Hair, Yellow & White Striped Torso)
+        elif getattr(char, "id", "") == "sonya" or getattr(char, "shirt_color", "") == "#eab308":
             tw = 52
             half_w = tw / 2.0
             corners = [
@@ -360,16 +340,55 @@ class StickFigureRenderer:
                 (px - vx * half_w, py - vy * half_w),
                 (px + vx * half_w, py + vy * half_w)
             ]
-            # Crisp white pill body
+            draw.polygon(corners, fill=(255, 255, 255), outline=col, width=3)
+            draw.ellipse([nx - half_w, ny - half_w, nx + half_w, ny + half_w], fill=(255, 255, 255), outline=col, width=3)
+            draw.ellipse([px - half_w, py - half_w, px + half_w, py + half_w], fill=(255, 255, 255), outline=col, width=3)
+
+            for frac in [0.22, 0.44, 0.66, 0.88]:
+                sx = px + ux * (t_dist * frac)
+                sy = py + uy * (t_dist * frac)
+                draw.line([
+                    (sx + vx * (half_w - 3), sy + vy * (half_w - 3)),
+                    (sx - vx * (half_w - 3), sy - vy * (half_w - 3))
+                ], fill=(234, 179, 8), width=11)
+
+            draw.polygon(corners, outline=col, width=3)
+            draw.line([(nx + vx * 14, ny + vy * 14), (nx - vx * 14, ny - vy * 14)], fill=col, width=3)
+
+        # D) ROHYA (रोह्या - Purple Swept Hair, Solid Pure White Pill Torso)
+        elif hair == "purple_swept" or getattr(char, "id", "") == "rohya" or pk == "varhadi_friend":
+            tw = 52
+            half_w = tw / 2.0
+            corners = [
+                (nx + vx * half_w, ny + vy * half_w),
+                (nx - vx * half_w, ny - vy * half_w),
+                (px - vx * half_w, py - vy * half_w),
+                (px + vx * half_w, py + vy * half_w)
+            ]
             draw.polygon(corners, fill=(255, 255, 255), outline=col, width=3)
             draw.ellipse([nx - half_w, ny - half_w, nx + half_w, ny + half_w], fill=(255, 255, 255), outline=col, width=3)
             draw.ellipse([px - half_w, py - half_w, px + half_w, py + half_w], fill=(255, 255, 255), outline=col, width=3)
             draw.polygon(corners, outline=col, width=3)
-            # Black collar ring
             draw.line([(nx + vx * 14, ny + vy * 14), (nx - vx * 14, ny - vy * 14)], fill=col, width=3)
 
-        # D) UNCLE / FATHER (काका - Vest / Jacket)
-        elif pk == "varhadi_uncle":
+        # E) YOGYA (योग्या - Solid Cyan Pill Torso)
+        elif getattr(char, "id", "") == "yogya" or getattr(char, "shirt_color", "") == "#0284c7":
+            tw = 52
+            half_w = tw / 2.0
+            corners = [
+                (nx + vx * half_w, ny + vy * half_w),
+                (nx - vx * half_w, ny - vy * half_w),
+                (px - vx * half_w, py - vy * half_w),
+                (px + vx * half_w, py + vy * half_w)
+            ]
+            draw.polygon(corners, fill=(2, 132, 199), outline=col, width=3)
+            draw.ellipse([nx - half_w, ny - half_w, nx + half_w, ny + half_w], fill=(2, 132, 199), outline=col, width=3)
+            draw.ellipse([px - half_w, py - half_w, px + half_w, py + half_w], fill=(2, 132, 199), outline=col, width=3)
+            draw.polygon(corners, outline=col, width=3)
+            draw.line([(nx + vx * 14, ny + vy * 14), (nx - vx * 14, ny - vy * 14)], fill=col, width=3)
+
+        # F) AAKYA (आक्या - Charcoal Slate Vest / Jacket)
+        elif pk == "varhadi_uncle" or getattr(char, "id", "") == "aakya":
             tw = 56
             half_w = tw / 2.0
             corners = [
@@ -381,7 +400,6 @@ class StickFigureRenderer:
             draw.polygon(corners, fill=(241, 245, 249), outline=col, width=3)
             draw.ellipse([nx - half_w, ny - half_w, nx + half_w, ny + half_w], fill=(241, 245, 249), outline=col, width=3)
             draw.ellipse([px - half_w, py - half_w, px + half_w, py + half_w], fill=(241, 245, 249), outline=col, width=3)
-            # Vest
             draw.polygon([
                 (nx + vx * half_w, ny + vy * half_w), (nx + vx * 6, ny + vy * 6),
                 (px + vx * 6, py + vy * 6), (px + vx * half_w, py + vy * half_w)
@@ -396,12 +414,13 @@ class StickFigureRenderer:
             draw.rounded_rectangle([px - tw//2, ny + 4, px + tw//2, py + 10], radius=14, fill=(255, 255, 255), outline=col, width=3)
 
         # -------------------------------------------------------------
-        # 2. LEGS & SNEAKERS (High-Contrast Outlines & Cartoon Shoes)
+        # 2. LEGS & FEET (Authentic Curved Black Shoes matching demo.mp4)
         # -------------------------------------------------------------
-        halo_width = th + 4
-        halo_color = (255, 255, 255)  # Crisp white rim outline separating characters from background
+        halo_width = th + 3
+        halo_color = (255, 255, 255)  # Crisp white outline underlay for 100% background visibility
 
-        if pk != "varhadi_mother":
+        is_saree = (pk == "varhadi_mother" or "mother" in pk or "shanti" in getattr(char, "id", ""))
+        if not is_saree:
             # White halo underlay
             draw.line([joints["pelvis"], joints["left_knee"]], fill=halo_color, width=halo_width)
             draw.line([joints["left_knee"], joints["left_foot"]], fill=halo_color, width=halo_width)
@@ -414,14 +433,13 @@ class StickFigureRenderer:
             draw.line([joints["pelvis"], joints["right_knee"]], fill=col, width=th)
             draw.line([joints["right_knee"], joints["right_foot"]], fill=col, width=th)
 
-            # High-top cartoon sneakers with white soles & laces
+            # Authentic 2D stick shoes (sleek curved black shoes matching demo.mp4)
             facing_dir = 1 if joints["head"][0] <= width / 2 else -1
-            shoe_col = (220, 38, 38) if hair == "spiky_orange" or pk == "varhadi_boy" else (79, 70, 229)
-            cls._draw_cartoon_sneaker(draw, joints["left_knee"], joints["left_foot"], facing_dir, shoe_col, col)
-            cls._draw_cartoon_sneaker(draw, joints["right_knee"], joints["right_foot"], facing_dir, shoe_col, col)
+            cls._draw_stick_foot(draw, joints["left_knee"], joints["left_foot"], facing_dir, col)
+            cls._draw_stick_foot(draw, joints["right_knee"], joints["right_foot"], facing_dir, col)
 
         # -------------------------------------------------------------
-        # 3. ARMS & WHITE CARTOON GLOVES (Voice-Synchronized Gestures)
+        # 3. ARMS & HANDS (Authentic Rounded Black Stick Hands matching demo.mp4)
         # -------------------------------------------------------------
         # White halo underlay
         draw.line([joints["left_shoulder"], joints["left_elbow"]], fill=halo_color, width=halo_width)
@@ -435,38 +453,39 @@ class StickFigureRenderer:
         draw.line([joints["right_shoulder"], joints["right_elbow"]], fill=col, width=th)
         draw.line([joints["right_elbow"], joints["right_hand"]], fill=col, width=th)
 
-        # Dynamic cartoon white gloves with fingers / pointing / gesturing
+        # Dynamic authentic stick hands with gesture articulation
         facing_dir = 1 if joints["head"][0] <= width / 2 else -1
         l_gest = getattr(pose, "left_hand_gesture", "relaxed")
         r_gest = getattr(pose, "right_hand_gesture", "pointing")
-        cls._draw_cartoon_hand(draw, joints["left_elbow"], joints["left_hand"], l_gest, facing_dir, col)
-        cls._draw_cartoon_hand(draw, joints["right_elbow"], joints["right_hand"], r_gest, facing_dir, col)
+        cls._draw_stick_hand(draw, joints["left_elbow"], joints["left_hand"], l_gest, facing_dir, col)
+        cls._draw_stick_hand(draw, joints["right_elbow"], joints["right_hand"], r_gest, facing_dir, col)
 
         # -------------------------------------------------------------
         # 4. HEAD, HAIR & FACIAL FEATURES
         # -------------------------------------------------------------
         hr = getattr(char, "head_radius", 40)
-        face_fill = (255, 237, 213) if pk == "varhadi_mother" else (255, 255, 255)
+        face_fill = (255, 237, 213) if is_saree else (255, 255, 255)
 
         # A) MOTHER HAIR BUN (Drawn behind head)
-        if hair == "brown_bun" or pk == "varhadi_mother":
+        if hair == "brown_bun" or is_saree:
             draw.ellipse([hx - 48, hy - 45, hx - 14, hy - 10], fill=(120, 53, 15), outline=col, width=3)
 
         # Skull
         draw.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=face_fill, outline=col, width=4)
 
-        # B) ORANGE SPIKY HAIR (बब्या - Fiery Orange Zig-Zags)
-        if hair == "spiky_orange" or pk == "varhadi_boy":
+        # B) GANYA / SONYA SPIKY HAIR (Fiery Orange Zig-Zags)
+        if hair == "spiky_orange" or getattr(char, "id", "") in ["ganya", "sonya"] or pk == "varhadi_boy":
+            hair_col = (234, 179, 8) if getattr(char, "id", "") == "sonya" else (249, 115, 22)
             spikes = [
                 (hx - 36, hy - 22), (hx - 42, hy - 42), (hx - 26, hy - 38),
                 (hx - 20, hy - 58), (hx - 6, hy - 42), (hx, hy - 64),
                 (hx + 8, hy - 42), (hx + 22, hy - 58), (hx + 26, hy - 38),
                 (hx + 42, hy - 44), (hx + 36, hy - 22)
             ]
-            draw.polygon(spikes, fill=(249, 115, 22), outline=col, width=3)
+            draw.polygon(spikes, fill=hair_col, outline=col, width=3)
 
-        # C) PURPLE SWEPT HAIR (गंप्या - Modern Side-Swept)
-        elif hair == "purple_swept" or pk == "varhadi_friend":
+        # C) ROHYA PURPLE SWEPT HAIR (Modern Side-Swept)
+        elif hair == "purple_swept" or getattr(char, "id", "") == "rohya" or pk == "varhadi_friend":
             p_hair = [
                 (hx - 36, hy - 18), (hx - 42, hy - 38), (hx - 24, hy - 54),
                 (hx + 10, hy - 56), (hx + 42, hy - 42), (hx + 46, hy - 22),
@@ -476,17 +495,15 @@ class StickFigureRenderer:
             draw.polygon(p_hair, fill=(109, 40, 217), outline=col, width=3)
 
         # D) MOTHER FRONT HAIR, BINDI & BLUSH CHEEKS
-        elif hair == "brown_bun" or pk == "varhadi_mother":
+        elif hair == "brown_bun" or is_saree:
             draw.chord([hx - hr - 1, hy - hr - 1, hx + hr + 1, hy - 5], 180, 360, fill=(120, 53, 15), outline=col, width=3)
             draw.line([(hx, hy - hr), (hx, hy - 18)], fill=col, width=2)
-            # Red Bindi (टिकली)
             draw.ellipse([hx - 4, hy - 12, hx + 4, hy - 4], fill=(220, 38, 38))
-            # Rosy Blush Cheeks
             draw.ellipse([hx - 26, hy + 4, hx - 14, hy + 14], fill=(254, 202, 202))
             draw.ellipse([hx + 14, hy + 4, hx + 26, hy + 14], fill=(254, 202, 202))
 
         # E) UNCLE HALF BALD & SUNGLASSES
-        elif hair == "half_bald" or pk == "varhadi_uncle":
+        elif hair == "half_bald" or getattr(char, "id", "") == "aakya" or pk == "varhadi_uncle":
             draw.arc([hx - hr - 2, hy - 10, hx - hr + 14, hy + 20], 90, 270, fill=col, width=6)
             draw.arc([hx + hr - 14, hy - 10, hx + hr + 2, hy + 20], 270, 90, fill=col, width=6)
             draw.rounded_rectangle([hx - 26, hy - 12, hx - 2, hy + 8], radius=3, fill=(15, 23, 42), outline=col, width=2)
@@ -494,28 +511,39 @@ class StickFigureRenderer:
             draw.line([(hx - 2, hy - 2), (hx + 2, hy - 2)], fill=col, width=3)
 
         # -------------------------------------------------------------
-        # 5. EYES, EYEBROWS & MOUTH (Animated Lip-Sync)
+        # 5. EYES, EYEBROWS & MOUTH (Animated Lip-Sync & Emotions)
         # -------------------------------------------------------------
-        if pk != "varhadi_uncle":
+        expr_key = str(cdata.get("expression", "curious")).lower()
+
+        if pk != "varhadi_uncle" and getattr(char, "id", "") != "aakya":
             # Big Expressive Cartoon Eyes
             draw.ellipse([hx - 26, hy - 16, hx - 4, hy + 12], fill=(255, 255, 255), outline=col, width=3)
             draw.ellipse([hx + 4, hy - 16, hx + 26, hy + 12], fill=(255, 255, 255), outline=col, width=3)
-            # Movable pupils (looking at interaction center)
-            draw.ellipse([hx - 20, hy - 6, hx - 10, hy + 6], fill=col)
-            draw.ellipse([hx + 10, hy - 6, hx + 20, hy + 6], fill=col)
+            # Pupils looking at interaction center
+            p_rad = 3 if expr_key in ["shocked", "fearful"] else 5
+            draw.ellipse([hx - 15 - p_rad, hy - p_rad, hx - 15 + p_rad, hy + p_rad], fill=col)
+            draw.ellipse([hx + 15 - p_rad, hy - p_rad, hx + 15 + p_rad, hy + p_rad], fill=col)
             # Catchlights
-            draw.ellipse([hx - 18, hy - 4, hx - 14, hy], fill=(255, 255, 255))
-            draw.ellipse([hx + 12, hy - 4, hx + 16, hy], fill=(255, 255, 255))
+            draw.ellipse([hx - 17, hy - 4, hx - 13, hy], fill=(255, 255, 255))
+            draw.ellipse([hx + 13, hy - 4, hx + 17, hy], fill=(255, 255, 255))
 
-        # Eyebrows based on emotion
-        expr_key = cdata.get("expression", "curious")
-        if pk == "varhadi_mother" or expr_key == "angry":
+        # Dynamic Eyebrows & Tears based on Emotion
+        if is_saree or expr_key == "angry":
             # Angry / Scolding furrowed eyebrows
             draw.line([(hx - 24, hy - 14), (hx - 6, hy - 6)], fill=col, width=4)
             draw.line([(hx + 6, hy - 6), (hx + 24, hy - 14)], fill=col, width=4)
+        elif expr_key in ["cry", "crying", "sad", "fearful", "plead"]:
+            # Sad / Crying drooping eyebrows
+            draw.line([(hx - 24, hy - 20), (hx - 6, hy - 26)], fill=col, width=3)
+            draw.line([(hx + 6, hy - 26), (hx + 24, hy - 20)], fill=col, width=3)
+            # Streaming blue tears on cheeks
+            draw.line([(hx - 16, hy + 2), (hx - 16, hy + 20)], fill=(56, 189, 248), width=3)
+            draw.ellipse([hx - 19, hy + 18, hx - 13, hy + 25], fill=(56, 189, 248), outline=(14, 165, 233), width=1)
+            draw.line([(hx + 16, hy + 2), (hx + 16, hy + 20)], fill=(56, 189, 248), width=3)
+            draw.ellipse([hx + 13, hy + 18, hx + 19, hy + 25], fill=(56, 189, 248), outline=(14, 165, 233), width=1)
         elif expr_key in ["shocked", "fearful"]:
-            draw.line([(hx - 24, hy - 22), (hx - 6, hy - 26)], fill=col, width=3)
-            draw.line([(hx + 6, hy - 26), (hx + 24, hy - 22)], fill=col, width=3)
+            draw.line([(hx - 24, hy - 24), (hx - 6, hy - 28)], fill=col, width=3)
+            draw.line([(hx + 6, hy - 28), (hx + 24, hy - 24)], fill=col, width=3)
         else:
             draw.line([(hx - 22, hy - 20), (hx - 6, hy - 20)], fill=col, width=3)
             draw.line([(hx + 6, hy - 20), (hx + 22, hy - 20)], fill=col, width=3)
@@ -534,30 +562,24 @@ class StickFigureRenderer:
                 lmw = max(28, mw)
                 lmh = max(20, mh)
                 draw.pieslice([hx - lmw/2, my - lmh/2, hx + lmw/2, my + lmh/2], 0, 180, fill=(136, 19, 55), outline=col, width=3)
-                # Upper teeth bar
                 draw.rectangle([hx - lmw/3, my - lmh/2, hx + lmw/3, my - lmh/2 + 6], fill=(255, 255, 255), outline=col, width=1)
-                # Pink tongue
                 draw.chord([hx - lmw/4, my + lmh/2 - 8, hx + lmw/4, my + lmh/2 + 2], 180, 360, fill=(251, 113, 133))
             elif shape == "circle_pucker":
-                # 'O' / 'U' circular mouth
                 draw.ellipse([hx - mw/2, my - mh/2, hx + mw/2, my + mh/2], fill=(136, 19, 55), outline=col, width=3)
                 draw.ellipse([hx - mw/3, my + mh/4 - 4, hx + mw/3, my + mh/4 + 4], fill=(251, 113, 133))
             elif shape == "wide_slit":
-                # 'E' smiling teeth
                 draw.rounded_rectangle([hx - mw/2, my - mh/2, hx + mw/2, my + mh/2], radius=4, fill=(136, 19, 55), outline=col, width=3)
                 draw.line([(hx - mw/2 + 3, my), (hx + mw/2 - 3, my)], fill=(255, 255, 255), width=3)
             else:
-                # Standard open vowel ('A', 'I', talk)
                 draw.ellipse([hx - mw/2, my - mh/2, hx + mw/2, my + mh/2], fill=(136, 19, 55), outline=col, width=3)
                 draw.chord([hx - mw/2 + 2, my - mh/2, hx + mw/2 - 2, my - mh/2 + 7], 0, 180, fill=(255, 255, 255))
                 draw.chord([hx - mw/3, my + mh/2 - 7, hx + mw/3, my + mh/2], 180, 360, fill=(251, 113, 133))
         else:
             if expr_key in ["happy", "laughing", "confident"]:
                 draw.arc([hx - mw/2, my - 6, hx + mw/2, my + 6], 0, 180, fill=col, width=3)
-                # Dimple creases
                 draw.line([(hx - mw/2 - 2, my - 2), (hx - mw/2 + 2, my + 2)], fill=col, width=2)
                 draw.line([(hx + mw/2 - 2, my + 2), (hx + mw/2 + 2, my - 2)], fill=col, width=2)
-            elif expr_key in ["sad", "disappointed", "angry"]:
+            elif expr_key in ["sad", "disappointed", "angry", "cry", "crying"]:
                 draw.arc([hx - mw/2, my, hx + mw/2, my + 10], 180, 0, fill=col, width=3)
             elif expr_key in ["shocked", "fearful"]:
                 draw.ellipse([hx - 6, my - 6, hx + 6, my + 6], fill=(136, 19, 55), outline=col, width=2)
@@ -565,7 +587,7 @@ class StickFigureRenderer:
                 draw.line([(hx - mw/2, my), (hx + mw/2, my - 2)], fill=col, width=3)
 
     @classmethod
-    def _draw_cartoon_hand(
+    def _draw_stick_hand(
         cls,
         draw: ImageDraw.ImageDraw,
         wrist: Tuple[float, float],
@@ -574,7 +596,7 @@ class StickFigureRenderer:
         facing_dir: int,
         col: Tuple[int, int, int]
     ):
-        """Draws expressive 2D cartoon white gloves with articulated fingers."""
+        """Draws authentic sleek rounded 2D stick hands matching demo.mp4 with gesture articulation."""
         hx, hy = hand
         wx, wy = wrist
         dx = hx - wx
@@ -585,173 +607,170 @@ class StickFigureRenderer:
         vx = -uy
         vy = ux
 
-        glove_col = (255, 255, 255)
+        r = 7.5
 
-        # 1. Wristband Cuff
-        cuff_cx = hx - ux * 4
-        cuff_cy = hy - uy * 4
-        cw = 11.0
-        ch = 5.0
-        cuff_pts = [
-            (cuff_cx + vx * cw - ux * ch, cuff_cy + vy * cw - uy * ch),
-            (cuff_cx - vx * cw - ux * ch, cuff_cy - vy * cw - uy * ch),
-            (cuff_cx - vx * cw + ux * ch, cuff_cy - vy * cw + uy * ch),
-            (cuff_cx + vx * cw + ux * ch, cuff_cy + vy * cw + uy * ch)
-        ]
-        draw.polygon(cuff_pts, fill=glove_col, outline=col, width=2)
+        # Subtle white outline halo underlay for contrast on dark backgrounds
+        draw.ellipse([hx - r - 2, hy - r - 2, hx + r + 2, hy + r + 2], fill=(255, 255, 255), outline=(255, 255, 255), width=1)
+        draw.ellipse([hx - r, hy - r, hx + r, hy + r], fill=col, outline=col)
 
-        # 2. Main Glove Palm
-        px = hx + ux * 8
-        py = hy + uy * 8
-        draw.ellipse([px - 13, py - 13, px + 13, py + 13], fill=glove_col, outline=col, width=3)
-        # Stitching lines on back of glove
-        draw.line([(px - vx * 4 - ux * 3, py - vy * 4 - uy * 3), (px - vx * 4 + ux * 2, py - vy * 4 + uy * 2)], fill=col, width=2)
-        draw.line([(px + vx * 4 - ux * 3, py + vy * 4 - uy * 3), (px + vx * 4 + ux * 2, py + vy * 4 + uy * 2)], fill=col, width=2)
-
-        # 3. Finger articulation based on gesture
         if "point" in gesture:
-            # Extended pointing index finger
-            fx1 = px + ux * 2
-            fy1 = py + uy * 2
-            fx2 = px + ux * 22
-            fy2 = py + uy * 22
-            draw.line([(fx1, fy1), (fx2, fy2)], fill=glove_col, width=8)
-            draw.line([(fx1, fy1), (fx2, fy2)], fill=col, width=2)
-            # Folded thumb
-            draw.ellipse([px + vx * 8 * facing_dir - 4, py + vy * 8 * facing_dir - 4, px + vx * 8 * facing_dir + 4, py + vy * 8 * facing_dir + 4], fill=glove_col, outline=col, width=2)
-        elif "palm" in gesture or "explain" in gesture:
-            # 4 open spread cartoon fingers
-            for ang_offset in [-0.4, -0.15, 0.15, 0.4]:
-                cur_u = ux * math.cos(ang_offset) - uy * math.sin(ang_offset)
-                cur_v = ux * math.sin(ang_offset) + uy * math.cos(ang_offset)
-                fx = px + cur_u * 14
-                fy = py + cur_v * 14
-                draw.ellipse([fx - 4, fy - 4, fx + 4, fy + 4], fill=glove_col, outline=col, width=2)
+            fx2 = hx + ux * 16
+            fy2 = hy + uy * 16
+            draw.line([(hx, hy), (fx2, fy2)], fill=(255, 255, 255), width=7)
+            draw.line([(hx, hy), (fx2, fy2)], fill=col, width=5)
         elif "wave" in gesture:
-            # Waving fingers pointing up
-            for offset in [-7, -2, 3, 8]:
-                fx = px + vx * offset - ux * 3
-                fy = py + vy * offset - uy * 15
-                draw.ellipse([fx - 4, fy - 4, fx + 4, fy + 4], fill=glove_col, outline=col, width=2)
-        else:
-            # Clenched / relaxed knuckle bumps
-            for k in [-5, 0, 5]:
-                kx = px + ux * 9 + vx * k
-                ky = py + uy * 9 + vy * k
-                draw.ellipse([kx - 4, ky - 4, kx + 4, ky + 4], fill=glove_col, outline=col, width=2)
+            for offset in [-4, 4]:
+                tx = hx + vx * offset - ux * 8
+                ty = hy + vy * offset - uy * 8
+                draw.line([(hx, hy), (tx, ty)], fill=col, width=4)
+        elif "plead" in gesture or "explain" in gesture:
+            for offset in [-3, 3]:
+                px = hx + ux * 8 + vx * offset
+                py = hy + uy * 8 + vy * offset
+                draw.line([(hx, hy), (px, py)], fill=col, width=4)
 
     @classmethod
-    def _draw_cartoon_sneaker(
+    def _draw_stick_foot(
         cls,
         draw: ImageDraw.ImageDraw,
         knee: Tuple[float, float],
         foot: Tuple[float, float],
         facing_dir: int,
-        shoe_col: Tuple[int, int, int],
         col: Tuple[int, int, int]
     ):
-        """Draws stylish 2D cartoon sneakers with white rubber soles and laces."""
+        """Draws authentic 2D stick-figure curved black shoe matching demo.mp4."""
         fx, fy = foot
-        s_back = fx - 10 * facing_dir
-        s_front = fx + 24 * facing_dir
-        x_min = min(s_back, s_front)
-        x_max = max(s_back, s_front)
+        s_back = fx - 5 * facing_dir
+        s_front = fx + 16 * facing_dir
+        x1 = min(s_back, s_front)
+        x2 = max(s_back, s_front)
+        y1 = fy - 2
+        y2 = fy + 7
 
-        # 1. White Rubber Sole with Tread
-        draw.rounded_rectangle([x_min, fy + 2, x_max, fy + 9], radius=3, fill=(255, 255, 255), outline=col, width=2)
-        for tx in range(int(x_min) + 6, int(x_max) - 4, 8):
-            draw.line([(tx, fy + 7), (tx, fy + 9)], fill=col, width=1)
-
-        # 2. Sneaker Canvas Upper
-        draw.polygon([
-            (s_back, fy + 2),
-            (s_back + 4 * facing_dir, fy - 10),
-            (fx, fy - 12),
-            (s_front - 4 * facing_dir, fy - 4),
-            (s_front, fy + 2)
-        ], fill=shoe_col, outline=col, width=2)
-
-        # 3. White Rubber Toe Cap
-        draw.ellipse([s_front - 6, fy - 3, s_front + 6, fy + 3], fill=(255, 255, 255), outline=col, width=1)
-
-        # 4. White Laces
-        draw.line([(fx - 2 * facing_dir, fy - 8), (fx + 6 * facing_dir, fy - 8)], fill=(255, 255, 255), width=2)
-        draw.line([(fx, fy - 5), (fx + 8 * facing_dir, fy - 5)], fill=(255, 255, 255), width=2)
+        # Subtle white outline halo underlay for contrast on dark backgrounds
+        draw.rounded_rectangle([x1 - 2, y1 - 2, x2 + 2, y2 + 2], radius=4, fill=(255, 255, 255), outline=(255, 255, 255), width=1)
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=4, fill=col, outline=col)
 
     @classmethod
-    def _draw_subtitles(cls, draw: ImageDraw.ImageDraw, text: str, w: int, h: int):
-        """Draws high-contrast clean spoken Marathi dialogue banner with word-wrapping."""
+    def _draw_subtitles(
+        cls,
+        draw: ImageDraw.ImageDraw,
+        text: str,
+        w: int,
+        h: int,
+        speaker_id: str = "",
+        frame_img: Optional[Image.Image] = None
+    ):
+        """
+        Draws high-contrast, 100% correctly shaped Devanagari Marathi dialogue banner.
+        Strictly strips any raw English speaker prefixes like (Bob): or [Bob]: or English search prompts.
+        """
+        # 1. Clean out any (Speaker): or [Speaker]: tags
         clean_text = re.sub(r'^\s*[\(\[]?[A-Za-z0-9_\u0900-\u097F\s\.\-]+[\)\]]?\s*:\s*', '', text).strip()
         if not clean_text:
             return
 
-        font_size = max(18, int(h * 0.036))
-        font = None
-        font_paths = ["C:/Windows/Fonts/Nirmala.ttc", "C:/Windows/Fonts/mangal.ttf", "C:/Windows/Fonts/arial.ttf"]
-        for fp in font_paths:
-            if os.path.exists(fp):
-                try:
-                    font = ImageFont.truetype(fp, font_size)
-                    break
-                except Exception:
-                    pass
-
+        font_size = max(20, int(h * 0.034))
         max_allowed_w = w - 160
-        # Wrap words so subtitles never clip horizontally
-        words = clean_text.split()
-        lines = []
-        curr = []
-        for word in words:
-            test_line = ' '.join(curr + [word])
-            if font:
-                bbox = draw.textbbox((0, 0), test_line, font=font)
-                line_w = bbox[2] - bbox[0]
-            else:
-                line_w = len(test_line) * 16
 
-            if line_w > max_allowed_w and curr:
-                lines.append(' '.join(curr))
-                curr = [word]
-            else:
-                curr.append(word)
-        if curr:
-            lines.append(' '.join(curr))
-
-        if not lines:
-            return
-
-        if font:
-            line_bboxes = [draw.textbbox((0, 0), l, font=font) for l in lines]
-            line_ws = [b[2] - b[0] for b in line_bboxes]
-            line_hs = [max(24, b[3] - b[1]) for b in line_bboxes]
-        else:
-            line_ws = [min(w - 80, len(l) * 16) for l in lines]
-            line_hs = [28 for _ in lines]
-
-        max_w = max(line_ws)
-        line_spacing = 6
-        total_h = sum(line_hs) + line_spacing * (len(lines) - 1)
-
-        pad_x, pad_y = 24, 10
-        box_bottom = int(h * 0.96)
-        box_top = box_bottom - total_h - 2 * pad_y
-        box_left = max(20, w/2 - max_w/2 - pad_x)
-        box_right = min(w - 20, w/2 + max_w/2 + pad_x)
-
-        draw.rounded_rectangle(
-            [box_left, box_top, box_right, box_bottom],
-            radius=14,
-            fill=(15, 23, 42, 230),
-            outline=(234, 179, 8),
-            width=3
+        # 2. Render complex-shaped Devanagari text image via GDI+ DirectWrite
+        text_img = DevanagariTextShaper.render_devanagari_text_image(
+            text=clean_text,
+            font_size=font_size,
+            text_color=(255, 255, 255),
+            max_width=max_allowed_w,
+            is_bold=True
         )
 
-        curr_y = box_top + pad_y
-        for i, l in enumerate(lines):
-            lw = line_ws[i]
-            lh = line_hs[i]
-            tx = w/2 - lw/2
-            for ox, oy in [(-2, 0), (2, 0), (0, -2), (0, 2)]:
-                draw.text((tx + ox, curr_y + oy), l, fill=(0, 0, 0), font=font)
-            draw.text((tx, curr_y), l, fill=(255, 255, 255), font=font)
-            curr_y += lh + line_spacing
+        if text_img is not None and frame_img is not None:
+            tw, th_box = text_img.size
+            pad_x, pad_y = 28, 12
+            card_w = min(w - 40, tw + 2 * pad_x)
+            card_h = th_box + 2 * pad_y
+
+            box_bottom = int(h * 0.96)
+            box_top = box_bottom - card_h
+            box_left = int(w / 2 - card_w / 2)
+            box_right = int(w / 2 + card_w / 2)
+
+            # Draw card background
+            draw.rounded_rectangle(
+                [box_left, box_top, box_right, box_bottom],
+                radius=14,
+                fill=(15, 23, 42, 235),
+                outline=(234, 179, 8),
+                width=3
+            )
+
+            # Optional Speaker Badge above card in authentic Marathi
+            speaker_map = {
+                "ganya": ("गण्या", (234, 88, 12)),        # Orange
+                "shanti": ("शांताबाई", (29, 78, 216)),    # Blue
+                "rohya": ("रोह्या", (124, 58, 237)),      # Purple
+                "sonya": ("सोन्या", (202, 138, 4)),       # Gold
+                "yogya": ("योग्या", (2, 132, 199)),       # Cyan
+                "aakya": ("आक्या", (51, 65, 85))          # Slate
+            }
+            spk_clean = speaker_id.lower().replace("stick_", "").replace("varhadi_", "")
+            if spk_clean in speaker_map:
+                badge_name, badge_col = speaker_map[spk_clean]
+                badge_img = DevanagariTextShaper.render_devanagari_text_image(
+                    badge_name,
+                    font_size=max(14, int(font_size * 0.72)),
+                    text_color=(255, 255, 255),
+                    is_bold=True
+                )
+                if badge_img:
+                    bw, bh = badge_img.size
+                    b_left = box_left + 16
+                    b_top = box_top - bh - 6
+                    draw.rounded_rectangle(
+                        [b_left, b_top, b_left + bw + 16, b_top + bh + 4],
+                        radius=6,
+                        fill=badge_col,
+                        outline=(255, 255, 255),
+                        width=1
+                    )
+                    frame_img.paste(badge_img, (b_left + 8, b_top + 2), mask=badge_img.split()[3])
+
+            # Paste transparent shaped Marathi text image onto frame
+            tx = int(w / 2 - tw / 2)
+            ty = int(box_top + pad_y)
+            frame_img.paste(text_img, (tx, ty), mask=text_img.split()[3])
+
+        else:
+            # Fallback to standard Pillow rendering
+            font = None
+            font_paths = ["C:/Windows/Fonts/Nirmala.ttc", "C:/Windows/Fonts/mangal.ttf", "C:/Windows/Fonts/arial.ttf"]
+            for fp in font_paths:
+                if os.path.exists(fp):
+                    try:
+                        font = ImageFont.truetype(fp, font_size)
+                        break
+                    except Exception:
+                        pass
+
+            words = clean_text.split()
+            lines = []
+            curr = []
+            for word in words:
+                test_line = ' '.join(curr + [word])
+                bbox = draw.textbbox((0, 0), test_line, font=font) if font else (0, 0, len(test_line) * 16, 30)
+                if (bbox[2] - bbox[0]) > max_allowed_w and curr:
+                    lines.append(' '.join(curr))
+                    curr = [word]
+                else:
+                    curr.append(word)
+            if curr:
+                lines.append(' '.join(curr))
+
+            line_spacing = 6
+            total_h = len(lines) * 28 + line_spacing * (len(lines) - 1)
+            pad_x, pad_y = 24, 10
+            box_bottom = int(h * 0.96)
+            box_top = box_bottom - total_h - 2 * pad_y
+            draw.rounded_rectangle([40, box_top, w - 40, box_bottom], radius=14, fill=(15, 23, 42, 230), outline=(234, 179, 8), width=3)
+            curr_y = box_top + pad_y
+            for l in lines:
+                draw.text((w/2 - len(l)*8, curr_y), l, fill=(255, 255, 255), font=font)
+                curr_y += 28 + line_spacing

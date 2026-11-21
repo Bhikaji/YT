@@ -150,6 +150,104 @@
       "phonetic_guidance": "Ensures clean infinitive pronunciation",
       "category": "verb",
       "verified": true
+    },
+    {
+      "written_word": "भडव्या",
+      "spoken_form": "भडव्या,",
+      "phonetic_guidance": "Comma ensures expressive punch without slurred consonants",
+      "category": "gavti_shivi",
+      "verified": true
+    },
+    {
+      "written_word": "मुडद्या",
+      "spoken_form": "मुडद्या,",
+      "phonetic_guidance": "Sustained dya ending with micro-pause",
+      "category": "gavti_shivi",
+      "verified": true
+    },
+    {
+      "written_word": "येड्या",
+      "spoken_form": "येड्या,",
+      "phonetic_guidance": "Natural colloquial insult",
+      "category": "gavti_shivi",
+      "verified": true
+    },
+    {
+      "written_word": "काळ्या तोंडाच्या",
+      "spoken_form": "काळ्या तोंडाच्या,",
+      "phonetic_guidance": "Distinct phrasing for maternal scold",
+      "category": "gavti_shivi",
+      "verified": true
+    },
+    {
+      "written_word": "फुकट्या",
+      "spoken_form": "फुकट्या,",
+      "phonetic_guidance": "Crisp voiceless stop followed by open vowel",
+      "category": "gavti_shivi",
+      "verified": true
+    },
+    {
+      "written_word": "मारीन एक मुस्काटात",
+      "spoken_form": "मारीन एक मुस्काटात!",
+      "phonetic_guidance": "Aggressive emphasis on muskaatat",
+      "category": "threat",
+      "verified": true
+    },
+    {
+      "written_word": "अक्कल गहाण ठेवली का",
+      "spoken_form": "अक्कल गहाण ठेवली का?",
+      "phonetic_guidance": "Interrogative rhythm",
+      "category": "phrase",
+      "verified": true
+    },
+    {
+      "written_word": "आयला",
+      "spoken_form": "आयला,",
+      "phonetic_guidance": "Colloquial exclamation",
+      "category": "exclamation",
+      "verified": true
+    },
+    {
+      "written_word": "शांताबाई",
+      "spoken_form": "शांताबाई,",
+      "phonetic_guidance": "Respectful sarcastic mother address",
+      "category": "name",
+      "verified": true
+    },
+    {
+      "written_word": "गण्या",
+      "spoken_form": "गण्या,",
+      "phonetic_guidance": "Hero boy name sustained",
+      "category": "name",
+      "verified": true
+    },
+    {
+      "written_word": "सोन्या",
+      "spoken_form": "सोन्या,",
+      "phonetic_guidance": "Brother name",
+      "category": "name",
+      "verified": true
+    },
+    {
+      "written_word": "रोह्या",
+      "spoken_form": "रोह्या,",
+      "phonetic_guidance": "Friend name",
+      "category": "name",
+      "verified": true
+    },
+    {
+      "written_word": "योग्या",
+      "spoken_form": "योग्या,",
+      "phonetic_guidance": "Friend name",
+      "category": "name",
+      "verified": true
+    },
+    {
+      "written_word": "आक्या",
+      "spoken_form": "आक्या,",
+      "phonetic_guidance": "Village friend name",
+      "category": "name",
+      "verified": true
     }
   ]
 }

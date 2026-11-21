@@ -49,6 +49,24 @@ class MasterAudioMixer:
                 mix_labels.append(label)
                 clip_idx += 1
 
+        # Add synchronous sound effect cues
+        for sfx in (sfx_cues or []):
+            sfx_name = sfx.get("name", "")
+            sfx_time = float(sfx.get("time", sfx.get("timestamp", 0.0)))
+            sfx_path = sfx.get("sfx_path")
+            if not sfx_path or not os.path.exists(sfx_path):
+                sfx_path = CartoonSFXManager.get_sfx_path(sfx_name)
+            if sfx_path and os.path.exists(sfx_path):
+                sfx_ms = max(1, int(sfx_time * 1000))
+                vol = float(sfx.get("volume", 0.9))
+                inputs.extend(["-i", str(sfx_path)])
+                label = f"[sfx{clip_idx}]"
+                filter_complex.append(
+                    f"[{clip_idx}:a]volume={vol},adelay={sfx_ms}|{sfx_ms}{label};"
+                )
+                mix_labels.append(label)
+                clip_idx += 1
+
         # Final broadcast mastering: clean summing, presence enhancement (+2dB at 3.2kHz), and YouTube Shorts -14 LUFS normalization
         filter_complex.append(
             "".join(mix_labels)

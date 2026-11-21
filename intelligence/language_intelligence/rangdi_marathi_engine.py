@@ -2,7 +2,8 @@
 Natural Varhadi & Rangdi Marathi Language Intelligence Engine matching demo.mp4.
 Generates authentic, colloquial Varhadi Marathi comedy screenplays with the exact
 regional verbal expressions (मा, हो का व, बकऱ्या, तुले, आम्हाले), fast scolding mother dialogue,
-and classic multi-character situational cartoon timing.
+hilarious Gavti shivya (भडव्या, मुडद्या, येड्या, काळ्या तोंडाच्या, फुकट्या, मारीन एक मुस्काटात),
+and canonical cast: ganya, shanti, rohya, sonya, yogya, aakya.
 """
 
 from typing import Dict, Any, List
@@ -22,13 +23,13 @@ class RangdiMarathiEngine:
         """
         scenario = GavtiComedyCatalog.get_scenario_by_id_or_keyword(topic)
 
-        # Characters matching demo.mp4
-        char1_id = "stick_bob"          # बब्या (Orange Hair Hero Boy in Red-and-White Stripes)
-        char1_name = "बब्या"
-        char2_id = "stick_prof"         # गंप्या (Purple Hair Friend in White T-Shirt)
-        char2_name = "गंप्या"
-        char3_id = "varhadi_mother"     # आई (Mother in Blue Saree)
-        char3_name = "आई"
+        # Canonical characters matching demo.mp4
+        char1_id = scenario.get("char1_id", "ganya")       # गण्या (Orange Hair Hero Boy in Red-and-White Stripes)
+        char1_name = scenario.get("char1_name", "गण्या")
+        char2_id = scenario.get("char2_id", "shanti")      # शांताबाई (Mother in Blue Saree) or Rohya
+        char2_name = scenario.get("char2_name", "शांताबाई")
+        char3_id = scenario.get("char3_id", "rohya")       # रोह्या (Purple Hair Friend in White T-Shirt)
+        char3_name = scenario.get("char3_name", "रोह्या")
 
         env = scenario.get("environment", "msrtc_bus_stand")
         scenes: List[ScriptScene] = []
@@ -43,14 +44,14 @@ class RangdiMarathiEngine:
             environment=env,
             start_second=0.0,
             end_second=5.0,
-            description="बब्या चालत येऊन आश्चर्याने मित्राकडे हात करतो." if not is_bus_scene else "बब्या आईपुढे हात पसरून तिकिटाचे पैसे मागतो.",
+            description="गण्या आईपुढे हात पसरून रडवेल्या चेहऱ्याने तिकिटाचे पैसे मागतो." if is_bus_scene else "गण्या चालत येऊन मित्राकडे हात करतो.",
             camera_movement="ZOOM_IN",
             dialogues=[
                 DialogueLine(
                     speaker_id=char1_id,
                     speaker_name=char1_name,
                     text=scenario["hook"],
-                    emotion="shocked",
+                    emotion="cry" if is_bus_scene else "shocked",
                     start_second=0.3,
                     end_second=4.5
                 )
@@ -58,9 +59,9 @@ class RangdiMarathiEngine:
             actions=[
                 SceneAction(
                     character_id=char1_id,
-                    action_type="walk" if not is_bus_scene else "slapstick_react",
-                    gesture="point",
-                    facial_expression="shocked",
+                    action_type="slapstick_react" if is_bus_scene else "walk",
+                    gesture="plead" if is_bus_scene else "point",
+                    facial_expression="cry" if is_bus_scene else "shocked",
                     start_second=0.0,
                     end_second=5.0
                 )
@@ -69,23 +70,23 @@ class RangdiMarathiEngine:
         ))
 
         # -------------------------------------------------------------
-        # SCENE 2: 5–10 sec - SITUATION (Introduce Premise)
+        # SCENE 2: 5–10 sec - SITUATION (Introduce Premise / Maternal Scold)
         # -------------------------------------------------------------
-        spk_2 = char3_id if is_bus_scene else char2_id
-        spk_2_name = char3_name if is_bus_scene else char2_name
+        spk_2 = char2_id
+        spk_2_name = char2_name
         scenes.append(ScriptScene(
             scene_id=2,
             environment=env,
             start_second=5.0,
             end_second=10.0,
-            description="गंप्या हात जोडून/पसरून अपराधी चेहऱ्याने कारण सांगतो." if not is_bus_scene else "आई कंबरेवर हात ठेवून बब्याला जोरात ओरडते.",
+            description="शांताबाई कंबरेवर हात ठेवून संतापाने गण्याला ओरडतात." if is_bus_scene else "रोह्या हात पसरून अपराधी चेहऱ्याने कारण सांगतो.",
             camera_movement="PAN_RIGHT",
             dialogues=[
                 DialogueLine(
                     speaker_id=spk_2,
                     speaker_name=spk_2_name,
                     text=scenario["situation"],
-                    emotion="angry" if is_bus_scene else "apologetic",
+                    emotion="angry" if is_bus_scene else "fearful",
                     start_second=5.2,
                     end_second=9.5
                 )
@@ -94,7 +95,7 @@ class RangdiMarathiEngine:
                 SceneAction(
                     character_id=spk_2,
                     action_type="scold" if is_bus_scene else "explain",
-                    gesture="plead" if not is_bus_scene else "cross_arms",
+                    gesture="cross_arms" if is_bus_scene else "plead",
                     facial_expression="angry" if is_bus_scene else "fearful",
                     start_second=5.0,
                     end_second=10.0
@@ -104,23 +105,23 @@ class RangdiMarathiEngine:
         ))
 
         # -------------------------------------------------------------
-        # SCENE 3: 10–15 sec - DEVELOPMENT (Create Intrigue)
+        # SCENE 3: 10–15 sec - INTRIGUE (Friend steps in with cheeky comment)
         # -------------------------------------------------------------
-        spk_3 = char2_id if is_bus_scene else char1_id
-        spk_3_name = char2_name if is_bus_scene else char1_name
+        spk_3 = char3_id
+        spk_3_name = char3_name
         scenes.append(ScriptScene(
             scene_id=3,
             environment=env,
             start_second=10.0,
             end_second=15.0,
-            description="बसच्या दारात उभा गंप्या काकूंना धीर देतो." if is_bus_scene else "बब्या कंबरेवर हात ठेवून बोट दाखवून मित्राला खडसावतो.",
+            description="रोह्या पुढे येऊन शहाणपणा शिकवतो आणि काकूंना धीर देतो.",
             camera_movement="STATIC",
             dialogues=[
                 DialogueLine(
                     speaker_id=spk_3,
                     speaker_name=spk_3_name,
                     text=scenario["intrigue"],
-                    emotion="excited" if is_bus_scene else "angry",
+                    emotion="confident",
                     start_second=10.2,
                     end_second=14.5
                 )
@@ -128,34 +129,34 @@ class RangdiMarathiEngine:
             actions=[
                 SceneAction(
                     character_id=spk_3,
-                    action_type="wave" if is_bus_scene else "scold",
-                    gesture="wave" if is_bus_scene else "point",
-                    facial_expression="laughing" if is_bus_scene else "angry",
+                    action_type="explain",
+                    gesture="point",
+                    facial_expression="confident",
                     start_second=10.0,
                     end_second=15.0
                 )
             ],
-            sound_effects=[]
+            sound_effects=["ding_lightbulb"]
         ))
 
         # -------------------------------------------------------------
-        # SCENE 4: 15–20 sec - CONFLICT / SURPRISE (Twist)
+        # SCENE 4: 15–20 sec - TWIST (Mother roasts the friend!)
         # -------------------------------------------------------------
-        spk_4 = char3_id if is_bus_scene else char2_id
-        spk_4_name = char3_name if is_bus_scene else char2_name
+        spk_4 = char2_id
+        spk_4_name = char2_name
         scenes.append(ScriptScene(
             scene_id=4,
             environment=env,
             start_second=15.0,
             end_second=20.0,
-            description="आई डोळे मोठे करून धोक्याचा इशारा देते." if is_bus_scene else "गंप्या वेटरकडे बघून घाबरून बोट दाखवतो.",
-            camera_movement="SHAKE",
+            description="शांताबाई रोह्यावर भडकतात आणि हात उगारून दम भरतात.",
+            camera_movement="ZOOM_IN",
             dialogues=[
                 DialogueLine(
                     speaker_id=spk_4,
                     speaker_name=spk_4_name,
                     text=scenario["twist"],
-                    emotion="suspicious" if is_bus_scene else "fearful",
+                    emotion="angry",
                     start_second=15.2,
                     end_second=19.5
                 )
@@ -163,28 +164,28 @@ class RangdiMarathiEngine:
             actions=[
                 SceneAction(
                     character_id=spk_4,
-                    action_type="point" if is_bus_scene else "shock",
+                    action_type="scold",
                     gesture="point",
-                    facial_expression="angry" if is_bus_scene else "shocked",
+                    facial_expression="angry",
                     start_second=15.0,
                     end_second=20.0
                 )
             ],
-            sound_effects=["punchline_impact"]
+            sound_effects=["slap_impact"]
         ))
 
         # -------------------------------------------------------------
-        # SCENE 5: 20–25 sec - PAYOFF (Main Value Punchline)
+        # SCENE 5: 20–25 sec - PAYOFF (Hilarious punchline & laughter)
         # -------------------------------------------------------------
-        spk_5 = char1_id
-        spk_5_name = char1_name
+        spk_5 = char3_id
+        spk_5_name = char3_name
         scenes.append(ScriptScene(
             scene_id=5,
             environment=env,
             start_second=20.0,
             end_second=25.0,
-            description="बब्या हसून पोट धरतो आणि भन्नाट युक्ती सांगतो.",
-            camera_movement="ZOOM_IN",
+            description="रोह्या तोंडावर हात ठेवून हसतो आणि पंचलाईन सांगतो.",
+            camera_movement="PAN_LEFT",
             dialogues=[
                 DialogueLine(
                     speaker_id=spk_5,
@@ -198,32 +199,34 @@ class RangdiMarathiEngine:
             actions=[
                 SceneAction(
                     character_id=spk_5,
-                    action_type="laugh",
-                    gesture="thumbs_up",
-                    facial_expression="laughing",
+                    action_type="slapstick_react",
+                    gesture="wave_arms_frantic",
+                    facial_expression="happy",
                     start_second=20.0,
                     end_second=25.0
                 )
             ],
-            sound_effects=["whoosh"]
+            sound_effects=["laughter_punchline"]
         ))
 
         # -------------------------------------------------------------
-        # SCENE 6: 25–30 sec - CALL TO ACTION (Engagement)
+        # SCENE 6: 25–30 sec - CALL TO ACTION (CTA & Subscribe)
         # -------------------------------------------------------------
+        spk_6 = char1_id
+        spk_6_name = char1_name
         scenes.append(ScriptScene(
             scene_id=6,
             environment=env,
             start_second=25.0,
             end_second=30.0,
-            description="सर्वजण हसतात आणि वऱ्हाडी स्टाईलमध्ये सबस्क्राईब करायला सांगतात.",
-            camera_movement="ZOOM_OUT",
+            description="दोघेही कॅमेऱ्याकडे हात हलवून प्रेक्षकांना सबस्क्राईब करायला सांगतात.",
+            camera_movement="STATIC",
             dialogues=[
                 DialogueLine(
-                    speaker_id=char1_id,
-                    speaker_name=char1_name,
+                    speaker_id=spk_6,
+                    speaker_name=spk_6_name,
                     text=scenario["cta"],
-                    emotion="excited",
+                    emotion="happy",
                     start_second=25.2,
                     end_second=29.5
                 )
@@ -231,9 +234,9 @@ class RangdiMarathiEngine:
             actions=[
                 SceneAction(
                     character_id=char1_id,
-                    action_type="wave",
-                    gesture="wave",
-                    facial_expression="laughing",
+                    action_type="walk",
+                    gesture="wave_arms_frantic",
+                    facial_expression="happy",
                     start_second=25.0,
                     end_second=30.0
                 )
@@ -241,18 +244,19 @@ class RangdiMarathiEngine:
             sound_effects=["pop"]
         ))
 
+        # Compile final screenplay
+        title = scenario.get("title_marathi", "वऱ्हाडी कॉमेडी")
         cast_list = [
-            {"id": char3_id, "name": char3_name, "color": "#1d4ed8"},
-            {"id": char1_id, "name": char1_name, "color": "#f97316"}
-        ] if is_bus_scene else [
-            {"id": char1_id, "name": char1_name, "color": "#f97316"},
-            {"id": char2_id, "name": char2_name, "color": "#7c3aed"}
+            {"id": char1_id, "name": char1_name, "voice_id": "mr-IN-ManoharNeural"},
+            {"id": char2_id, "name": char2_name, "voice_id": "mr-IN-AarohiNeural" if "shanti" in char2_id else "mr-IN-ManoharNeural"}
         ]
+        if char3_id:
+            cast_list.append({"id": char3_id, "name": char3_name, "voice_id": "mr-IN-ManoharNeural"})
 
         return StickFigureScript(
-            title=f"वऱ्हाडी कॉमेडी: {scenario['title_marathi']}",
-            topic=scenario["title_marathi"],
-            category=category or "comedy_entertainment",
+            title=title,
+            topic=topic or scenario.get("title_marathi", "वऱ्हाडी कॉमेडी"),
+            category=category,
             hook=scenario["hook"],
             situation=scenario["situation"],
             development=scenario["intrigue"],
