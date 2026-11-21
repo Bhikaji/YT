@@ -36,27 +36,35 @@ class StickFigureRenderer:
     ) -> Image.Image:
         t_sec = frame_data["time_sec"]
 
-        # 1. Base Environment
-        img = ProceduralBackgroundRenderer.render_environment(
-            env_type=frame_data["environment"],
-            width=width,
-            height=height,
-            t_sec=t_sec
-        )
-        draw = ImageDraw.Draw(img)
+        # Check environments
+        is_bus_env = any(k in str(frame_data.get("environment", "")).lower() for k in ["bus", "msrtc", "lalpari", "station"])
+        is_croc_env = any(k in str(frame_data.get("environment", "")).lower() for k in ["croc", "crocodile", "river_bank"])
+        croc_scenes_dir = Path("assets/characters/demo_crocodile/scenes")
+        demo_scenes_dir = Path("assets/characters/demo_scenes")
 
-        # 2. Opening Marathi Disclaimer Screen (at t=0s to 2.2s like demo.mp4)
-        if t_sec < 2.2 and frame_data.get("show_disclaimer", True):
+        # 2. Opening Marathi Disclaimer Screen (at t=0s to 2.2s like demo.mp4 for bus scenes)
+        if is_bus_env and t_sec < 2.2 and frame_data.get("show_disclaimer", True):
+            img = Image.new("RGBA", (width, height), (0, 0, 0, 255))
+            draw = ImageDraw.Draw(img)
             cls._draw_marathi_disclaimer(draw, width, height, img=img)
             return img
 
-        # 3. Draw Characters / Bus Scene
-        is_bus_env = any(k in str(frame_data.get("environment", "")).lower() for k in ["bus", "msrtc", "lalpari", "station"])
-        demo_scenes_dir = Path("assets/characters/demo_scenes")
-        if is_bus_env and demo_scenes_dir.exists():
+        # 3. Draw Characters / Bus Scene / Crocodile Scene
+        if is_croc_env and croc_scenes_dir.exists():
+            img = cls._render_crocodile_scene(width, height, frame_data, t_sec)
+            draw = ImageDraw.Draw(img)
+        elif is_bus_env and demo_scenes_dir.exists():
             img = cls._render_demo_puppet_scene(width, height, frame_data, t_sec)
             draw = ImageDraw.Draw(img)
         else:
+            # Procedural Environment & Kinematics fallback
+            img = ProceduralBackgroundRenderer.render_environment(
+                env_type=frame_data["environment"],
+                width=width,
+                height=height,
+                t_sec=t_sec
+            )
+            draw = ImageDraw.Draw(img)
             c1_data = frame_data["char1"]
             c2_data = frame_data["char2"]
             cls._draw_single_character(draw, char1, c1_data, t_sec, width, height)
@@ -147,6 +155,94 @@ class StickFigureRenderer:
 
     _SCENE_CACHE: Dict[str, Image.Image] = {}
     _PATCH_CACHE: Dict[str, Image.Image] = {}
+    _CROC_SCENE_CACHE: Dict[str, Image.Image] = {}
+
+    @classmethod
+    def _render_crocodile_scene(
+        cls,
+        width: int,
+        height: int,
+        frame_data: Dict[str, Any],
+        t_sec: float
+    ) -> Image.Image:
+        """
+        Directly renders authentic 2D crocodile puppet and character scene matching demo_video/crockdile.mp4.
+        Sequences through the exact 15 beat keyframes with synchronized lip-sync, gestures, and zero jitter.
+        """
+        duration = float(frame_data.get("total_duration", 30.0))
+        s_t = (t_sec / duration) * 30.0 if duration > 0 else t_sec
+
+        if s_t < 2.5:
+            scene_name = "beat1_thinking.png"
+        elif s_t < 4.5:
+            scene_name = "beat1_lightbulb.png"
+        elif s_t < 5.4:
+            scene_name = "beat2_jump.png"
+        elif s_t < 8.5:
+            scene_name = "beat2_splash.png"
+        elif s_t < 11.5:
+            scene_name = "beat3_floating.png"
+        elif s_t < 14.0:
+            scene_name = "beat3_croc_surface.png"
+        elif s_t < 15.5:
+            scene_name = "beat4_croc_snap.png"
+        elif s_t < 17.0:
+            scene_name = "beat4_panic_run.png"
+        elif s_t < 18.5:
+            scene_name = "beat4_crawl_out.png"
+        elif s_t < 21.0:
+            scene_name = "beat5_point_sign.png"
+        elif s_t < 23.5:
+            scene_name = "beat5_angry_shout.png"
+        elif s_t < 25.0:
+            scene_name = "beat6_ranger_arrives.png"
+        elif s_t < 27.0:
+            scene_name = "beat6_ranger_writes.png"
+        elif s_t < 28.5:
+            scene_name = "beat7_final_climax.png"
+        else:
+            scene_name = "beat7_shock_jawdrop.png"
+
+        cache_key = f"{scene_name}_{width}_{height}"
+        if cache_key in cls._CROC_SCENE_CACHE:
+            base = cls._CROC_SCENE_CACHE[cache_key].copy()
+        else:
+            scene_path = Path("assets/characters/demo_crocodile/scenes") / scene_name
+            if scene_path.exists():
+                raw_img = Image.open(scene_path).convert("RGBA")
+                if raw_img.size != (width, height):
+                    base = raw_img.resize((width, height), Image.Resampling.LANCZOS)
+                else:
+                    base = raw_img
+                cls._CROC_SCENE_CACHE[cache_key] = base.copy()
+            else:
+                base = Image.new("RGBA", (width, height), (30, 41, 59, 255))
+
+        # Dynamic mouth articulation when active speaker speaks
+        active_speaker = frame_data.get("active_speaker", "")
+        diag_start = frame_data.get("dialogue_start", 0.0)
+        if active_speaker and t_sec >= diag_start:
+            rel_t = max(0.0, t_sec - diag_start)
+            mouth_open = (math.sin(rel_t * 16.0) > 0)
+            if mouth_open:
+                spk_draw = ImageDraw.Draw(base)
+                # If Rohya (ranger caretaker) is speaking at sign (Scene 5, ~23.5s to 27s)
+                if "rohya" in active_speaker.lower() and 23.0 <= s_t <= 28.5:
+                    rx, ry = int(width * 0.76), int(height * 0.44)
+                    spk_draw.ellipse([rx - 6, ry - 3, rx + 6, ry + 4], fill=(20, 20, 20))
+                # If Ganya is speaking
+                elif "ganya" in active_speaker.lower():
+                    if s_t < 4.5:
+                        gx, gy = int(width * 0.62), int(height * 0.45)
+                        spk_draw.ellipse([gx - 7, gy - 3, gx + 7, gy + 4], fill=(20, 20, 20))
+                    elif 8.5 <= s_t < 11.5:
+                        gx, gy = int(width * 0.50), int(height * 0.55)
+                        spk_draw.ellipse([gx - 6, gy - 3, gx + 6, gy + 3], fill=(20, 20, 20))
+                    elif 18.5 <= s_t < 21.0:
+                        gx, gy = int(width * 0.28), int(height * 0.47)
+                        spk_draw.ellipse([gx - 7, gy - 4, gx + 7, gy + 5], fill=(20, 20, 20))
+
+        return base
 
     @classmethod
     def _get_demo_scene_img(cls, name: str) -> Optional[Image.Image]:

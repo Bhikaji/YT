@@ -35,214 +35,407 @@ class RangdiMarathiEngine:
         scenes: List[ScriptScene] = []
 
         is_bus_scene = (scenario["id"] == "msrtc_bus_tour_scold")
+        is_crocodile_scene = (scenario["id"] == "crocodile_river_warning" or "croc" in env.lower())
 
-        # -------------------------------------------------------------
-        # SCENE 1: 0–5 sec - POWERFUL HOOK (Stop Scrolling)
-        # -------------------------------------------------------------
-        scenes.append(ScriptScene(
-            scene_id=1,
-            environment=env,
-            start_second=0.0,
-            end_second=5.0,
-            description="गण्या आईपुढे हात पसरून रडवेल्या चेहऱ्याने तिकिटाचे पैसे मागतो." if is_bus_scene else "गण्या चालत येऊन मित्राकडे हात करतो.",
-            camera_movement="ZOOM_IN",
-            dialogues=[
-                DialogueLine(
-                    speaker_id=char1_id,
-                    speaker_name=char1_name,
-                    text=scenario["hook"],
-                    emotion="cry" if is_bus_scene else "shocked",
-                    start_second=0.3,
-                    end_second=4.5
-                )
-            ],
-            actions=[
-                SceneAction(
-                    character_id=char1_id,
-                    action_type="slapstick_react" if is_bus_scene else "walk",
-                    gesture="plead" if is_bus_scene else "point",
-                    facial_expression="cry" if is_bus_scene else "shocked",
-                    start_second=0.0,
-                    end_second=5.0
-                )
-            ],
-            sound_effects=["whoosh"]
-        ))
+        if is_crocodile_scene:
+            # -------------------------------------------------------------
+            # CROCODILE DEMO MATCHED SCENE GRAPH
+            # -------------------------------------------------------------
+            # Scene 1: 0-5s - Reading Sign & Idea Ding
+            scenes.append(ScriptScene(
+                scene_id=1,
+                environment=env,
+                start_second=0.0,
+                end_second=5.0,
+                description="गण्या लाकडी पाटीकडे बघून डोक्यात विचार करतो आणि बत्ती पेटते.",
+                camera_movement="STATIC",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=char1_id,
+                        speaker_name=char1_name,
+                        text=scenario["hook"],
+                        emotion="confident",
+                        start_second=0.2,
+                        end_second=4.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=char1_id,
+                        action_type="walk",
+                        gesture="point",
+                        facial_expression="happy",
+                        start_second=0.0,
+                        end_second=5.0
+                    )
+                ],
+                sound_effects=["lightbulb_ding"]
+            ))
 
-        # -------------------------------------------------------------
-        # SCENE 2: 5–10 sec - SITUATION (Introduce Premise / Maternal Scold)
-        # -------------------------------------------------------------
-        spk_2 = char2_id
-        spk_2_name = char2_name
-        scenes.append(ScriptScene(
-            scene_id=2,
-            environment=env,
-            start_second=5.0,
-            end_second=10.0,
-            description="शांताबाई कंबरेवर हात ठेवून संतापाने गण्याला ओरडतात." if is_bus_scene else "रोह्या हात पसरून अपराधी चेहऱ्याने कारण सांगतो.",
-            camera_movement="PAN_RIGHT",
-            dialogues=[
-                DialogueLine(
-                    speaker_id=spk_2,
-                    speaker_name=spk_2_name,
-                    text=scenario["situation"],
-                    emotion="angry" if is_bus_scene else "fearful",
-                    start_second=5.2,
-                    end_second=9.5
-                )
-            ],
-            actions=[
-                SceneAction(
-                    character_id=spk_2,
-                    action_type="scold" if is_bus_scene else "explain",
-                    gesture="cross_arms" if is_bus_scene else "plead",
-                    facial_expression="angry" if is_bus_scene else "fearful",
-                    start_second=5.0,
-                    end_second=10.0
-                )
-            ],
-            sound_effects=["punchline_impact"]
-        ))
+            # Scene 2: 5-10s - Cannonball Jump & Water Splash
+            scenes.append(ScriptScene(
+                scene_id=2,
+                environment=env,
+                start_second=5.0,
+                end_second=10.0,
+                description="गण्या पाण्यात उडी मारतो आणि आनंदाने पोहायला लागतो.",
+                camera_movement="STATIC",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=char1_id,
+                        speaker_name=char1_name,
+                        text=scenario["situation"],
+                        emotion="happy",
+                        start_second=5.2,
+                        end_second=9.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=char1_id,
+                        action_type="slapstick_react",
+                        gesture="wave_arms_frantic",
+                        facial_expression="happy",
+                        start_second=5.0,
+                        end_second=10.0
+                    )
+                ],
+                sound_effects=["cannonball_splash"]
+            ))
 
-        # -------------------------------------------------------------
-        # SCENE 3: 10–15 sec - INTRIGUE (Friend steps in with cheeky comment)
-        # -------------------------------------------------------------
-        spk_3 = char3_id
-        spk_3_name = char3_name
-        scenes.append(ScriptScene(
-            scene_id=3,
-            environment=env,
-            start_second=10.0,
-            end_second=15.0,
-            description="रोह्या पुढे येऊन शहाणपणा शिकवतो आणि काकूंना धीर देतो.",
-            camera_movement="STATIC",
-            dialogues=[
-                DialogueLine(
-                    speaker_id=spk_3,
-                    speaker_name=spk_3_name,
-                    text=scenario["intrigue"],
-                    emotion="confident",
-                    start_second=10.2,
-                    end_second=14.5
-                )
-            ],
-            actions=[
-                SceneAction(
-                    character_id=spk_3,
-                    action_type="explain",
-                    gesture="point",
-                    facial_expression="confident",
-                    start_second=10.0,
-                    end_second=15.0
-                )
-            ],
-            sound_effects=["ding_lightbulb"]
-        ))
+            # Scene 3: 10-15s - Crocodile Surfaces & Panic Screaming
+            scenes.append(ScriptScene(
+                scene_id=3,
+                environment=env,
+                start_second=10.0,
+                end_second=15.0,
+                description="मगर पाण्याबाहेर येते आणि गण्या घाबरून किंचाळत पाण्याबाहेर पळतो.",
+                camera_movement="STATIC",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=char1_id,
+                        speaker_name=char1_name,
+                        text=scenario["intrigue"],
+                        emotion="cry",
+                        start_second=10.2,
+                        end_second=14.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=char1_id,
+                        action_type="slapstick_react",
+                        gesture="plead",
+                        facial_expression="cry",
+                        start_second=10.0,
+                        end_second=15.0
+                    )
+                ],
+                sound_effects=["crocodile_panic_splash"]
+            ))
 
-        # -------------------------------------------------------------
-        # SCENE 4: 15–20 sec - TWIST (Mother roasts the friend!)
-        # -------------------------------------------------------------
-        spk_4 = char2_id
-        spk_4_name = char2_name
-        scenes.append(ScriptScene(
-            scene_id=4,
-            environment=env,
-            start_second=15.0,
-            end_second=20.0,
-            description="शांताबाई रोह्यावर भडकतात आणि हात उगारून दम भरतात.",
-            camera_movement="ZOOM_IN",
-            dialogues=[
-                DialogueLine(
-                    speaker_id=spk_4,
-                    speaker_name=spk_4_name,
-                    text=scenario["twist"],
-                    emotion="angry",
-                    start_second=15.2,
-                    end_second=19.5
-                )
-            ],
-            actions=[
-                SceneAction(
-                    character_id=spk_4,
-                    action_type="scold",
-                    gesture="point",
-                    facial_expression="angry",
-                    start_second=15.0,
-                    end_second=20.0
-                )
-            ],
-            sound_effects=["slap_impact"]
-        ))
+            # Scene 4: 15-20s - Dripping Wet on Bank Shouting at Rohya Caretaker
+            scenes.append(ScriptScene(
+                scene_id=4,
+                environment=env,
+                start_second=15.0,
+                end_second=20.0,
+                description="गण्या ओलाचिंब होऊन काठावर केअरटेकर रोह्याला संतापाने ओरडतो.",
+                camera_movement="STATIC",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=char1_id,
+                        speaker_name=char1_name,
+                        text=scenario["twist"],
+                        emotion="angry",
+                        start_second=15.2,
+                        end_second=19.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=char1_id,
+                        action_type="scold",
+                        gesture="point",
+                        facial_expression="angry",
+                        start_second=15.0,
+                        end_second=20.0
+                    )
+                ],
+                sound_effects=["slap_impact"]
+            ))
 
-        # -------------------------------------------------------------
-        # SCENE 5: 20–25 sec - PAYOFF (Hilarious punchline & laughter)
-        # -------------------------------------------------------------
-        spk_5 = char3_id
-        spk_5_name = char3_name
-        scenes.append(ScriptScene(
-            scene_id=5,
-            environment=env,
-            start_second=20.0,
-            end_second=25.0,
-            description="रोह्या तोंडावर हात ठेवून हसतो आणि पंचलाईन सांगतो.",
-            camera_movement="PAN_LEFT",
-            dialogues=[
-                DialogueLine(
-                    speaker_id=spk_5,
-                    speaker_name=spk_5_name,
-                    text=scenario["payoff"],
-                    emotion="laughing",
-                    start_second=20.2,
-                    end_second=24.5
-                )
-            ],
-            actions=[
-                SceneAction(
-                    character_id=spk_5,
-                    action_type="slapstick_react",
-                    gesture="wave_arms_frantic",
-                    facial_expression="happy",
-                    start_second=20.0,
-                    end_second=25.0
-                )
-            ],
-            sound_effects=["laughter_punchline"]
-        ))
+            # Scene 5: 20-25s - Rohya Caretaker Writes Exclamation Mark on Sign
+            scenes.append(ScriptScene(
+                scene_id=5,
+                environment=env,
+                start_second=20.0,
+                end_second=25.0,
+                description="रोह्या मार्कर पेनने पाटीवर उद्गारवाचक चिन्ह काढतो आणि गण्याला समजावतो.",
+                camera_movement="STATIC",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=char2_id,
+                        speaker_name=char2_name,
+                        text=scenario["payoff"],
+                        emotion="confident",
+                        start_second=20.2,
+                        end_second=24.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=char2_id,
+                        action_type="explain",
+                        gesture="point",
+                        facial_expression="confident",
+                        start_second=20.0,
+                        end_second=25.0
+                    )
+                ],
+                sound_effects=["marker_pen_edit"]
+            ))
 
-        # -------------------------------------------------------------
-        # SCENE 6: 25–30 sec - CALL TO ACTION (CTA & Subscribe)
-        # -------------------------------------------------------------
-        spk_6 = char1_id
-        spk_6_name = char1_name
-        scenes.append(ScriptScene(
-            scene_id=6,
-            environment=env,
-            start_second=25.0,
-            end_second=30.0,
-            description="दोघेही कॅमेऱ्याकडे हात हलवून प्रेक्षकांना सबस्क्राईब करायला सांगतात.",
-            camera_movement="STATIC",
-            dialogues=[
-                DialogueLine(
-                    speaker_id=spk_6,
-                    speaker_name=spk_6_name,
-                    text=scenario["cta"],
-                    emotion="happy",
-                    start_second=25.2,
-                    end_second=29.5
-                )
-            ],
-            actions=[
-                SceneAction(
-                    character_id=char1_id,
-                    action_type="walk",
-                    gesture="wave_arms_frantic",
-                    facial_expression="happy",
-                    start_second=25.0,
-                    end_second=30.0
-                )
-            ],
-            sound_effects=["pop"]
-        ))
+            # Scene 6: 25-30s - Ganya Jaw Drop Shock & Subscribe CTA
+            scenes.append(ScriptScene(
+                scene_id=6,
+                environment=env,
+                start_second=25.0,
+                end_second=30.0,
+                description="गण्या आश्चर्याने तोंड उघडे ठेवून थक्क होतो आणि सबस्क्राईब करायला सांगतो.",
+                camera_movement="STATIC",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=char1_id,
+                        speaker_name=char1_name,
+                        text=scenario["cta"],
+                        emotion="shocked",
+                        start_second=25.2,
+                        end_second=29.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=char1_id,
+                        action_type="slapstick_react",
+                        gesture="wave_arms_frantic",
+                        facial_expression="shocked",
+                        start_second=25.0,
+                        end_second=30.0
+                    )
+                ],
+                sound_effects=["cartoon_shock_sting"]
+            ))
+        else:
+            # -------------------------------------------------------------
+                # STANDARD GAVTI / MSRTC SCENE GRAPH
+                # -------------------------------------------------------------
+                # SCENE 1: 0–5 sec - POWERFUL HOOK (Stop Scrolling)
+            # -------------------------------------------------------------
+            scenes.append(ScriptScene(
+                scene_id=1,
+                environment=env,
+                start_second=0.0,
+                end_second=5.0,
+                description="गण्या आईपुढे हात पसरून रडवेल्या चेहऱ्याने तिकिटाचे पैसे मागतो." if is_bus_scene else "गण्या चालत येऊन मित्राकडे हात करतो.",
+                camera_movement="ZOOM_IN",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=char1_id,
+                        speaker_name=char1_name,
+                        text=scenario["hook"],
+                        emotion="cry" if is_bus_scene else "shocked",
+                        start_second=0.3,
+                        end_second=4.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=char1_id,
+                        action_type="slapstick_react" if is_bus_scene else "walk",
+                        gesture="plead" if is_bus_scene else "point",
+                        facial_expression="cry" if is_bus_scene else "shocked",
+                        start_second=0.0,
+                        end_second=5.0
+                    )
+                ],
+                sound_effects=["whoosh"]
+            ))
+
+            # -------------------------------------------------------------
+            # SCENE 2: 5–10 sec - SITUATION (Introduce Premise / Maternal Scold)
+            # -------------------------------------------------------------
+            spk_2 = char2_id
+            spk_2_name = char2_name
+            scenes.append(ScriptScene(
+                scene_id=2,
+                environment=env,
+                start_second=5.0,
+                end_second=10.0,
+                description="शांताबाई कंबरेवर हात ठेवून संतापाने गण्याला ओरडतात." if is_bus_scene else "रोह्या हात पसरून अपराधी चेहऱ्याने कारण सांगतो.",
+                camera_movement="PAN_RIGHT",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=spk_2,
+                        speaker_name=spk_2_name,
+                        text=scenario["situation"],
+                        emotion="angry" if is_bus_scene else "fearful",
+                        start_second=5.2,
+                        end_second=9.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=spk_2,
+                        action_type="scold" if is_bus_scene else "explain",
+                        gesture="cross_arms" if is_bus_scene else "plead",
+                        facial_expression="angry" if is_bus_scene else "fearful",
+                        start_second=5.0,
+                        end_second=10.0
+                    )
+                ],
+                sound_effects=["punchline_impact"]
+            ))
+
+            # -------------------------------------------------------------
+            # SCENE 3: 10–15 sec - INTRIGUE (Friend steps in with cheeky comment)
+            # -------------------------------------------------------------
+            spk_3 = char3_id
+            spk_3_name = char3_name
+            scenes.append(ScriptScene(
+                scene_id=3,
+                environment=env,
+                start_second=10.0,
+                end_second=15.0,
+                description="रोह्या पुढे येऊन शहाणपणा शिकवतो आणि काकूंना धीर देतो.",
+                camera_movement="STATIC",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=spk_3,
+                        speaker_name=spk_3_name,
+                        text=scenario["intrigue"],
+                        emotion="confident",
+                        start_second=10.2,
+                        end_second=14.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=spk_3,
+                        action_type="explain",
+                        gesture="point",
+                        facial_expression="confident",
+                        start_second=10.0,
+                        end_second=15.0
+                    )
+                ],
+                sound_effects=["ding_lightbulb"]
+            ))
+
+            # -------------------------------------------------------------
+            # SCENE 4: 15–20 sec - TWIST (Mother roasts the friend!)
+            # -------------------------------------------------------------
+            spk_4 = char2_id
+            spk_4_name = char2_name
+            scenes.append(ScriptScene(
+                scene_id=4,
+                environment=env,
+                start_second=15.0,
+                end_second=20.0,
+                description="शांताबाई रोह्यावर भडकतात आणि हात उगारून दम भरतात.",
+                camera_movement="ZOOM_IN",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=spk_4,
+                        speaker_name=spk_4_name,
+                        text=scenario["twist"],
+                        emotion="angry",
+                        start_second=15.2,
+                        end_second=19.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=spk_4,
+                        action_type="scold",
+                        gesture="point",
+                        facial_expression="angry",
+                        start_second=15.0,
+                        end_second=20.0
+                    )
+                ],
+                sound_effects=["slap_impact"]
+            ))
+
+            # -------------------------------------------------------------
+            # SCENE 5: 20–25 sec - PAYOFF (Hilarious punchline & laughter)
+            # -------------------------------------------------------------
+            spk_5 = char3_id
+            spk_5_name = char3_name
+            scenes.append(ScriptScene(
+                scene_id=5,
+                environment=env,
+                start_second=20.0,
+                end_second=25.0,
+                description="रोह्या तोंडावर हात ठेवून हसतो आणि पंचलाईन सांगतो.",
+                camera_movement="PAN_LEFT",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=spk_5,
+                        speaker_name=spk_5_name,
+                        text=scenario["payoff"],
+                        emotion="laughing",
+                        start_second=20.2,
+                        end_second=24.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=spk_5,
+                        action_type="slapstick_react",
+                        gesture="wave_arms_frantic",
+                        facial_expression="happy",
+                        start_second=20.0,
+                        end_second=25.0
+                    )
+                ],
+                sound_effects=["laughter_punchline"]
+            ))
+
+            # -------------------------------------------------------------
+            # SCENE 6: 25–30 sec - CALL TO ACTION (CTA & Subscribe)
+            # -------------------------------------------------------------
+            spk_6 = char1_id
+            spk_6_name = char1_name
+            scenes.append(ScriptScene(
+                scene_id=6,
+                environment=env,
+                start_second=25.0,
+                end_second=30.0,
+                description="दोघेही कॅमेऱ्याकडे हात हलवून प्रेक्षकांना सबस्क्राईब करायला सांगतात.",
+                camera_movement="STATIC",
+                dialogues=[
+                    DialogueLine(
+                        speaker_id=spk_6,
+                        speaker_name=spk_6_name,
+                        text=scenario["cta"],
+                        emotion="happy",
+                        start_second=25.2,
+                        end_second=29.5
+                    )
+                ],
+                actions=[
+                    SceneAction(
+                        character_id=char1_id,
+                        action_type="walk",
+                        gesture="wave_arms_frantic",
+                        facial_expression="happy",
+                        start_second=25.0,
+                        end_second=30.0
+                    )
+                ],
+                sound_effects=["pop"]
+            ))
 
         # Compile final screenplay
         title = scenario.get("title_marathi", "वऱ्हाडी कॉमेडी")

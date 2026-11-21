@@ -191,13 +191,21 @@ class AutonomousStickStudioManager:
                     s.dialogues[0].start_second = item["start_second"]
                     s.dialogues[0].end_second = item["end_second"]
 
-        # Mix Soundtrack: Non-overlapping Dialogues + Ducked BGM + SFX
-        sfx_cues = [
-            {"name": "whoosh", "time": 0.5},
-            {"name": "punchline_impact", "time": 14.2},
-            {"name": "ding_lightbulb", "time": 21.3},
-            {"name": "pop", "time": 27.2}
-        ]
+        # Mix Soundtrack: Non-overlapping Dialogues + Ducked BGM + Timed SFX
+        sfx_cues = []
+        for s in script.scenes:
+            for sfx_name in getattr(s, "sound_effects", []):
+                # Place SFX right near the action / dialogue start
+                sfx_time = max(0.2, s.start_second + 0.25)
+                sfx_cues.append({"name": sfx_name, "time": sfx_time, "volume": 0.95})
+
+        if not sfx_cues:
+            sfx_cues = [
+                {"name": "whoosh", "time": 0.5},
+                {"name": "punchline_impact", "time": 14.2},
+                {"name": "ding_lightbulb", "time": 21.3},
+                {"name": "pop", "time": 27.2}
+            ]
         master_audio_path = audio_dir / "master_soundtrack.aac"
         print("             Mixing soundtrack: Dialogues + Ducked BGM (-16.5dB) + Cartoon SFX...")
         MasterAudioMixer.assemble_soundtrack(
@@ -260,7 +268,7 @@ class AutonomousStickStudioManager:
                 height=render_h
             )
             f_path = frames_dir / f"frame_{frame_counter:04d}.png"
-            frame_img.save(f_path)
+            frame_img.save(f_path, compress_level=1)
             if i == int(total_frames * 0.5) or not hero_frame_path:
                 hero_frame_path = f_path
             frame_counter += 1
