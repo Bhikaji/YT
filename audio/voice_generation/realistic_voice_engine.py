@@ -27,23 +27,23 @@ class RealisticHumanVoiceEngine:
         # Priority 1: Varhadi & Rangdi Marathi - Matching demo.mp4 Character Personalities
         "mr_rangdi": {
             # Ganya (गण्या - Energetic comedy hero boy, crisp natural Maharashtrian enunciation)
-            "ganya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+3Hz"},
-            "stick_ganya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+3Hz"},
-            "stick_bob": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+3Hz"},
+            "ganya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+12%", "base_pitch": "+3Hz"},
+            "stick_ganya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+12%", "base_pitch": "+3Hz"},
+            "stick_bob": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+12%", "base_pitch": "+3Hz"},
 
             # Sonya (सोन्या - Playful brother/friend, slightly higher pitch)
-            "sonya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+1Hz"},
-            "stick_sonya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+1Hz"},
+            "sonya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+10%", "base_pitch": "+1Hz"},
+            "stick_sonya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+10%", "base_pitch": "+1Hz"},
 
             # Shanti (शांती / शांताबाई - Authoritative, crisp Maharashtrian mother in saree)
-            "shanti": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "-2%", "base_pitch": "+4Hz"},
-            "varhadi_shanti": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "-2%", "base_pitch": "+4Hz"},
-            "varhadi_mother": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "-2%", "base_pitch": "+4Hz"},
+            "shanti": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "+5%", "base_pitch": "+4Hz"},
+            "varhadi_shanti": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "+5%", "base_pitch": "+4Hz"},
+            "varhadi_mother": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "+5%", "base_pitch": "+4Hz"},
 
             # Rohya (रोह्या - Sarcastic, mischievous teen friend in bus doorway)
-            "rohya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+7Hz"},
-            "stick_rohya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+7Hz"},
-            "stick_prof": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+7Hz"},
+            "rohya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+12%", "base_pitch": "+7Hz"},
+            "stick_rohya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+12%", "base_pitch": "+7Hz"},
+            "stick_prof": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+12%", "base_pitch": "+7Hz"},
 
             # Yogya (योग्या - Village katta buddy)
             "yogya": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+5Hz"},
