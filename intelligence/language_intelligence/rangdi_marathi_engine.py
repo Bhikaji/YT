@@ -43,7 +43,7 @@ class RangdiMarathiEngine:
             environment=env,
             start_second=0.0,
             end_second=5.0,
-            description="बब्या आईपुढे हात पसरून तिकिटाचे पैसे मागतो.",
+            description="बब्या चालत येऊन आश्चर्याने मित्राकडे हात करतो." if not is_bus_scene else "बब्या आईपुढे हात पसरून तिकिटाचे पैसे मागतो.",
             camera_movement="ZOOM_IN",
             dialogues=[
                 DialogueLine(
@@ -58,7 +58,7 @@ class RangdiMarathiEngine:
             actions=[
                 SceneAction(
                     character_id=char1_id,
-                    action_type="slapstick_react",
+                    action_type="walk" if not is_bus_scene else "slapstick_react",
                     gesture="point",
                     facial_expression="shocked",
                     start_second=0.0,
@@ -78,14 +78,14 @@ class RangdiMarathiEngine:
             environment=env,
             start_second=5.0,
             end_second=10.0,
-            description="आई कंबरेवर हात ठेवून बब्याला जोरात ओरडते.",
+            description="गंप्या हात जोडून/पसरून अपराधी चेहऱ्याने कारण सांगतो." if not is_bus_scene else "आई कंबरेवर हात ठेवून बब्याला जोरात ओरडते.",
             camera_movement="PAN_RIGHT",
             dialogues=[
                 DialogueLine(
                     speaker_id=spk_2,
                     speaker_name=spk_2_name,
                     text=scenario["situation"],
-                    emotion="angry",
+                    emotion="angry" if is_bus_scene else "apologetic",
                     start_second=5.2,
                     end_second=9.5
                 )
@@ -93,9 +93,9 @@ class RangdiMarathiEngine:
             actions=[
                 SceneAction(
                     character_id=spk_2,
-                    action_type="point",
-                    gesture="cross_arms",
-                    facial_expression="angry",
+                    action_type="scold" if is_bus_scene else "explain",
+                    gesture="plead" if not is_bus_scene else "cross_arms",
+                    facial_expression="angry" if is_bus_scene else "fearful",
                     start_second=5.0,
                     end_second=10.0
                 )
@@ -106,7 +106,6 @@ class RangdiMarathiEngine:
         # -------------------------------------------------------------
         # SCENE 3: 10–15 sec - DEVELOPMENT (Create Intrigue)
         # -------------------------------------------------------------
-        # In bus scene, the Purple Hair Friend (stick_prof) in the bus doorway reassures Mother
         spk_3 = char2_id if is_bus_scene else char1_id
         spk_3_name = char2_name if is_bus_scene else char1_name
         scenes.append(ScriptScene(
@@ -114,14 +113,14 @@ class RangdiMarathiEngine:
             environment=env,
             start_second=10.0,
             end_second=15.0,
-            description="बसच्या दारात उभा गंप्या काकूंना धीर देतो.",
+            description="बसच्या दारात उभा गंप्या काकूंना धीर देतो." if is_bus_scene else "बब्या कंबरेवर हात ठेवून बोट दाखवून मित्राला खडसावतो.",
             camera_movement="STATIC",
             dialogues=[
                 DialogueLine(
                     speaker_id=spk_3,
                     speaker_name=spk_3_name,
                     text=scenario["intrigue"],
-                    emotion="excited",
+                    emotion="excited" if is_bus_scene else "angry",
                     start_second=10.2,
                     end_second=14.5
                 )
@@ -129,9 +128,9 @@ class RangdiMarathiEngine:
             actions=[
                 SceneAction(
                     character_id=spk_3,
-                    action_type="dance",
-                    gesture="wave",
-                    facial_expression="laughing",
+                    action_type="wave" if is_bus_scene else "scold",
+                    gesture="wave" if is_bus_scene else "point",
+                    facial_expression="laughing" if is_bus_scene else "angry",
                     start_second=10.0,
                     end_second=15.0
                 )
@@ -149,14 +148,14 @@ class RangdiMarathiEngine:
             environment=env,
             start_second=15.0,
             end_second=20.0,
-            description="आई डोळे मोठे करून धोक्याचा इशारा देते.",
+            description="आई डोळे मोठे करून धोक्याचा इशारा देते." if is_bus_scene else "गंप्या वेटरकडे बघून घाबरून बोट दाखवतो.",
             camera_movement="SHAKE",
             dialogues=[
                 DialogueLine(
                     speaker_id=spk_4,
                     speaker_name=spk_4_name,
                     text=scenario["twist"],
-                    emotion="suspicious",
+                    emotion="suspicious" if is_bus_scene else "fearful",
                     start_second=15.2,
                     end_second=19.5
                 )
@@ -164,9 +163,9 @@ class RangdiMarathiEngine:
             actions=[
                 SceneAction(
                     character_id=spk_4,
-                    action_type="point",
+                    action_type="point" if is_bus_scene else "shock",
                     gesture="point",
-                    facial_expression="angry",
+                    facial_expression="angry" if is_bus_scene else "shocked",
                     start_second=15.0,
                     end_second=20.0
                 )
@@ -177,21 +176,21 @@ class RangdiMarathiEngine:
         # -------------------------------------------------------------
         # SCENE 5: 20–25 sec - PAYOFF (Main Value Punchline)
         # -------------------------------------------------------------
-        spk_5 = char1_id if is_bus_scene else char2_id
-        spk_5_name = char1_name if is_bus_scene else char2_name
+        spk_5 = char1_id
+        spk_5_name = char1_name
         scenes.append(ScriptScene(
             scene_id=5,
             environment=env,
             start_second=20.0,
             end_second=25.0,
-            description="बब्या हसून खरा तोडगा सांगतो.",
+            description="बब्या हसून पोट धरतो आणि भन्नाट युक्ती सांगतो.",
             camera_movement="ZOOM_IN",
             dialogues=[
                 DialogueLine(
                     speaker_id=spk_5,
                     speaker_name=spk_5_name,
                     text=scenario["payoff"],
-                    emotion="confident",
+                    emotion="laughing",
                     start_second=20.2,
                     end_second=24.5
                 )
@@ -199,9 +198,9 @@ class RangdiMarathiEngine:
             actions=[
                 SceneAction(
                     character_id=spk_5,
-                    action_type="slapstick_react",
+                    action_type="laugh",
                     gesture="thumbs_up",
-                    facial_expression="confident",
+                    facial_expression="laughing",
                     start_second=20.0,
                     end_second=25.0
                 )
@@ -232,7 +231,7 @@ class RangdiMarathiEngine:
             actions=[
                 SceneAction(
                     character_id=char1_id,
-                    action_type="dance",
+                    action_type="wave",
                     gesture="wave",
                     facial_expression="laughing",
                     start_second=25.0,

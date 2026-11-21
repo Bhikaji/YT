@@ -396,26 +396,51 @@ class StickFigureRenderer:
             draw.rounded_rectangle([px - tw//2, ny + 4, px + tw//2, py + 10], radius=14, fill=(255, 255, 255), outline=col, width=3)
 
         # -------------------------------------------------------------
-        # 2. LEGS & SNEAKERS
+        # 2. LEGS & SNEAKERS (High-Contrast Outlines & Cartoon Shoes)
         # -------------------------------------------------------------
+        halo_width = th + 4
+        halo_color = (255, 255, 255)  # Crisp white rim outline separating characters from background
+
         if pk != "varhadi_mother":
+            # White halo underlay
+            draw.line([joints["pelvis"], joints["left_knee"]], fill=halo_color, width=halo_width)
+            draw.line([joints["left_knee"], joints["left_foot"]], fill=halo_color, width=halo_width)
+            draw.line([joints["pelvis"], joints["right_knee"]], fill=halo_color, width=halo_width)
+            draw.line([joints["right_knee"], joints["right_foot"]], fill=halo_color, width=halo_width)
+
+            # Core dark limb strokes
             draw.line([joints["pelvis"], joints["left_knee"]], fill=col, width=th)
             draw.line([joints["left_knee"], joints["left_foot"]], fill=col, width=th)
             draw.line([joints["pelvis"], joints["right_knee"]], fill=col, width=th)
             draw.line([joints["right_knee"], joints["right_foot"]], fill=col, width=th)
 
-            # Cartoon rounded shoes
-            for foot_key in ["left_foot", "right_foot"]:
-                fx, fy = joints[foot_key]
-                draw.ellipse([fx - 14, fy - 6, fx + 14, fy + 6], fill=col)
+            # High-top cartoon sneakers with white soles & laces
+            facing_dir = 1 if joints["head"][0] <= width / 2 else -1
+            shoe_col = (220, 38, 38) if hair == "spiky_orange" or pk == "varhadi_boy" else (79, 70, 229)
+            cls._draw_cartoon_sneaker(draw, joints["left_knee"], joints["left_foot"], facing_dir, shoe_col, col)
+            cls._draw_cartoon_sneaker(draw, joints["right_knee"], joints["right_foot"], facing_dir, shoe_col, col)
 
         # -------------------------------------------------------------
-        # 3. ARMS
+        # 3. ARMS & WHITE CARTOON GLOVES (Voice-Synchronized Gestures)
         # -------------------------------------------------------------
+        # White halo underlay
+        draw.line([joints["left_shoulder"], joints["left_elbow"]], fill=halo_color, width=halo_width)
+        draw.line([joints["left_elbow"], joints["left_hand"]], fill=halo_color, width=halo_width)
+        draw.line([joints["right_shoulder"], joints["right_elbow"]], fill=halo_color, width=halo_width)
+        draw.line([joints["right_elbow"], joints["right_hand"]], fill=halo_color, width=halo_width)
+
+        # Core dark arm strokes
         draw.line([joints["left_shoulder"], joints["left_elbow"]], fill=col, width=th)
         draw.line([joints["left_elbow"], joints["left_hand"]], fill=col, width=th)
         draw.line([joints["right_shoulder"], joints["right_elbow"]], fill=col, width=th)
         draw.line([joints["right_elbow"], joints["right_hand"]], fill=col, width=th)
+
+        # Dynamic cartoon white gloves with fingers / pointing / gesturing
+        facing_dir = 1 if joints["head"][0] <= width / 2 else -1
+        l_gest = getattr(pose, "left_hand_gesture", "relaxed")
+        r_gest = getattr(pose, "right_hand_gesture", "pointing")
+        cls._draw_cartoon_hand(draw, joints["left_elbow"], joints["left_hand"], l_gest, facing_dir, col)
+        cls._draw_cartoon_hand(draw, joints["right_elbow"], joints["right_hand"], r_gest, facing_dir, col)
 
         # -------------------------------------------------------------
         # 4. HEAD, HAIR & FACIAL FEATURES
@@ -495,23 +520,163 @@ class StickFigureRenderer:
             draw.line([(hx - 22, hy - 20), (hx - 6, hy - 20)], fill=col, width=3)
             draw.line([(hx + 6, hy - 20), (hx + 22, hy - 20)], fill=col, width=3)
 
-        # Mouth (Dynamic Lip-Sync)
+        # Mouth (Dynamic Multi-State Lip-Sync with Teeth & Tongue)
         mouth_info = cdata.get("mouth", {})
-        mw = mouth_info.get("width", 16)
-        mh = mouth_info.get("height", 4)
+        mw = mouth_info.get("width", 22)
+        mh = mouth_info.get("height", 14)
         m_open = mouth_info.get("open", False)
+        shape = mouth_info.get("shape", "oval_vertical")
         my = hy + 18
 
         if m_open and mh > 4:
-            draw.ellipse([hx - mw/2, my - mh/2, hx + mw/2, my + mh/2], fill=(220, 38, 38), outline=col, width=3)
-            draw.line([(hx - mw/3, my - mh/4), (hx + mw/3, my - mh/4)], fill=(255, 255, 255), width=2)
+            if expr_key in ["happy", "laughing", "confident"]:
+                # Big laughing mouth with upper teeth & pink tongue
+                lmw = max(28, mw)
+                lmh = max(20, mh)
+                draw.pieslice([hx - lmw/2, my - lmh/2, hx + lmw/2, my + lmh/2], 0, 180, fill=(136, 19, 55), outline=col, width=3)
+                # Upper teeth bar
+                draw.rectangle([hx - lmw/3, my - lmh/2, hx + lmw/3, my - lmh/2 + 6], fill=(255, 255, 255), outline=col, width=1)
+                # Pink tongue
+                draw.chord([hx - lmw/4, my + lmh/2 - 8, hx + lmw/4, my + lmh/2 + 2], 180, 360, fill=(251, 113, 133))
+            elif shape == "circle_pucker":
+                # 'O' / 'U' circular mouth
+                draw.ellipse([hx - mw/2, my - mh/2, hx + mw/2, my + mh/2], fill=(136, 19, 55), outline=col, width=3)
+                draw.ellipse([hx - mw/3, my + mh/4 - 4, hx + mw/3, my + mh/4 + 4], fill=(251, 113, 133))
+            elif shape == "wide_slit":
+                # 'E' smiling teeth
+                draw.rounded_rectangle([hx - mw/2, my - mh/2, hx + mw/2, my + mh/2], radius=4, fill=(136, 19, 55), outline=col, width=3)
+                draw.line([(hx - mw/2 + 3, my), (hx + mw/2 - 3, my)], fill=(255, 255, 255), width=3)
+            else:
+                # Standard open vowel ('A', 'I', talk)
+                draw.ellipse([hx - mw/2, my - mh/2, hx + mw/2, my + mh/2], fill=(136, 19, 55), outline=col, width=3)
+                draw.chord([hx - mw/2 + 2, my - mh/2, hx + mw/2 - 2, my - mh/2 + 7], 0, 180, fill=(255, 255, 255))
+                draw.chord([hx - mw/3, my + mh/2 - 7, hx + mw/3, my + mh/2], 180, 360, fill=(251, 113, 133))
         else:
             if expr_key in ["happy", "laughing", "confident"]:
                 draw.arc([hx - mw/2, my - 6, hx + mw/2, my + 6], 0, 180, fill=col, width=3)
-            elif expr_key in ["sad", "disappointed"]:
+                # Dimple creases
+                draw.line([(hx - mw/2 - 2, my - 2), (hx - mw/2 + 2, my + 2)], fill=col, width=2)
+                draw.line([(hx + mw/2 - 2, my + 2), (hx + mw/2 + 2, my - 2)], fill=col, width=2)
+            elif expr_key in ["sad", "disappointed", "angry"]:
                 draw.arc([hx - mw/2, my, hx + mw/2, my + 10], 180, 0, fill=col, width=3)
+            elif expr_key in ["shocked", "fearful"]:
+                draw.ellipse([hx - 6, my - 6, hx + 6, my + 6], fill=(136, 19, 55), outline=col, width=2)
             else:
-                draw.line([(hx - mw/2, my), (hx + mw/2, my)], fill=col, width=3)
+                draw.line([(hx - mw/2, my), (hx + mw/2, my - 2)], fill=col, width=3)
+
+    @classmethod
+    def _draw_cartoon_hand(
+        cls,
+        draw: ImageDraw.ImageDraw,
+        wrist: Tuple[float, float],
+        hand: Tuple[float, float],
+        gesture: str,
+        facing_dir: int,
+        col: Tuple[int, int, int]
+    ):
+        """Draws expressive 2D cartoon white gloves with articulated fingers."""
+        hx, hy = hand
+        wx, wy = wrist
+        dx = hx - wx
+        dy = hy - wy
+        dist = math.hypot(dx, dy) or 1.0
+        ux = dx / dist
+        uy = dy / dist
+        vx = -uy
+        vy = ux
+
+        glove_col = (255, 255, 255)
+
+        # 1. Wristband Cuff
+        cuff_cx = hx - ux * 4
+        cuff_cy = hy - uy * 4
+        cw = 11.0
+        ch = 5.0
+        cuff_pts = [
+            (cuff_cx + vx * cw - ux * ch, cuff_cy + vy * cw - uy * ch),
+            (cuff_cx - vx * cw - ux * ch, cuff_cy - vy * cw - uy * ch),
+            (cuff_cx - vx * cw + ux * ch, cuff_cy - vy * cw + uy * ch),
+            (cuff_cx + vx * cw + ux * ch, cuff_cy + vy * cw + uy * ch)
+        ]
+        draw.polygon(cuff_pts, fill=glove_col, outline=col, width=2)
+
+        # 2. Main Glove Palm
+        px = hx + ux * 8
+        py = hy + uy * 8
+        draw.ellipse([px - 13, py - 13, px + 13, py + 13], fill=glove_col, outline=col, width=3)
+        # Stitching lines on back of glove
+        draw.line([(px - vx * 4 - ux * 3, py - vy * 4 - uy * 3), (px - vx * 4 + ux * 2, py - vy * 4 + uy * 2)], fill=col, width=2)
+        draw.line([(px + vx * 4 - ux * 3, py + vy * 4 - uy * 3), (px + vx * 4 + ux * 2, py + vy * 4 + uy * 2)], fill=col, width=2)
+
+        # 3. Finger articulation based on gesture
+        if "point" in gesture:
+            # Extended pointing index finger
+            fx1 = px + ux * 2
+            fy1 = py + uy * 2
+            fx2 = px + ux * 22
+            fy2 = py + uy * 22
+            draw.line([(fx1, fy1), (fx2, fy2)], fill=glove_col, width=8)
+            draw.line([(fx1, fy1), (fx2, fy2)], fill=col, width=2)
+            # Folded thumb
+            draw.ellipse([px + vx * 8 * facing_dir - 4, py + vy * 8 * facing_dir - 4, px + vx * 8 * facing_dir + 4, py + vy * 8 * facing_dir + 4], fill=glove_col, outline=col, width=2)
+        elif "palm" in gesture or "explain" in gesture:
+            # 4 open spread cartoon fingers
+            for ang_offset in [-0.4, -0.15, 0.15, 0.4]:
+                cur_u = ux * math.cos(ang_offset) - uy * math.sin(ang_offset)
+                cur_v = ux * math.sin(ang_offset) + uy * math.cos(ang_offset)
+                fx = px + cur_u * 14
+                fy = py + cur_v * 14
+                draw.ellipse([fx - 4, fy - 4, fx + 4, fy + 4], fill=glove_col, outline=col, width=2)
+        elif "wave" in gesture:
+            # Waving fingers pointing up
+            for offset in [-7, -2, 3, 8]:
+                fx = px + vx * offset - ux * 3
+                fy = py + vy * offset - uy * 15
+                draw.ellipse([fx - 4, fy - 4, fx + 4, fy + 4], fill=glove_col, outline=col, width=2)
+        else:
+            # Clenched / relaxed knuckle bumps
+            for k in [-5, 0, 5]:
+                kx = px + ux * 9 + vx * k
+                ky = py + uy * 9 + vy * k
+                draw.ellipse([kx - 4, ky - 4, kx + 4, ky + 4], fill=glove_col, outline=col, width=2)
+
+    @classmethod
+    def _draw_cartoon_sneaker(
+        cls,
+        draw: ImageDraw.ImageDraw,
+        knee: Tuple[float, float],
+        foot: Tuple[float, float],
+        facing_dir: int,
+        shoe_col: Tuple[int, int, int],
+        col: Tuple[int, int, int]
+    ):
+        """Draws stylish 2D cartoon sneakers with white rubber soles and laces."""
+        fx, fy = foot
+        s_back = fx - 10 * facing_dir
+        s_front = fx + 24 * facing_dir
+        x_min = min(s_back, s_front)
+        x_max = max(s_back, s_front)
+
+        # 1. White Rubber Sole with Tread
+        draw.rounded_rectangle([x_min, fy + 2, x_max, fy + 9], radius=3, fill=(255, 255, 255), outline=col, width=2)
+        for tx in range(int(x_min) + 6, int(x_max) - 4, 8):
+            draw.line([(tx, fy + 7), (tx, fy + 9)], fill=col, width=1)
+
+        # 2. Sneaker Canvas Upper
+        draw.polygon([
+            (s_back, fy + 2),
+            (s_back + 4 * facing_dir, fy - 10),
+            (fx, fy - 12),
+            (s_front - 4 * facing_dir, fy - 4),
+            (s_front, fy + 2)
+        ], fill=shoe_col, outline=col, width=2)
+
+        # 3. White Rubber Toe Cap
+        draw.ellipse([s_front - 6, fy - 3, s_front + 6, fy + 3], fill=(255, 255, 255), outline=col, width=1)
+
+        # 4. White Laces
+        draw.line([(fx - 2 * facing_dir, fy - 8), (fx + 6 * facing_dir, fy - 8)], fill=(255, 255, 255), width=2)
+        draw.line([(fx, fy - 5), (fx + 8 * facing_dir, fy - 5)], fill=(255, 255, 255), width=2)
 
     @classmethod
     def _draw_subtitles(cls, draw: ImageDraw.ImageDraw, text: str, w: int, h: int):

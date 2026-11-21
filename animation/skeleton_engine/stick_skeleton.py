@@ -22,7 +22,9 @@ class StickSkeletonPose:
         left_hip_deg: float = 10.0,
         left_knee_deg: float = 5.0,
         right_hip_deg: float = -10.0,
-        right_knee_deg: float = 5.0
+        right_knee_deg: float = 5.0,
+        left_hand_gesture: str = "open",
+        right_hand_gesture: str = "open"
     ):
         self.root_x = root_x
         self.root_y = root_y
@@ -36,3 +38,5 @@ class StickSkeletonPose:
         self.left_knee = left_knee_deg
         self.right_hip = right_hip_deg
         self.right_knee = right_knee_deg
+        self.left_hand_gesture = left_hand_gesture
+        self.right_hand_gesture = right_hand_gesture
