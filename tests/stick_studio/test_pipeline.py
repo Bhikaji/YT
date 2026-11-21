@@ -275,5 +275,30 @@ class TestLipSyncAndSubtitleCleaner(unittest.TestCase):
         self.assertFalse(mouth_post["open"])
 
 
+class TestGavtiComedyAndVillageEnvironment(unittest.TestCase):
+    def test_gavti_comedy_catalog_integrity(self):
+        from intelligence.language_intelligence.gavti_comedy_catalog import GavtiComedyCatalog
+        sc = GavtiComedyCatalog.get_random_scenario()
+        self.assertIn("hook", sc)
+        self.assertIn("situation", sc)
+        self.assertIn("intrigue", sc)
+        self.assertIn("twist", sc)
+        self.assertIn("payoff", sc)
+        self.assertIn("cta", sc)
+        # Verify 100% pure Marathi comedy - no prompt labels
+        all_text = " ".join(sc[k] for k in ["hook", "situation", "intrigue", "twist", "payoff", "cta"])
+        for k in ["hook", "situation", "intrigue", "twist", "payoff", "cta"]:
+            text = sc[k]
+            self.assertNotIn("(Bob):", text)
+            self.assertNotIn("(Prof):", text)
+        self.assertTrue(any(w in all_text for w in ["गड्या", "बब्या", "लाईट", "पैसे", "चहा", "गुलाबजाम", "गाडी"]))
+
+    def test_village_katta_environment_rendering(self):
+        from animation.environment_engine.procedural_backgrounds import ProceduralBackgroundRenderer
+        img = ProceduralBackgroundRenderer.render_environment("village_katta", 540, 960)
+        self.assertIsInstance(img, Image.Image)
+        self.assertEqual(img.size, (540, 960))
+
+
 if __name__ == "__main__":
     unittest.main()

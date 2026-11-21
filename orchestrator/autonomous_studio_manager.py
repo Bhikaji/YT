@@ -1,4 +1,5 @@
 import os
+import math
 import asyncio
 import uuid
 import time
@@ -62,6 +63,16 @@ class AutonomousStickStudioManager:
                 "topic": forced_topic,
                 "category": category,
                 "volume_numeric": 350000,
+                "geo": geo
+            }
+        elif language_override == "mr_rangdi":
+            # For Rangdi Marathi, prioritize 100% relatable, non-educational everyday village comedy
+            from intelligence.language_intelligence.gavti_comedy_catalog import GavtiComedyCatalog
+            sc = GavtiComedyCatalog.get_random_scenario()
+            selected_trend = {
+                "topic": sc["title_marathi"],
+                "category": "comedy_entertainment",
+                "volume_numeric": 500000,
                 "geo": geo
             }
         else:
@@ -164,14 +175,20 @@ class AutonomousStickStudioManager:
         overlap_audit = DialogueScheduler.audit_zero_overlap(scheduled_dialogues)
         print(f"             Dialogue Schedule: {len(scheduled_dialogues)} lines, Zero Overlap Passed: {overlap_audit['passed']}")
 
-        # Synchronize exact scheduled timestamps back into script scenes for perfect lip-sync
-        sched_map = {f"{item['speaker_id']}_{item['text']}": item for item in scheduled_dialogues}
-        for s in script.scenes:
-            for d in s.dialogues:
-                k = f"{d.speaker_id}_{d.text}"
-                if k in sched_map:
-                    d.start_second = sched_map[k]["start_second"]
-                    d.end_second = sched_map[k]["end_second"]
+        # Dynamically fit the total short duration to ensure all dialogue lines finish with zero truncation
+        if scheduled_dialogues:
+            last_end = scheduled_dialogues[-1]["end_second"]
+            script.total_duration = max(30.0, float(math.ceil(last_end + 0.8)))
+
+        # Synchronize exact scheduled timestamps back into script scenes for perfect lip-sync & camera pacing
+        for idx, s in enumerate(script.scenes):
+            if idx < len(scheduled_dialogues):
+                item = scheduled_dialogues[idx]
+                s.start_second = 0.0 if idx == 0 else max(0.0, item["start_second"] - 0.15)
+                s.end_second = script.total_duration if idx == len(script.scenes) - 1 else item["end_second"] + 0.15
+                if s.dialogues:
+                    s.dialogues[0].start_second = item["start_second"]
+                    s.dialogues[0].end_second = item["end_second"]
 
         # Mix Soundtrack: Non-overlapping Dialogues + Ducked BGM + SFX
         sfx_cues = [
@@ -186,7 +203,7 @@ class AutonomousStickStudioManager:
             dialogue_clips=scheduled_dialogues,
             sfx_cues=sfx_cues,
             output_audio_path=master_audio_path,
-            total_duration=30.0
+            total_duration=script.total_duration
         )
 
         # Audio Quality Assurance Engine

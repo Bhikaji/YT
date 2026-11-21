@@ -107,12 +107,12 @@ class AnimationTimelineDirector:
                 facing_dir=coord[c2_id]["facing"]
             )
 
-            # Active Subtitle: CLEAN SPOKEN TEXT ONLY (Never show speaker prefixes like "(Bob):")
+            # Active Subtitle: CLEAN SPOKEN TEXT ONLY (Never show speaker prefixes like "(Bob):" or "[Prof]:")
             current_sub = ""
             for d in all_dialogues:
                 if d.get("start_second", 0.0) <= t_sec <= d.get("end_second", 0.0):
                     raw_text = d.get("text", "")
-                    clean_text = re.sub(r'^\s*\(?[A-Za-z0-9_\u0900-\u097F\s\.\-]+\)?\s*:\s*', '', raw_text)
+                    clean_text = re.sub(r'^\s*[\(\[]?[A-Za-z0-9_\u0900-\u097F\s\.\-]+[\)\]]?\s*:\s*', '', raw_text)
                     current_sub = clean_text.strip()
                     break
 

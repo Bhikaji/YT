@@ -322,6 +322,12 @@ class StickFigureRenderer:
     @classmethod
     def _draw_subtitles(cls, draw: ImageDraw.ImageDraw, text: str, w: int, h: int):
         """Draws high-contrast yellow/white viral Shorts subtitle banner supporting Marathi/Hindi/English."""
+        import re
+        # Ensure 100% pure spoken dialogue: remove any prompt, debug tags, or speaker prefixes (e.g. '(Bob):', 'Bob:', 'बब्या:')
+        clean_text = re.sub(r'^\s*[\(\[]?[A-Za-z0-9_\u0900-\u097F\s\.\-]+[\)\]]?\s*:\s*', '', text).strip()
+        if not clean_text:
+            return
+
         sy = 1660
         font = None
         font_paths = [
@@ -339,11 +345,11 @@ class StickFigureRenderer:
 
         # Text bounding box
         if font:
-            bbox = draw.textbbox((0, 0), text, font=font)
+            bbox = draw.textbbox((0, 0), clean_text, font=font)
             text_w = bbox[2] - bbox[0]
             text_h = bbox[3] - bbox[1]
         else:
-            text_w = min(w - 100, len(text) * 16)
+            text_w = min(w - 100, len(clean_text) * 16)
             text_h = 36
 
         pad_x, pad_y = 36, 18
@@ -359,7 +365,7 @@ class StickFigureRenderer:
         tx = w/2 - text_w/2
         ty = sy
         for ox, oy in [(-2, 0), (2, 0), (0, -2), (0, 2), (-1, -1), (1, 1)]:
-            draw.text((tx + ox, ty + oy), text, fill=(0, 0, 0), font=font)
+            draw.text((tx + ox, ty + oy), clean_text, fill=(0, 0, 0), font=font)
 
         # Main text in vibrant white
-        draw.text((tx, ty), text, fill=(255, 255, 255), font=font)
+        draw.text((tx, ty), clean_text, fill=(255, 255, 255), font=font)
