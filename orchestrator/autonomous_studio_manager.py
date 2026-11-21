@@ -45,7 +45,8 @@ class AutonomousStickStudioManager:
         forced_category: Optional[str] = None,
         forced_topic: Optional[str] = None,
         language_override: Optional[str] = "mr_rangdi",
-        privacy_status: str = "private"
+        privacy_status: str = "private",
+        video_format: str = "widescreen"
     ) -> Dict[str, Any]:
         job_id = str(uuid.uuid4())
         start_time = time.time()
@@ -216,17 +217,28 @@ class AutonomousStickStudioManager:
         # ---------------------------------------------------------
         # STAGE 9: Directorial Timeline Compilation
         # ---------------------------------------------------------
-        print("[Stage 9/14] Compiling 900-frame directorial timeline with synced lip-sync & listener reactions...")
+        if video_format == "vertical":
+            render_w, render_h = 1080, 1920
+        else:
+            render_w, render_h = 1280, 720
+
+        print(f"[Stage 9/14] Compiling directorial timeline with synced lip-sync ({render_w}x{render_h})...")
         timeline = AnimationTimelineDirector.compile_timeline(
             script=script,
             fps=30,
-            scheduled_dialogues=scheduled_dialogues
+            scheduled_dialogues=scheduled_dialogues,
+            width=render_w,
+            height=render_h
         )
 
         # ---------------------------------------------------------
-        # STAGE 10: 2D Video Rendering (High-Contrast Dual-Pass Outline)
+        # STAGE 10: 2D Video Rendering (Matching demo.mp4 Cartoon Rigging)
         # ---------------------------------------------------------
-        print("[Stage 10/14] Rendering high-contrast 2D frames (1080x1920 9:16 vertical)...")
+        if video_format == "vertical":
+            print(f"[Stage 10/14] Rendering high-contrast 2D frames (1080x1920 9:16 vertical)...")
+        else:
+            print(f"[Stage 10/14] Rendering 2D episodic cartoon frames (1280x720 16:9 widescreen)...")
+
         frames_dir = job_dir / "frames"
         frames_dir.mkdir(parents=True, exist_ok=True)
 
@@ -244,8 +256,8 @@ class AutonomousStickStudioManager:
                 frame_data=frame_state,
                 char1=char1,
                 char2=char2,
-                width=1080,
-                height=1920
+                width=render_w,
+                height=render_h
             )
             f_path = frames_dir / f"frame_{frame_counter:04d}.png"
             frame_img.save(f_path)

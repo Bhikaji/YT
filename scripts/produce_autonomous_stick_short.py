@@ -15,6 +15,7 @@ async def main():
     parser.add_argument("--category", type=str, default=None, help="Force a specific category (e.g. science_discovery, technology, comedy_entertainment)")
     parser.add_argument("--geo", type=str, default="IN", help="Target country code: IN, US, GB, CA, AU, WORLDWIDE")
     parser.add_argument("--language", type=str, default="mr_rangdi", choices=["mr_rangdi", "hi", "en"], help="Target language (Default: Priority 1 - Rangdi Marathi)")
+    parser.add_argument("--format", type=str, default="widescreen", choices=["widescreen", "vertical"], help="Video layout: widescreen (1280x720 like demo.mp4) or vertical (1080x1920)")
     parser.add_argument("--privacy", type=str, default="private", choices=["private", "unlisted", "public"], help="YouTube publishing visibility")
 
     args = parser.parse_args()
@@ -24,7 +25,8 @@ async def main():
         forced_category=args.category,
         forced_topic=args.topic,
         language_override=args.language,
-        privacy_status=args.privacy
+        privacy_status=args.privacy,
+        video_format=args.format
     )
 
     print("\n------------------ PRODUCTION SUMMARY ------------------")

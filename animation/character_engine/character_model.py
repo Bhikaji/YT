@@ -67,61 +67,65 @@ class StickFigureCharacter:
 
     @classmethod
     def get_canonical_library(cls) -> Dict[str, "StickFigureCharacter"]:
-        """Canonical cast of iconic, visually distinct stick-figure characters."""
+        """Canonical cast of iconic, visually distinct cartoon characters matching demo.mp4."""
         return {
+            # 1. Main Boy ("बब्या") - Orange Spiky Hair, Red & White Striped Pill Torso
             "stick_bob": cls(
                 character_id="stick_bob",
-                name="Bob",
-                personality_key="funny",
-                voice_id="en-US-GuyNeural",
+                name="बब्या",
+                personality_key="varhadi_boy",
+                voice_id="mr-IN-ManoharNeural",
                 line_color="#0f172a",
-                line_thickness=11,
-                head_radius=42,
-                accessory="red_tie",
-                hair_style="tuft",
-                shirt_color="#ffffff",
-                shoe_color="#ffffff",
+                line_thickness=8,
+                head_radius=40,
+                accessory=None,
+                hair_style="spiky_orange",
+                shirt_color="#dc2626",
+                shoe_color="#0f172a",
                 glove_color="#ffffff"
             ),
+            # 2. Sidekick Friend ("गंप्या") - Purple Swept Hair, Pure White Pill Torso
             "stick_prof": cls(
                 character_id="stick_prof",
-                name="Prof. Pixel",
-                personality_key="scientist",
-                voice_id="en-US-ChristopherNeural",
+                name="गंप्या",
+                personality_key="varhadi_friend",
+                voice_id="mr-IN-ManoharNeural",
                 line_color="#0f172a",
-                line_thickness=11,
-                head_radius=42,
-                accessory="glasses",
-                hair_style="spiky",
+                line_thickness=8,
+                head_radius=40,
+                accessory=None,
+                hair_style="purple_swept",
                 shirt_color="#ffffff",
-                shoe_color="#ffffff",
+                shoe_color="#0f172a",
                 glove_color="#ffffff"
             ),
-            "stick_sam": cls(
-                character_id="stick_sam",
-                name="Sam",
-                personality_key="techie",
-                voice_id="en-US-EricNeural",
+            # 3. Mother ("आई / काकू") - Traditional Brown Bun, Red Bindi, Royal Blue Saree & Violet Blouse
+            "varhadi_mother": cls(
+                character_id="varhadi_mother",
+                name="आई",
+                personality_key="varhadi_mother",
+                voice_id="mr-IN-AarohiNeural",
                 line_color="#0f172a",
-                line_thickness=11,
-                head_radius=42,
+                line_thickness=8,
+                head_radius=38,
+                accessory="red_bindi",
+                hair_style="brown_bun",
+                shirt_color="#1d4ed8",
+                shoe_color="#0f172a",
+                glove_color="#ffffff"
+            ),
+            # 4. Uncle / Father ("काका") - Half Bald, Dark Sunglasses, Vest Jacket
+            "varhadi_uncle": cls(
+                character_id="varhadi_uncle",
+                name="काका",
+                personality_key="varhadi_uncle",
+                voice_id="mr-IN-ManoharNeural",
+                line_color="#0f172a",
+                line_thickness=8,
+                head_radius=40,
                 accessory="sunglasses",
-                hair_style="spiky",
-                shirt_color="#0ea5e9",
-                shoe_color="#ffffff",
-                glove_color="#ffffff"
-            ),
-            "stick_alex": cls(
-                character_id="stick_alex",
-                name="Alex",
-                personality_key="intelligent",
-                voice_id="en-US-JennyNeural",
-                line_color="#0f172a",
-                line_thickness=11,
-                head_radius=42,
-                accessory="blue_tie",
-                hair_style="curly",
-                shirt_color="#a855f7",
+                hair_style="half_bald",
+                shirt_color="#1e293b",
                 shoe_color="#ffffff",
                 glove_color="#ffffff"
             )

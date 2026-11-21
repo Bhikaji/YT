@@ -17,10 +17,16 @@ class RealisticHumanVoiceEngine:
     """
 
     CHARACTER_VOICE_MAP = {
-        # Priority 1: Rangdi Marathi - Warm, Organic Human Maharashtrian Voices
+        # Priority 1: Varhadi & Rangdi Marathi - Matching demo.mp4 Character Personalities
         "mr_rangdi": {
-            "stick_bob": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+3%", "base_pitch": "+1Hz"},
-            "stick_prof": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "-3Hz"},
+            # Bob (बब्या - Whiny energetic comedy boy)
+            "stick_bob": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+6%", "base_pitch": "+4Hz"},
+            # Gampya (गंप्या - Sarcastic, mischievous teen friend)
+            "stick_prof": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+2%", "base_pitch": "-2Hz"},
+            # Mother (आई - Fast, scolding, high-energy Maharashtrian mother in saree)
+            "varhadi_mother": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "+10%", "base_pitch": "+5Hz"},
+            # Uncle (काका - Mature, dry village elder)
+            "varhadi_uncle": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "-1%", "base_pitch": "-4Hz"},
             "stick_sam": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+2%", "base_pitch": "+0Hz"},
             "stick_alex": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "+0%", "base_pitch": "+0Hz"}
         },

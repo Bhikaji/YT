@@ -3,251 +3,259 @@ import math
 
 class ProceduralBackgroundRenderer:
     """
-    Renders clean, vibrant 2D vector-style backgrounds for vertical (1080x1920) Shorts.
-    Supports authentic Village Katta (गावचा कट्टा / चावडी), science lab, modern office,
-    classroom, tech showroom, space station, and retail shop.
+    Renders clean, vibrant 2D vector-style backgrounds for both 16:9 widescreen and 9:16 vertical episodes.
+    Matches demo.mp4 aesthetic:
+    - MSRTC Red ST Bus Stand (लालपरी एसटी बस स्थानक)
+    - Night Terrace with Giant Ferris Wheel (रात्रीची हॉटेल गॅलरी व आकाशपाळणा)
+    - School / College Corridor (शाळा/कॉलेजचा कॉरिडॉर)
+    - Village Katta (गावाकडचा कट्टा / पार / चावडी)
     Guarantees ZERO English prompt leaks or text in any environment.
     """
 
     @classmethod
-    def render_environment(cls, env_type: str, width: int = 1080, height: int = 1920, t_sec: float = 0.0) -> Image.Image:
+    def render_environment(cls, env_type: str, width: int = 1280, height: int = 720, t_sec: float = 0.0) -> Image.Image:
         img = Image.new("RGBA", (width, height), (248, 250, 252, 255))
         draw = ImageDraw.Draw(img)
 
         env = env_type.lower()
-        if any(k in env for k in ["village", "katta", "chawadi", "rural", "gav", "outdoor", "park"]):
+        if any(k in env for k in ["bus", "msrtc", "lalpari", "station"]):
+            cls._draw_msrtc_bus_stand(draw, width, height, t_sec)
+        elif any(k in env for k in ["terrace", "restaurant", "ferris", "night", "hotel"]):
+            cls._draw_night_terrace_ferris_wheel(draw, width, height, t_sec)
+        elif any(k in env for k in ["college", "school", "corridor", "hallway", "class"]):
+            cls._draw_college_corridor(draw, width, height, t_sec)
+        elif any(k in env for k in ["village", "katta", "chawadi", "rural", "gav", "outdoor"]):
             cls._draw_village_katta(draw, width, height, t_sec)
-        elif "lab" in env:
-            cls._draw_science_lab(draw, width, height, t_sec)
-        elif "office" in env:
-            cls._draw_modern_office(draw, width, height, t_sec)
-        elif "class" in env:
-            cls._draw_classroom(draw, width, height, t_sec)
-        elif "tech" in env or "gadget" in env:
-            cls._draw_tech_showroom(draw, width, height, t_sec)
-        elif "space" in env:
-            cls._draw_space_station(draw, width, height, t_sec)
-        elif "shop" in env or "retail" in env or "mall" in env:
-            cls._draw_retail_shop(draw, width, height, t_sec)
         else:
-            cls._draw_village_katta(draw, width, height, t_sec)
+            cls._draw_msrtc_bus_stand(draw, width, height, t_sec)
 
         return img
 
     @classmethod
+    def _draw_msrtc_bus_stand(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
+        """
+        Iconic Maharashtrian MSRTC Red ST Bus Stand (लालपरी एसटी बस स्थानक).
+        Features the red-and-white ST bus parked with open folding passenger door,
+        trees, terminal concrete pavement, and green grass patches.
+        """
+        horizon_y = int(h * 0.45)
+        ground_y = int(h * 0.62)
+
+        # 1. Sky Gradient (Bright sunny daytime)
+        for y in range(0, horizon_y, 4):
+            r = int(190 + (240 - 190) * (y / horizon_y))
+            g = int(225 + (248 - 225) * (y / horizon_y))
+            b = int(255)
+            draw.line([(0, y), (w, y)], fill=(r, g, b), width=4)
+
+        # Fluffy white clouds
+        draw.ellipse([int(w * 0.35), int(h * 0.08), int(w * 0.52), int(h * 0.22)], fill=(255, 255, 255, 230))
+        draw.ellipse([int(w * 0.40), int(h * 0.04), int(w * 0.48), int(h * 0.18)], fill=(255, 255, 255, 240))
+
+        # 2. Lush green trees in background
+        draw.ellipse([-50, horizon_y - 120, int(w * 0.35), horizon_y + 40], fill=(74, 107, 70), outline=(50, 80, 50), width=3)
+        draw.ellipse([int(w * 0.2), horizon_y - 140, int(w * 0.5), horizon_y + 40], fill=(90, 125, 80), outline=(50, 80, 50), width=3)
+
+        # 3. Ground / Concrete Bus Terminal Pavement
+        draw.rectangle([0, ground_y, w, h], fill=(215, 212, 204))
+        # Concrete slabs & perspective lines
+        for y_l in range(ground_y, h, 65):
+            draw.line([(0, y_l), (w, y_l)], fill=(185, 180, 170), width=2)
+
+        # Green Grass Patch along pavement
+        draw.polygon([(0, ground_y), (int(w * 0.45), ground_y), (int(w * 0.35), h), (0, h)], fill=(120, 160, 95))
+        for gx in range(20, int(w * 0.4), 25):
+            draw.line([(gx, ground_y + 30), (gx - 5, ground_y + 10)], fill=(75, 115, 55), width=3)
+            draw.line([(gx, ground_y + 30), (gx + 6, ground_y + 8)], fill=(75, 115, 55), width=3)
+
+        # 4. Bus Stand Platform Pillar / Monument on far left
+        draw.rectangle([0, int(h * 0.25), int(w * 0.14), ground_y + 50], fill=(230, 228, 222), outline=(150, 145, 138), width=3)
+        draw.rectangle([int(w * 0.02), int(h * 0.48), int(w * 0.12), int(h * 0.58)], fill=(200, 196, 188), outline=(150, 145, 138), width=2)
+        for ly in range(int(h * 0.50), int(h * 0.57), 8):
+            draw.line([(int(w * 0.03), ly), (int(w * 0.11), ly)], fill=(120, 115, 108), width=2)
+
+        # 5. ICONIC MSRTC RED ST BUS (लालपरी बस)
+        # Positioned parked from x ~ 0.38 to beyond right border
+        bus_x1 = int(w * 0.36)
+        bus_x2 = w + 40
+        bus_top = int(h * 0.16)
+        bus_bottom = int(h * 0.56)
+
+        # Bus Body (Classic Maharashtra Red / Vermilion)
+        draw.rounded_rectangle([bus_x1, bus_top, bus_x2, bus_bottom], radius=24, fill=(217, 70, 38), outline=(138, 35, 15), width=5)
+
+        # Bus Cream Middle Belt Stripe
+        draw.rectangle([bus_x1 + 4, bus_top + 160, bus_x2, bus_top + 205], fill=(254, 243, 199), outline=(180, 83, 9), width=2)
+
+        # Bus Roof Accent / Luggage Carrier Rail
+        draw.line([(bus_x1 + 30, bus_top - 6), (bus_x2, bus_top - 6)], fill=(180, 83, 9), width=4)
+        for rx in range(bus_x1 + 40, bus_x2, 50):
+            draw.line([(rx, bus_top - 6), (rx, bus_top)], fill=(180, 83, 9), width=3)
+
+        # Bus Big Tinted Windows (Dark glass with subtle reflections)
+        win_top = bus_top + 45
+        win_bot = bus_top + 155
+        for wx in range(bus_x1 + 25, bus_x2 - 120, 130):
+            draw.rounded_rectangle([wx, win_top, wx + 115, win_bot], radius=8, fill=(40, 50, 60, 240), outline=(20, 25, 30), width=3)
+            # Seat silhouettes inside window
+            draw.rounded_rectangle([wx + 15, win_bot - 45, wx + 50, win_bot - 5], radius=4, fill=(80, 90, 100))
+            draw.rounded_rectangle([wx + 65, win_bot - 45, wx + 100, win_bot - 5], radius=4, fill=(80, 90, 100))
+            # Glass glare line
+            draw.line([(wx + 10, win_top + 10), (wx + 35, win_bot - 10)], fill=(255, 255, 255, 120), width=2)
+
+        # Front Windshield Glass
+        draw.rounded_rectangle([bus_x2 - 100, win_top - 10, bus_x2, win_bot + 15], radius=10, fill=(30, 40, 50), outline=(15, 20, 25), width=3)
+
+        # OPEN PASSENGER FOLDING DOOR (Entrance where conductor stands)
+        door_x1 = int(w * 0.72)
+        door_x2 = int(w * 0.84)
+        draw.rectangle([door_x1, bus_top + 30, door_x2, bus_bottom + 15], fill=(25, 30, 35), outline=(138, 35, 15), width=4)
+        # Bus interior steps
+        draw.rectangle([door_x1 + 5, bus_bottom - 20, door_x2 - 5, bus_bottom + 10], fill=(71, 85, 105), outline=(15, 23, 42), width=2)
+        # Open door leaf swung outward
+        draw.polygon([(door_x1 - 10, bus_top + 35), (door_x1 + 8, bus_top + 25), (door_x1 + 8, bus_bottom + 10), (door_x1 - 10, bus_bottom + 15)], fill=(217, 70, 38), outline=(15, 23, 42), width=3)
+        draw.rectangle([door_x1 - 6, bus_top + 55, door_x1 + 4, bus_top + 130], fill=(148, 163, 184, 180), outline=(15, 23, 42), width=2)
+
+        # Heavy Black Bus Wheels / Tires
+        for wx in [int(w * 0.46), int(w * 0.94)]:
+            draw.ellipse([wx - 48, bus_bottom - 25, wx + 48, bus_bottom + 75], fill=(20, 24, 30), outline=(10, 12, 16), width=4)
+            # Silver Rim
+            draw.ellipse([wx - 26, bus_bottom - 2, wx + 26, bus_bottom + 52], fill=(148, 163, 184), outline=(100, 116, 139), width=3)
+            draw.ellipse([wx - 10, bus_bottom + 14, wx + 10, bus_bottom + 34], fill=(30, 41, 59))
+
+    @classmethod
+    def _draw_night_terrace_ferris_wheel(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
+        """
+        Nighttime Terrace Restaurant overlooking illuminated Giant Ferris Wheel.
+        """
+        # 1. Dark Blue Night Sky
+        for y in range(0, int(h * 0.65), 4):
+            draw.line([(0, y), (w, y)], fill=(10, 15, 30 + int(20 * (y / h))), width=4)
+
+        # Twinkling Stars
+        for i in range(45):
+            sx = (i * 97) % w
+            sy = (i * 131) % int(h * 0.5)
+            draw.rectangle([sx, sy, sx + 2, sy + 2], fill=(255, 255, 255))
+
+        # 2. Illuminated Giant Ferris Wheel (आकाशपाळणा)
+        fw_cx = int(w * 0.75)
+        fw_cy = int(h * 0.32)
+        fw_r = int(h * 0.36)
+
+        # Ferris Wheel Support Legs
+        draw.line([(fw_cx, fw_cy), (fw_cx - 120, int(h * 0.70))], fill=(100, 116, 139), width=8)
+        draw.line([(fw_cx, fw_cy), (fw_cx + 120, int(h * 0.70))], fill=(100, 116, 139), width=8)
+
+        # Concentric Light Rings
+        draw.ellipse([fw_cx - fw_r, fw_cy - fw_r, fw_cx + fw_r, fw_cy + fw_r], outline=(56, 189, 248), width=5)
+        draw.ellipse([fw_cx - fw_r + 25, fw_cy - fw_r + 25, fw_cx + fw_r - 25, fw_cy + fw_r - 25], outline=(147, 51, 234), width=3)
+        draw.ellipse([fw_cx - 20, fw_cy - 20, fw_cx + 20, fw_cy + 20], fill=(255, 255, 255))
+
+        # Spokes & Cabins
+        num_spokes = 16
+        rot_ang = t_sec * 0.2
+        for s in range(num_spokes):
+            ang = rot_ang + s * (2 * math.pi / num_spokes)
+            ex = fw_cx + int(fw_r * math.cos(ang))
+            ey = fw_cy + int(fw_r * math.sin(ang))
+            draw.line([(fw_cx, fw_cy), (ex, ey)], fill=(186, 230, 253, 140), width=2)
+            # Illuminated Passenger Gondola / Cabin
+            draw.rounded_rectangle([ex - 12, ey - 8, ex + 12, ey + 14], radius=4, fill=(244, 114, 182), outline=(255, 255, 255), width=2)
+
+        # 3. Terrace Restaurant Wooden Flooring
+        floor_y = int(h * 0.65)
+        draw.rectangle([0, floor_y, w, h], fill=(160, 82, 45))
+        for fy in range(floor_y, h, 35):
+            draw.line([(0, fy), (w, fy)], fill=(120, 53, 15), width=2)
+
+        # Terrace Balustrade / Railing
+        rail_y = floor_y - 80
+        draw.line([(0, rail_y), (w, rail_y)], fill=(226, 232, 240), width=6)
+        draw.line([(0, floor_y), (w, floor_y)], fill=(203, 213, 225), width=4)
+        for rx in range(0, w, 40):
+            draw.line([(rx, rail_y), (rx, floor_y)], fill=(203, 213, 225), width=4)
+
+        # 4. Center Dining Table with Tablecloth & Chairs
+        tbl_x = int(w * 0.52)
+        tbl_y = floor_y + 10
+        # Round Table Base
+        draw.ellipse([tbl_x - 140, tbl_y - 45, tbl_x + 140, tbl_y + 45], fill=(244, 215, 230), outline=(219, 150, 190), width=3)
+        # Hanging tablecloth skirt
+        draw.polygon([
+            (tbl_x - 138, tbl_y), (tbl_x + 138, tbl_y),
+            (tbl_x + 115, tbl_y + 120), (tbl_x - 115, tbl_y + 120)
+        ], fill=(253, 232, 240), outline=(219, 150, 190), width=3)
+        # Table pedestal base
+        draw.rectangle([tbl_x - 15, tbl_y + 120, tbl_x + 15, tbl_y + 160], fill=(30, 41, 59))
+        draw.ellipse([tbl_x - 45, tbl_y + 150, tbl_x + 45, tbl_y + 175], fill=(15, 23, 42))
+
+        # Potted Flower Bush on Terrace
+        draw.ellipse([int(w * 0.08) - 45, floor_y - 20, int(w * 0.08) + 45, floor_y + 60], fill=(34, 197, 94), outline=(21, 128, 61), width=3)
+        draw.polygon([(int(w * 0.08) - 30, floor_y + 40), (int(w * 0.08) + 30, floor_y + 40), (int(w * 0.08) + 20, floor_y + 120), (int(w * 0.08) - 20, floor_y + 120)], fill=(180, 83, 9))
+
+    @classmethod
+    def _draw_college_corridor(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
+        """
+        School / College Hallway with Classroom Doors and Polished Corridor.
+        """
+        floor_y = int(h * 0.64)
+
+        # Upper Wall: Warm Cream / Golden Yellow
+        draw.rectangle([0, 0, w, floor_y], fill=(254, 240, 138))
+
+        # Lower Wall Runner
+        draw.rectangle([0, floor_y - 80, w, floor_y], fill=(251, 191, 36), outline=(217, 119, 6), width=3)
+
+        # Polished Cyan / Blue Floor with Reflections
+        draw.rectangle([0, floor_y, w, h], fill=(125, 211, 252))
+        for x in range(0, w, 140):
+            draw.line([(x, floor_y), (int((x - w/2) * 2.2 + w/2), h)], fill=(56, 189, 248), width=2)
+
+        # Bright Red Classroom Doors
+        for dx in [int(w * 0.12), int(w * 0.58)]:
+            draw.rectangle([dx, int(h * 0.18), dx + 140, floor_y], fill=(220, 38, 38), outline=(153, 27, 27), width=4)
+            # Door Glass Window
+            draw.rectangle([dx + 30, int(h * 0.24), dx + 110, int(h * 0.38)], fill=(241, 245, 249), outline=(100, 116, 139), width=3)
+            # Door Silver Handle
+            draw.rectangle([dx + 12, int(h * 0.44), dx + 24, int(h * 0.48)], fill=(226, 232, 240), outline=(100, 116, 139), width=2)
+
+        # Notice Board between doors
+        nb_x = int(w * 0.35)
+        draw.rectangle([nb_x, int(h * 0.22), nb_x + 160, int(h * 0.45)], fill=(120, 53, 15), outline=(69, 26, 3), width=4)
+        draw.rectangle([nb_x + 15, int(h * 0.25), nb_x + 75, int(h * 0.35)], fill=(255, 255, 255))
+        draw.rectangle([nb_x + 85, int(h * 0.26), nb_x + 145, int(h * 0.38)], fill=(254, 243, 199))
+
+    @classmethod
     def _draw_village_katta(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
         """
-        Vibrant, authentic Maharashtrian Village Square (गावाकडचा पार / कट्टा / चावडी).
-        Features sunny sky, banyan/neem tree shade, rustic stone sitting deck, cutting chai glasses.
+        Vibrant Maharashtrian Village Square (गावाकडचा पार / कट्टा / चावडी).
         """
-        # 1. Warm Daytime Sky Gradient
-        horizon_y = int(h * 0.64)
+        horizon_y = int(h * 0.52)
+        ground_y = int(h * 0.64)
+
+        # Sky Gradient
         for y in range(0, horizon_y, 4):
             r = int(186 + (240 - 186) * (y / horizon_y))
             g = int(230 + (249 - 230) * (y / horizon_y))
-            b = int(253 + (255 - 253) * (y / horizon_y))
+            b = 255
             draw.line([(0, y), (w, y)], fill=(r, g, b), width=4)
 
-        # 2. Warm Village Sun with Soft Glow
-        sun_cx, sun_cy = int(w * 0.82), int(h * 0.16)
-        draw.ellipse([sun_cx - 90, sun_cy - 90, sun_cx + 90, sun_cy + 90], fill=(254, 240, 138, 90))
-        draw.ellipse([sun_cx - 65, sun_cy - 65, sun_cx + 65, sun_cy + 65], fill=(253, 224, 71, 150))
-        draw.ellipse([sun_cx - 45, sun_cy - 45, sun_cx + 45, sun_cy + 45], fill=(251, 191, 36))
+        # Village Sun
+        draw.ellipse([int(w * 0.82) - 45, int(h * 0.16) - 45, int(w * 0.82) + 45, int(h * 0.16) + 45], fill=(251, 191, 36))
 
-        # Fluffy Cartoon Clouds
-        for cx, cy in [(int(w * 0.22), int(h * 0.14)), (int(w * 0.55), int(h * 0.22))]:
-            draw.ellipse([cx - 70, cy - 25, cx + 70, cy + 25], fill=(255, 255, 255, 230))
-            draw.ellipse([cx - 40, cy - 45, cx + 25, cy + 20], fill=(255, 255, 255, 240))
-            draw.ellipse([cx - 10, cy - 35, cx + 55, cy + 20], fill=(255, 255, 255, 240))
+        # Distant Sahyadri Hills
+        draw.polygon([(0, horizon_y), (int(w*0.3), int(horizon_y*0.85)), (int(w*0.7), int(horizon_y*0.9)), (w, horizon_y)], fill=(187, 215, 172))
 
-        # 3. Distant Rolling Green Sahyadri Hills Silhouette
-        hill_points = [
-            (0, horizon_y),
-            (int(w * 0.25), int(horizon_y * 0.88)),
-            (int(w * 0.55), int(horizon_y * 0.94)),
-            (int(w * 0.85), int(horizon_y * 0.85)),
-            (w, horizon_y)
-        ]
-        draw.polygon(hill_points, fill=(187, 215, 172))
-        draw.line([(0, horizon_y), (w, horizon_y)], fill=(163, 190, 140), width=3)
-
-        # 4. Warm Rustic Village Soil Ground
-        ground_y = horizon_y
+        # Earthen Ground
         draw.rectangle([0, ground_y, w, h], fill=(245, 236, 215))
 
-        # Ground texture paths
-        draw.line([(0, ground_y + 120), (w, ground_y + 80)], fill=(234, 216, 185), width=6)
-        draw.line([(0, ground_y + 280), (w, ground_y + 320)], fill=(234, 216, 185), width=8)
+        # Raised Stone Katta
+        katta_top = int(h * 0.60)
+        draw.rectangle([int(w * 0.05), katta_top, int(w * 0.95), h], fill=(226, 232, 240), outline=(148, 163, 184), width=4)
+        for sy in range(katta_top + 45, h, 45):
+            draw.line([(int(w * 0.05), sy), (int(w * 0.95), sy)], fill=(148, 163, 184), width=2)
 
-        # 5. Raised Village Stone Platform (चावडीचा कट्टा / पार)
-        # Characters stand at y=1380 with feet at y=1535.
-        katta_top = 1260
-        katta_bot = 1680
-        draw.rectangle([int(w * 0.05), katta_top, int(w * 0.95), katta_bot], fill=(226, 232, 240), outline=(148, 163, 184), width=5)
-
-        # Stone slab top coping (smooth sitting ledge)
-        draw.rectangle([int(w * 0.03), katta_top - 20, int(w * 0.97), katta_top], fill=(203, 213, 225), outline=(100, 116, 139), width=4)
-
-        # Rustic stone masonry courses
-        for sy in range(katta_top + 70, katta_bot, 70):
-            draw.line([(int(w * 0.05), sy), (int(w * 0.95), sy)], fill=(148, 163, 184), width=3)
-            # Staggered vertical stone joints
-            offset = 40 if (sy // 70) % 2 == 0 else 0
-            for sx in range(int(w * 0.1) + offset, int(w * 0.9), 110):
-                draw.line([(sx, sy - 70), (sx, sy)], fill=(148, 163, 184), width=2)
-
-        # 6. Majestic Village Banyan Tree (डावीकडचा वड / पिंपळ)
-        # Strong rustic brown trunk on the left border
-        draw.polygon([
-            (-40, katta_top), (140, katta_top),
-            (90, 0), (-40, 0)
-        ], fill=(120, 80, 50), outline=(85, 55, 30), width=5)
-
-        # Sprawling green canopy branches spreading across top
-        draw.ellipse([-80, -60, 480, 280], fill=(34, 197, 94, 245), outline=(22, 163, 74), width=6)
-        draw.ellipse([260, -40, 720, 220], fill=(22, 163, 74, 235), outline=(21, 128, 61), width=5)
-        draw.ellipse([540, -50, 1050, 200], fill=(34, 197, 94, 235), outline=(22, 163, 74), width=5)
-        draw.ellipse([820, -40, 1160, 240], fill=(22, 163, 74, 245), outline=(21, 128, 61), width=6)
-
-        # Hanging aerial roots (वडाच्या पारंब्या)
-        for rx, r_len in [(180, 220), (320, 180), (460, 140)]:
-            draw.line([(rx, 140), (rx + 10, 140 + r_len)], fill=(101, 67, 33), width=4)
-
-        # 7. Tea Kettle & Glasses on Katta Edge (गावातली चहाची किटली)
-        bench_x = int(w * 0.12)
-        bench_y = katta_top - 20
-        # Copper Kettle
-        draw.polygon([(bench_x, bench_y), (bench_x + 50, bench_y), (bench_x + 40, bench_y - 60), (bench_x + 10, bench_y - 60)], fill=(217, 119, 6), outline=(180, 83, 9), width=3)
-        draw.ellipse([bench_x + 10, bench_y - 70, bench_x + 40, bench_y - 50], fill=(245, 158, 11), outline=(180, 83, 9), width=2)
-        # Cutting chai glass
-        draw.polygon([(bench_x + 65, bench_y), (bench_x + 85, bench_y), (bench_x + 90, bench_y - 35), (bench_x + 60, bench_y - 35)], fill=(254, 243, 199), outline=(100, 116, 139), width=2)
-        draw.rectangle([bench_x + 63, bench_y - 25, bench_x + 87, bench_y - 5], fill=(217, 119, 6))
-
-    @classmethod
-    def _draw_science_lab(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
-        floor_y = int(h * 0.68)
-        table_y = int(h * 0.60)
-        draw.rectangle([0, 0, w, floor_y], fill=(230, 245, 248))
-        draw.rectangle([0, floor_y, w, h], fill=(203, 213, 225))
-        for y in range(floor_y, h, 60):
-            draw.line([(0, y), (w, y)], fill=(148, 163, 184), width=2)
-        for x in range(0, w, 120):
-            draw.line([(x, floor_y), (x, h)], fill=(148, 163, 184), width=2)
-
-        wb_top = int(h * 0.13)
-        wb_bot = int(h * 0.36)
-        draw.rectangle([int(w*0.15), wb_top, int(w*0.85), wb_bot], fill=(255, 255, 255), outline=(100, 116, 139), width=5)
-        # Graphical atom icon on board instead of text
-        acx, acy = int(w * 0.5), (wb_top + wb_bot) // 2
-        draw.ellipse([acx - 60, acy - 25, acx + 60, acy + 25], outline=(14, 165, 233), width=3)
-        draw.ellipse([acx - 25, acy - 60, acx + 25, acy + 60], outline=(16, 185, 129), width=3)
-        draw.ellipse([acx - 14, acy - 14, acx + 14, acy + 14], fill=(239, 68, 68))
-
-        draw.rectangle([int(w*0.08), table_y, int(w*0.92), floor_y + 20], fill=(71, 85, 105))
-        draw.rectangle([int(w*0.06), table_y - 20, int(w*0.94), table_y], fill=(15, 23, 42))
-
-        bubble_y = math.sin(t_sec * 5.0) * 8.0
-        flask_x = int(w * 0.2)
-        draw.polygon([(flask_x, table_y), (flask_x+60, table_y), (flask_x+40, table_y-80), (flask_x+20, table_y-80)], fill=(56, 189, 248, 180), outline=(14, 165, 233), width=3)
-        draw.ellipse([flask_x+5, table_y-50, flask_x+55, table_y], fill=(16, 185, 129, 200))
-        draw.ellipse([flask_x+25, table_y-60 + bubble_y, flask_x+35, table_y-50 + bubble_y], fill=(255, 255, 255))
-
-        mic_x = int(w * 0.78)
-        draw.rectangle([mic_x+20, table_y-70, mic_x+40, table_y], fill=(30, 41, 59))
-        draw.ellipse([mic_x, table_y-100, mic_x+60, table_y-60], fill=(15, 23, 42))
-        draw.rectangle([mic_x-10, table_y-5, mic_x+70, table_y+5], fill=(100, 116, 139))
-
-    @classmethod
-    def _draw_modern_office(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
-        floor_y = int(h * 0.68)
-        draw.rectangle([0, 0, w, floor_y], fill=(241, 245, 249))
-        draw.rectangle([0, floor_y, w, h], fill=(226, 232, 240))
-        draw.line([(0, floor_y), (w, floor_y)], fill=(148, 163, 184), width=4)
-
-        wb_top = int(h * 0.12)
-        wb_bot = int(h * 0.35)
-        draw.rectangle([int(w*0.13), wb_top, int(w*0.87), wb_bot], fill=(255, 255, 255), outline=(100, 116, 139), width=6)
-        points = [
-            (int(w*0.2), wb_bot - 40),
-            (int(w*0.35), wb_bot - 80),
-            (int(w*0.5), wb_bot - 140),
-            (int(w*0.68), wb_bot - 110),
-            (int(w*0.82), wb_bot - 220)
-        ]
-        for i in range(len(points) - 1):
-            draw.line([points[i], points[i+1]], fill=(16, 185, 129), width=6)
-            draw.ellipse([points[i][0]-8, points[i][1]-8, points[i][0]+8, points[i][1]+8], fill=(5, 150, 105))
-        draw.ellipse([points[-1][0]-8, points[-1][1]-8, points[-1][0]+8, points[-1][1]+8], fill=(239, 68, 68))
-
-        draw.ellipse([int(w*0.06), int(h*0.04), int(w*0.16), int(h*0.09)], fill=(255, 255, 255), outline=(30, 41, 59), width=4)
-        sec_angle = t_sec * 6.0 * (math.pi / 180.0)
-        cx, cy = int(w * 0.11), int(h * 0.065)
-        draw.line([(cx, cy), (cx + 25 * math.sin(sec_angle), cy - 25 * math.cos(sec_angle))], fill=(239, 68, 68), width=2)
-
-        desk_y = int(h * 0.61)
-        draw.rectangle([int(w*0.1), desk_y + 20, int(w*0.9), floor_y + 10], fill=(168, 85, 247, 50), outline=(120, 113, 108), width=3)
-        draw.rectangle([int(w*0.08), desk_y, int(w*0.92), desk_y + 30], fill=(120, 113, 108))
-
-    @classmethod
-    def _draw_classroom(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
-        floor_y = int(h * 0.68)
-        draw.rectangle([0, 0, w, floor_y], fill=(254, 243, 199))
-        draw.rectangle([0, floor_y, w, h], fill=(217, 119, 6))
-        draw.rectangle([int(w*0.1), int(h*0.1), int(w*0.9), int(h*0.38)], fill=(22, 101, 52), outline=(180, 83, 9), width=8)
-        # Clean geometric chalk diagrams instead of text
-        draw.polygon([(int(w*0.25), int(h*0.32)), (int(w*0.45), int(h*0.32)), (int(w*0.35), int(h*0.16))], outline=(254, 240, 138), width=4)
-        draw.ellipse([int(w*0.6), int(h*0.16), int(w*0.75), int(h*0.32)], outline=(255, 255, 255), width=4)
-
-    @classmethod
-    def _draw_tech_showroom(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
-        draw.rectangle([0, 0, w, h], fill=(15, 23, 42))
-
-        for x_edge in [30, w - 30]:
-            draw.rectangle([x_edge - 6, 80, x_edge + 6, h - 80], fill=(14, 165, 233, 180), outline=(56, 189, 248), width=2)
-            draw.line([(x_edge, 80), (x_edge, h - 80)], fill=(255, 255, 255), width=2)
-
-        ped_x = w // 2
-        stage_cy = 1420
-        stage_rx = int(w * 0.44)
-        stage_ry = 210
-
-        draw.polygon([
-            (int(w * 0.35), 0), (int(w * 0.65), 0),
-            (ped_x + stage_rx, stage_cy), (ped_x - stage_rx, stage_cy)
-        ], fill=(30, 58, 138, 55))
-
-        draw.ellipse([ped_x - stage_rx - 14, stage_cy - stage_ry - 14, ped_x + stage_rx + 14, stage_cy + stage_ry + 14], fill=(14, 165, 233, 130))
-        draw.ellipse([ped_x - stage_rx, stage_cy - stage_ry, ped_x + stage_rx, stage_cy + stage_ry], fill=(240, 249, 255), outline=(56, 189, 248), width=6)
-        draw.ellipse([ped_x - stage_rx + 35, stage_cy - stage_ry + 18, ped_x + stage_rx - 35, stage_cy + stage_ry - 18], outline=(186, 230, 253), width=3)
-
-    @classmethod
-    def _draw_space_station(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
-        draw.rectangle([0, 0, w, h], fill=(3, 7, 18))
-        for i in range(60):
-            sx = (i * 97) % w
-            sy = (i * 131) % 1200
-            sz = 2 if (i + int(t_sec * 3)) % 3 == 0 else 1
-            draw.rectangle([sx, sy, sx+sz, sy+sz], fill=(255, 255, 255))
-        draw.ellipse([700, 150, 1020, 470], fill=(168, 85, 247), outline=(236, 72, 153), width=4)
-        draw.arc([660, 270, 1060, 350], 0, 360, fill=(244, 114, 182), width=6)
-        floor_y = int(h * 0.65)
-        draw.rectangle([0, floor_y, w, h], fill=(226, 232, 240))
-        draw.rectangle([0, floor_y, w, floor_y + 16], fill=(14, 165, 233))
-        draw.rectangle([int(w * 0.1), floor_y + 40, int(w * 0.9), h], fill=(241, 245, 249), outline=(148, 163, 184), width=3)
-        draw.rectangle([0, 0, 80, h], fill=(30, 41, 59))
-        draw.rectangle([w-80, 0, w, h], fill=(30, 41, 59))
-        draw.rectangle([0, 0, w, 80], fill=(30, 41, 59))
-
-    @classmethod
-    def _draw_retail_shop(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
-        draw.rectangle([0, 0, w, 1250], fill=(255, 251, 235))
-        draw.rectangle([0, 1250, w, h], fill=(241, 245, 249))
-        draw.rectangle([80, 300, 1000, 1150], fill=(254, 215, 170), outline=(194, 65, 12), width=4)
-        for y in [550, 850, 1150]:
-            draw.line([(80, y), (1000, y)], fill=(154, 52, 18), width=8)
-            for px in range(120, 960, 90):
-                color = (239, 68, 68) if px % 180 == 0 else (59, 130, 246)
-                draw.rectangle([px, y - 90, px + 65, y - 5], fill=color, outline=(30, 41, 59), width=2)
-        # Clean shopping tag icon instead of English text
-        draw.polygon([(480, 150), (560, 150), (600, 210), (520, 210)], fill=(239, 68, 68), outline=(255, 255, 255), width=3)
-        draw.ellipse([500, 170, 515, 185], fill=(255, 255, 255))
+        # Shady Banyan Tree on left
+        draw.polygon([(-30, h), (110, h), (70, 0), (-30, 0)], fill=(120, 80, 50))
+        draw.ellipse([-50, -40, int(w * 0.5), int(h * 0.35)], fill=(34, 197, 94), outline=(22, 163, 74), width=4)

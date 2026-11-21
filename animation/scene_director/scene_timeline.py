@@ -19,7 +19,9 @@ class AnimationTimelineDirector:
         cls,
         script: StickFigureScript,
         fps: int = 30,
-        scheduled_dialogues: Optional[List[Dict[str, Any]]] = None
+        scheduled_dialogues: Optional[List[Dict[str, Any]]] = None,
+        width: int = 1280,
+        height: int = 720
     ) -> List[Dict[str, Any]]:
         total_frames = int(script.total_duration * fps)
         timeline = []
@@ -66,7 +68,9 @@ class AnimationTimelineDirector:
                 char2_id=c2_id,
                 t_sec=t_sec,
                 dialogues=all_dialogues,
-                scene_action_map=act_map
+                scene_action_map=act_map,
+                width=width,
+                height=height
             )
 
             # Accurate Lip-Sync: Synchronized to exact synthesized audio timestamps

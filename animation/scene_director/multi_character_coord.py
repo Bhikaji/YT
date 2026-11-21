@@ -13,13 +13,23 @@ class MultiCharacterCoordinator:
         char2_id: str,
         t_sec: float,
         dialogues: List[Dict[str, Any]],
-        scene_action_map: Dict[str, str]
+        scene_action_map: Dict[str, str],
+        width: int = 1280,
+        height: int = 720
     ) -> Dict[str, Dict[str, Any]]:
         """
         Determines gaze direction, primary action, and social reaction for both characters.
+        Dynamically adapts positioning for both 16:9 widescreen and 9:16 vertical resolutions.
         """
-        # Default positioning: Char1 on left (x=380), Char2 on right (x=700)
-        c1_x, c2_x = 380.0, 700.0
+        if height <= 800:
+            # Widescreen 16:9 (1280x720)
+            c1_x = float(int(width * 0.36))
+            c2_x = float(int(width * 0.74))
+            root_y = float(int(height * 0.62))
+        else:
+            # Vertical 9:16 (1080x1920)
+            c1_x, c2_x = 380.0, 700.0
+            root_y = 1380.0
 
         # Check who is speaking
         c1_speaking = False
@@ -60,14 +70,14 @@ class MultiCharacterCoordinator:
         return {
             char1_id: {
                 "x": c1_x,
-                "y": 1380.0,
+                "y": root_y,
                 "facing": c1_facing,
                 "action": c1_action,
                 "is_speaking": c1_speaking
             },
             char2_id: {
                 "x": c2_x,
-                "y": 1380.0,
+                "y": root_y,
                 "facing": c2_facing,
                 "action": c2_action,
                 "is_speaking": c2_speaking
