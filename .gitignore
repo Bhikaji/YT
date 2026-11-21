@@ -36,6 +36,9 @@ output/renders/*
 !output/renders/.gitkeep
 output/stick_shorts/*
 !output/stick_shorts/.gitkeep
+output/bus_search/
+output/demo_frames/
+output/voice_benchmark/
 output/*.mp3
 output/*.png
 output/*.wav

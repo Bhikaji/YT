@@ -106,14 +106,15 @@ class RangdiMarathiEngine:
         # -------------------------------------------------------------
         # SCENE 3: 10–15 sec - DEVELOPMENT (Create Intrigue)
         # -------------------------------------------------------------
-        spk_3 = char1_id if is_bus_scene else char2_id
-        spk_3_name = char1_name if is_bus_scene else char2_name
+        # In bus scene, the Purple Hair Friend (stick_prof) in the bus doorway reassures Mother
+        spk_3 = char2_id if is_bus_scene else char1_id
+        spk_3_name = char2_name if is_bus_scene else char1_name
         scenes.append(ScriptScene(
             scene_id=3,
             environment=env,
             start_second=10.0,
             end_second=15.0,
-            description="बब्या आईला समजावतो आणि गंप्यासोबत मजा करायची सांगतो.",
+            description="बसच्या दारात उभा गंप्या काकूंना धीर देतो.",
             camera_movement="STATIC",
             dialogues=[
                 DialogueLine(
@@ -135,7 +136,7 @@ class RangdiMarathiEngine:
                     end_second=15.0
                 )
             ],
-            sound_effects=["ding_lightbulb"]
+            sound_effects=[]
         ))
 
         # -------------------------------------------------------------

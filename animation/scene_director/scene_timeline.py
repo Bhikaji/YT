@@ -111,13 +111,15 @@ class AnimationTimelineDirector:
                 facing_dir=coord[c2_id]["facing"]
             )
 
-            # Active Subtitle: CLEAN SPOKEN TEXT ONLY (Never show speaker prefixes like "(Bob):" or "[Prof]:")
+            # Active Subtitle & Active Speaker
             current_sub = ""
+            active_speaker = ""
             for d in all_dialogues:
                 if d.get("start_second", 0.0) <= t_sec <= d.get("end_second", 0.0):
                     raw_text = d.get("text", "")
                     clean_text = re.sub(r'^\s*[\(\[]?[A-Za-z0-9_\u0900-\u097F\s\.\-]+[\)\]]?\s*:\s*', '', raw_text)
                     current_sub = clean_text.strip()
+                    active_speaker = d.get("speaker_id", "")
                     break
 
             # Sound effects triggered around start of scene
@@ -130,6 +132,7 @@ class AnimationTimelineDirector:
                 "time_sec": t_sec,
                 "environment": active_scene.environment,
                 "camera": {"zoom": zoom, "pan_x": pan_x, "pan_y": pan_y},
+                "active_speaker": active_speaker,
                 "char1": {
                     "id": c1_id,
                     "name": char1_info["name"],

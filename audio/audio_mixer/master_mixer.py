@@ -42,28 +42,18 @@ class MasterAudioMixer:
                 start_ms = max(1, int(start_sec * 1000))
                 inputs.extend(["-i", str(clip_path)])
                 label = f"[diag{clip_idx}]"
-                # Consonant presence EQ (+2.5dB at 2.8kHz) and rumble cut (<80Hz) matching professional cartoon speech
+                # Broadcast vocal clarity chain: subtle 75Hz low-cut and precise adelay
                 filter_complex.append(
-                    f"[{clip_idx}:a]highpass=f=80,equalizer=f=2800:width_type=o:w=1.2:g=2.5,adelay={start_ms}|{start_ms},volume=1.15{label};"
+                    f"[{clip_idx}:a]highpass=f=75,adelay={start_ms}|{start_ms},volume=1.0{label};"
                 )
                 mix_labels.append(label)
                 clip_idx += 1
 
-        # Add key sound effects
-        sfx_dir = output_audio_path.parent / "sfx_stems"
-        for s in sfx_cues[:4]:
-            sfx_name = s.get("name", "pop")
-            sfx_time_ms = max(1, int(s.get("time", 0.0) * 1000))
-            s_file = CartoonSFXManager.generate_sfx(sfx_name, sfx_dir / f"{sfx_name}.mp3")
-            if os.path.exists(s_file):
-                inputs.extend(["-i", str(s_file)])
-                label = f"[sfx{clip_idx}]"
-                filter_complex.append(f"[{clip_idx}:a]adelay={sfx_time_ms}|{sfx_time_ms},volume=0.35{label};")
-                mix_labels.append(label)
-                clip_idx += 1
-
-        # Final amix with normalize=0 to maintain full voice volume
-        filter_complex.append("".join(mix_labels) + f"amix=inputs={len(mix_labels)}:duration=first:dropout_transition=0:normalize=0[outa]")
+        # Final broadcast mastering: clean summing, presence enhancement (+2dB at 3.2kHz), and YouTube Shorts -14 LUFS normalization
+        filter_complex.append(
+            "".join(mix_labels)
+            + f"amix=inputs={len(mix_labels)}:duration=first:dropout_transition=0:normalize=0,highpass=f=75,equalizer=f=3200:width_type=o:w=1:g=2.0,loudnorm=I=-14:LRA=7:TP=-1.0[outa]"
+        )
 
         cmd = [exe, "-y"] + inputs + [
             "-filter_complex", "".join(filter_complex),

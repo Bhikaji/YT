@@ -25,14 +25,14 @@ class RealisticHumanVoiceEngine:
 
     CHARACTER_VOICE_MAP = {
         # Priority 1: Varhadi & Rangdi Marathi - Matching demo.mp4 Character Personalities
-        # Speech rates set to natural conversational velocity [0% to +1%] to ensure 100% word clarity
+        # Bob voiced with natural crisp Maharashtrian young tone, Mother voiced with silky smooth maternal scold, Friend with playful pitch
         "mr_rangdi": {
-            # Bob (बब्या - Whiny energetic comedy boy)
-            "stick_bob": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+2Hz"},
-            # Gampya (गंप्या - Sarcastic, mischievous teen friend)
-            "stick_prof": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "-1%", "base_pitch": "-2Hz"},
-            # Mother (आई - Fast, scolding, crisp Maharashtrian mother in saree)
-            "varhadi_mother": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "+0%", "base_pitch": "+2Hz"},
+            # Bob (बब्या - Energetic comedy cartoon boy, crystal clear natural male enunciation)
+            "stick_bob": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+3Hz"},
+            # Gampya (गंप्या - Sarcastic, mischievous teen friend in bus doorway)
+            "stick_prof": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+1%", "base_pitch": "+8Hz"},
+            # Mother (आई - Smooth, authoritative, crisp Maharashtrian mother in saree)
+            "varhadi_mother": {"voice": "mr-IN-AarohiNeural", "gender": "female", "base_rate": "-2%", "base_pitch": "+4Hz"},
             # Uncle (काका - Mature, dry village elder)
             "varhadi_uncle": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "-2%", "base_pitch": "-4Hz"},
             "stick_sam": {"voice": "mr-IN-ManoharNeural", "gender": "male", "base_rate": "+0%", "base_pitch": "+0Hz"},

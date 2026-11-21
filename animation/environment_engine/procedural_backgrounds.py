@@ -1,3 +1,4 @@
+import os
 from PIL import Image, ImageDraw, ImageFont
 import math
 
@@ -14,22 +15,44 @@ class ProceduralBackgroundRenderer:
 
     @classmethod
     def render_environment(cls, env_type: str, width: int = 1280, height: int = 720, t_sec: float = 0.0) -> Image.Image:
-        img = Image.new("RGBA", (width, height), (248, 250, 252, 255))
-        draw = ImageDraw.Draw(img)
-
         env = env_type.lower()
         if any(k in env for k in ["bus", "msrtc", "lalpari", "station"]):
+            plate_path = "assets/environments/msrtc_bus_plate.png"
+            if os.path.exists(plate_path):
+                plate = Image.open(plate_path).convert("RGBA")
+                if plate.size != (width, height):
+                    plate = plate.resize((width, height), Image.Resampling.LANCZOS)
+                return plate
+            img = Image.new("RGBA", (width, height), (248, 250, 252, 255))
+            draw = ImageDraw.Draw(img)
             cls._draw_msrtc_bus_stand(draw, width, height, t_sec)
+            return img
         elif any(k in env for k in ["terrace", "restaurant", "ferris", "night", "hotel"]):
+            img = Image.new("RGBA", (width, height), (248, 250, 252, 255))
+            draw = ImageDraw.Draw(img)
             cls._draw_night_terrace_ferris_wheel(draw, width, height, t_sec)
+            return img
         elif any(k in env for k in ["college", "school", "corridor", "hallway", "class"]):
+            img = Image.new("RGBA", (width, height), (248, 250, 252, 255))
+            draw = ImageDraw.Draw(img)
             cls._draw_college_corridor(draw, width, height, t_sec)
+            return img
         elif any(k in env for k in ["village", "katta", "chawadi", "rural", "gav", "outdoor"]):
+            img = Image.new("RGBA", (width, height), (248, 250, 252, 255))
+            draw = ImageDraw.Draw(img)
             cls._draw_village_katta(draw, width, height, t_sec)
+            return img
         else:
+            plate_path = "assets/environments/msrtc_bus_plate.png"
+            if os.path.exists(plate_path):
+                plate = Image.open(plate_path).convert("RGBA")
+                if plate.size != (width, height):
+                    plate = plate.resize((width, height), Image.Resampling.LANCZOS)
+                return plate
+            img = Image.new("RGBA", (width, height), (248, 250, 252, 255))
+            draw = ImageDraw.Draw(img)
             cls._draw_msrtc_bus_stand(draw, width, height, t_sec)
-
-        return img
+            return img
 
     @classmethod
     def _draw_msrtc_bus_stand(cls, draw: ImageDraw.ImageDraw, w: int, h: int, t_sec: float):
